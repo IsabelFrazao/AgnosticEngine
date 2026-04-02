@@ -1,6 +1,6 @@
 'use client';
 
-import { format, parseISO } from 'date-fns';
+import { formatUtcLongLocal, parseUtcIso } from '@/src/lib/datetime/utc-display';
 
 type FormattedUtcProps = {
   /** ISO 8601 UTC string from the API or CMS */
@@ -8,13 +8,13 @@ type FormattedUtcProps = {
 };
 
 export function FormattedUtc({ iso }: FormattedUtcProps) {
-  const d = parseISO(iso);
-  if (Number.isNaN(d.getTime())) {
+  const d = parseUtcIso(iso);
+  if (!d) {
     return <span className="text-zinc-500">—</span>;
   }
   return (
     <time dateTime={iso} className="tabular-nums">
-      {format(d, 'PPpp')}
+      {formatUtcLongLocal(d)}
     </time>
   );
 }

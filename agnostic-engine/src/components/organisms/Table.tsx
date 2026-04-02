@@ -1,17 +1,9 @@
 import type { MetadataComponentProps } from '@/src/lib/metadata-types';
+import { parseTableMetadata } from '@/src/lib/metadata/parse-table-metadata';
 
-type TableMetadata = {
-  columns?: string[];
-  rows?: Record<string, unknown>[];
-};
-
-export function Table({
-  metadata,
-  requiredPermissions: _requiredPermissions,
-}: MetadataComponentProps) {
-  const m = (metadata ?? {}) as TableMetadata;
-  const columns = m.columns ?? [];
-  const rows = m.rows ?? [];
+export function Table({ metadata, requiredPermissions }: MetadataComponentProps) {
+  void requiredPermissions;
+  const { columns, rows } = parseTableMetadata(metadata);
 
   return (
     <table className="w-full border-collapse border border-slate-300 text-sm dark:border-slate-600">
@@ -28,8 +20,8 @@ export function Table({
         </tr>
       </thead>
       <tbody>
-        {rows.map((row, i) => (
-          <tr key={i}>
+        {rows.map((row, rowIndex) => (
+          <tr key={rowIndex}>
             {columns.map((c) => (
               <td
                 key={c}

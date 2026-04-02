@@ -4,6 +4,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 @AGENTS.md
 
+## Mandatory engineering standards
+
+Treat the following project rules as **non-optional** for any code or config you add or change (same bar as Cursor’s always-on rules). They apply to components, hooks, `src/lib/` utilities, services, and parsers.
+
+@.cursor/rules/agnostic-standards.mdc
+
+@.cursor/rules/solid-atomic-reuse.mdc
+
+**Other tools:** Cursor reads `.cursor/rules/` automatically. Claude Code reads this file and `@`-referenced files. **v0 MCP and other external agents do not automatically load these files**—paste a short checklist or point them at this section when you use them, then normalize output in-repo with Claude Code or Cursor.
+
 ## Commands
 
 ```bash

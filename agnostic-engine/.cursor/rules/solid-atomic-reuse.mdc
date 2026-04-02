@@ -1,0 +1,44 @@
+---
+description: SOLID, atomic UI layers, no duplicate components—maximize reuse via metadata and composition.
+globs: "**/*.{ts,tsx}"
+alwaysApply: true
+---
+
+# Architecture: SOLID, atomic, reusable
+
+## Where code lives
+
+- **Components** — `src/components/` (atoms → organisms); UI only, no raw `fetch`.
+- **Hooks** — `src/hooks/`; one concern per hook, name `useX`; no JSX inside hooks.
+- **Pure logic** — `src/lib/` (parsers, formatters, small utilities) and `src/lib/metadata/` for schema-to-model parsing.
+- **HTTP** — `src/lib/api.ts` (`apiClient`) only; services that call the API live beside or under `src/lib/` (e.g. `src/lib/services/`) and take `apiClient` or return typed functions for tests.
+- **Seed / demo data** — `src/data/`; keep route files thin importers.
+
+## Atomic layout (this repo)
+
+- **Atoms** (`src/components/atoms/`): small, presentational, no domain assumptions beyond `metadata` + shared types.
+- **Organisms** (`src/components/organisms/`): larger blocks; still driven by schema/metadata, lazy-loaded from `MetadataEngine` when appropriate.
+- **Orchestration**: register types in `COMPONENT_MAP` in `MetadataEngine.tsx`—do not fork parallel render paths for the same UI role.
+
+## SOLID (practical)
+
+- **S** — One clear responsibility per module/component; split when validation, layout, and data fetching would otherwise live in one file.
+- **O** — Extend behavior via props/metadata, composition, or new registered `type`s—not by copying a component and tweaking inline.
+- **L** — Implementations that share a contract (e.g. `MetadataComponentProps`) must honor it; do not narrow or ignore required props.
+- **I** — Keep surface area small: only props the renderer needs; avoid “god” metadata bags without structure.
+- **D** — UI depends on `MetadataSchemaItem` / typed metadata shapes and abstractions (`api` client, hooks), not on one-off page imports inside shared components.
+
+## No duplication
+
+- Before adding a component, search for an existing atom/organism or `COMPONENT_MAP` entry that fits; **extend or compose** instead of duplicating.
+- Shared styling, variants, and validation belong in **one** place (e.g. shared constants, `castToXMetadata`, small helpers)—not copy-pasted across files.
+
+## Generic & reusable
+
+- **No hardcoded page copy or routes** inside atoms/organisms; drive labels and config from `metadata` (and i18n keys when i18n is wired).
+- Prefer **data-in-schema** over **component-per-page**; the homepage should stay a thin schema consumer when demonstrating UI.
+
+## Parsing & validation
+
+- **Strict metadata** for engine-driven components: validate in `src/lib/metadata/*` (throw `TypeError` with clear messages), then render. Avoid silent `?? []` in organisms unless the product contract truly allows empty implicit defaults—document that in the parser.
+- **Datetime**: parse/format in `src/lib/datetime/`; UI components only call those helpers and render markup.

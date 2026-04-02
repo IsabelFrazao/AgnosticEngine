@@ -1,32 +1,6 @@
 import { MetadataEngine } from '@/src/components/MetadataEngine';
 import { FormattedUtc } from '@/src/components/atoms/FormattedUtc';
-import type { MetadataSchemaItem } from '@/src/lib/metadata-types';
-
-const DEMO_UPDATED_AT = '2026-04-01T12:00:00.000Z';
-
-const demoSchema: MetadataSchemaItem[] = [
-  {
-    id: 'demo-button',
-    type: 'button',
-    props: { metadata: { label: 'Metadata-driven action' } },
-    permissions: ['demo:read'],
-  },
-  {
-    id: 'demo-table',
-    type: 'table',
-    props: {
-      metadata: {
-        columns: ['Name', 'Updated (UTC string)'],
-        rows: [
-          {
-            Name: 'Course module',
-            'Updated (UTC string)': DEMO_UPDATED_AT,
-          },
-        ],
-      },
-    },
-  },
-];
+import { DEMO_UPDATED_AT, demoSchema } from '@/src/data/demo-schema';
 
 export default function Home() {
   return (

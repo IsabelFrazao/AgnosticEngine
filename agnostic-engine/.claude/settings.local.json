@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__v0__createChat",
+      "mcp__v0__getChat"
+    ]
+  }
+}

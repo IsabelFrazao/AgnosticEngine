@@ -1,6 +1,7 @@
 ---
 description: Senior standards for Agnostic Metadata CMS (metadata-driven UI, data, security).
 globs: "**/*.{ts,tsx}"
+alwaysApply: true
 ---
 
 # Senior Code Standards
@@ -8,6 +9,6 @@ globs: "**/*.{ts,tsx}"
 - **Forms:** Use React Hook Form + Zod for dynamic validation.
 - **Dates:** Format UTC strings only at the UI layer using `date-fns`.
 - **Querying:** Use TanStack Query for any paginated or lazy-loaded data.
-- **i18n:** Wrap all text in `t()`.~
+- **i18n:** Wrap all text in `t()` when i18n is enabled.
 - **API:** Use the centralized `apiClient` only. No raw `fetch`.
 - **A11y:** 100% ARIA compliance. Semantic HTML only.
