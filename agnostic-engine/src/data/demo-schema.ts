@@ -6,6 +6,11 @@ export { DEMO_UPDATED_AT };
 
 export const demoSchema: MetadataSchemaItem[] = [
   {
+    id: 'demo-theme-switcher',
+    type: 'theme-switcher',
+    props: { metadata: { groupLabel: 'Color theme' } },
+  },
+  {
     id: 'demo-button',
     type: 'button',
     props: { metadata: { labelKey: 'Metadata-driven action', variant: 'primary' } },

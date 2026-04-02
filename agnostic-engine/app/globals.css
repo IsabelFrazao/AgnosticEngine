@@ -1,26 +1,232 @@
 @import "tailwindcss";
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   LAYER 1 — DEFAULT TOKENS (system / light base)
+   All themed CSS variables are declared here. Every [data-theme] block below
+   overrides this complete set — no partial overrides, no inheritance surprises.
+───────────────────────────────────────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Structural */
+  --radius-brand: 0.375rem;
+
+  /* Page surface */
+  --background:           #ffffff;
+  --foreground:           #0f172a;
+  --color-surface:        #ffffff;
+  --color-surface-raised: #f8fafc;
+
+  /* Primary action */
+  --color-primary:            #1d4ed8;
+  --color-primary-foreground: #ffffff;
+  --color-primary-hover:      #1e40af;
+
+  /* Secondary action */
+  --color-secondary:            #e2e8f0;
+  --color-secondary-foreground: #0f172a;
+  --color-secondary-hover:      #cbd5e1;
+
+  /* Muted / subtle */
+  --color-muted:            #f1f5f9;
+  --color-muted-foreground: #475569;
+
+  /* Semantic chrome */
+  --color-foreground: #0f172a;
+  --color-border:     #cbd5e1;
+  --color-ring:       #3b82f6;
+
+  /* Table */
+  --color-table-header: #f1f5f9;
+  --color-table-border: #cbd5e1;
+
+  /* Skeleton loader */
+  --color-skeleton: #e2e8f0;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
+/* ─────────────────────────────────────────────────────────────────────────────
+   LAYER 2 — SYSTEM DARK
+   Only active when no explicit data-theme is set (i.e. theme = "system").
+   :root:not([data-theme]) prevents this from conflicting with explicit themes.
+───────────────────────────────────────────────────────────────────────────── */
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme]) {
+    --background:           #0f172a;
+    --foreground:           #f1f5f9;
+    --color-surface:        #0f172a;
+    --color-surface-raised: #1e293b;
+
+    --color-primary:            #60a5fa;
+    --color-primary-foreground: #0f172a;
+    --color-primary-hover:      #93c5fd;
+
+    --color-secondary:            #1e293b;
+    --color-secondary-foreground: #f1f5f9;
+    --color-secondary-hover:      #334155;
+
+    --color-muted:            #1e293b;
+    --color-muted-foreground: #94a3b8;
+
+    --color-foreground: #f1f5f9;
+    --color-border:     #334155;
+    --color-ring:       #60a5fa;
+
+    --color-table-header: #1e293b;
+    --color-table-border: #334155;
+
+    --color-skeleton: #334155;
   }
 }
 
+/* ─────────────────────────────────────────────────────────────────────────────
+   LAYER 3 — EXPLICIT THEME OVERRIDES
+   Each block is self-contained. Adding a new theme = add one block here.
+───────────────────────────────────────────────────────────────────────────── */
+
+[data-theme="light"] {
+  --background:           #ffffff;
+  --foreground:           #0f172a;
+  --color-surface:        #ffffff;
+  --color-surface-raised: #f8fafc;
+
+  --color-primary:            #1d4ed8;
+  --color-primary-foreground: #ffffff;
+  --color-primary-hover:      #1e40af;
+
+  --color-secondary:            #e2e8f0;
+  --color-secondary-foreground: #0f172a;
+  --color-secondary-hover:      #cbd5e1;
+
+  --color-muted:            #f1f5f9;
+  --color-muted-foreground: #475569;
+
+  --color-foreground: #0f172a;
+  --color-border:     #cbd5e1;
+  --color-ring:       #3b82f6;
+
+  --color-table-header: #f1f5f9;
+  --color-table-border: #cbd5e1;
+
+  --color-skeleton: #e2e8f0;
+}
+
+[data-theme="dark"] {
+  --background:           #0f172a;
+  --foreground:           #f1f5f9;
+  --color-surface:        #0f172a;
+  --color-surface-raised: #1e293b;
+
+  --color-primary:            #60a5fa;
+  --color-primary-foreground: #0f172a;
+  --color-primary-hover:      #93c5fd;
+
+  --color-secondary:            #1e293b;
+  --color-secondary-foreground: #f1f5f9;
+  --color-secondary-hover:      #334155;
+
+  --color-muted:            #1e293b;
+  --color-muted-foreground: #94a3b8;
+
+  --color-foreground: #f1f5f9;
+  --color-border:     #334155;
+  --color-ring:       #60a5fa;
+
+  --color-table-header: #1e293b;
+  --color-table-border: #334155;
+
+  --color-skeleton: #334155;
+}
+
+[data-theme="ocean"] {
+  --background:           #f0fdff;
+  --foreground:           #164e63;
+  --color-surface:        #ffffff;
+  --color-surface-raised: #f0fdff;
+
+  --color-primary:            #0891b2;
+  --color-primary-foreground: #ffffff;
+  --color-primary-hover:      #0e7490;
+
+  --color-secondary:            #cffafe;
+  --color-secondary-foreground: #164e63;
+  --color-secondary-hover:      #a5f3fc;
+
+  --color-muted:            #f0fdff;
+  --color-muted-foreground: #0e7490;
+
+  --color-foreground: #164e63;
+  --color-border:     #a5f3fc;
+  --color-ring:       #0891b2;
+
+  --color-table-header: #cffafe;
+  --color-table-border: #a5f3fc;
+
+  --color-skeleton: #a5f3fc;
+}
+
+[data-theme="forest"] {
+  --background:           #f0fdf4;
+  --foreground:           #14532d;
+  --color-surface:        #ffffff;
+  --color-surface-raised: #f0fdf4;
+
+  --color-primary:            #16a34a;
+  --color-primary-foreground: #ffffff;
+  --color-primary-hover:      #15803d;
+
+  --color-secondary:            #dcfce7;
+  --color-secondary-foreground: #14532d;
+  --color-secondary-hover:      #bbf7d0;
+
+  --color-muted:            #f0fdf4;
+  --color-muted-foreground: #15803d;
+
+  --color-foreground: #14532d;
+  --color-border:     #bbf7d0;
+  --color-ring:       #16a34a;
+
+  --color-table-header: #dcfce7;
+  --color-table-border: #bbf7d0;
+
+  --color-skeleton: #bbf7d0;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   LAYER 4 — TAILWIND v4 THEME TOKENS
+   Maps CSS vars → Tailwind utility classes (bg-primary, text-foreground, etc.)
+   Components may use either utilities or arbitrary values — both read the same vars.
+───────────────────────────────────────────────────────────────────────────── */
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  --color-background:     var(--background);
+  --color-foreground:     var(--foreground);
+  --color-surface:        var(--color-surface);
+  --color-surface-raised: var(--color-surface-raised);
+
+  --color-primary:            var(--color-primary);
+  --color-primary-foreground: var(--color-primary-foreground);
+  --color-primary-hover:      var(--color-primary-hover);
+
+  --color-secondary:            var(--color-secondary);
+  --color-secondary-foreground: var(--color-secondary-foreground);
+  --color-secondary-hover:      var(--color-secondary-hover);
+
+  --color-muted:            var(--color-muted);
+  --color-muted-foreground: var(--color-muted-foreground);
+
+  --color-border:       var(--color-border);
+  --color-ring:         var(--color-ring);
+  --color-table-header: var(--color-table-header);
+  --color-table-border: var(--color-table-border);
+  --color-skeleton:     var(--color-skeleton);
+
+  --radius-brand: var(--radius-brand);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   LAYER 5 — BASE STYLES
+───────────────────────────────────────────────────────────────────────────── */
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
 }
