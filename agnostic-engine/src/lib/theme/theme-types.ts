@@ -8,7 +8,3 @@ export interface Theme {
   Icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 }
 
-export interface ThemeSwitcherMetadata {
-  visibleThemes?: ThemeId[];
-  groupLabel?: string;
-}

@@ -1,30 +1,14 @@
-export type TableMetadata = {
-  columns: string[];
-  rows: Record<string, unknown>[];
-};
+import { z } from 'zod';
 
-function isPlainRecord(value: unknown): value is Record<string, unknown> {
-  return value !== null && typeof value === 'object' && !Array.isArray(value);
-}
+const tableMetadataSchema = z.object({
+  columns: z.array(z.string()).min(1),
+  rows:    z.array(z.record(z.string(), z.unknown())),
+});
 
-export function parseTableMetadata(raw: Record<string, unknown> | undefined): TableMetadata {
-  if (!raw) {
-    throw new TypeError('TableMetadata: metadata prop is required');
-  }
+export type TableMetadata = z.infer<typeof tableMetadataSchema>;
 
-  const { columns, rows } = raw;
+export { tableMetadataSchema };
 
-  if (!Array.isArray(columns) || columns.length === 0 || !columns.every((c) => typeof c === 'string')) {
-    throw new TypeError(
-      `TableMetadata: "columns" must be a non-empty string array, received ${JSON.stringify(columns)}`
-    );
-  }
-
-  if (!Array.isArray(rows) || !rows.every(isPlainRecord)) {
-    throw new TypeError(
-      `TableMetadata: "rows" must be an array of objects, received ${JSON.stringify(rows)}`
-    );
-  }
-
-  return { columns, rows };
+export function parseTableMetadata(raw: unknown): TableMetadata {
+  return tableMetadataSchema.parse(raw);
 }

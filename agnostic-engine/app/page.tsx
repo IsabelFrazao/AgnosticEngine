@@ -1,6 +1,7 @@
 import { MetadataEngine } from '@/src/components/MetadataEngine';
 import { FormattedUtc } from '@/src/components/atoms/FormattedUtc';
-import { DEMO_UPDATED_AT, demoSchema } from '@/src/data/demo-schema';
+import { DEMO_UPDATED_AT } from '@/src/data/demo-schema';
+import { mockSchema } from '@/src/data/mock-schema';
 
 export default function Home() {
   return (
@@ -20,7 +21,7 @@ export default function Home() {
           </p>
         </header>
         <section className="rounded-xl border border-[var(--color-border)] bg-[var(--color-surface)] p-6 shadow-sm">
-          <MetadataEngine schema={demoSchema} />
+          <MetadataEngine schema={mockSchema} />
         </section>
       </main>
     </div>

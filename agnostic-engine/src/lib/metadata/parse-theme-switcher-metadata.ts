@@ -1,35 +1,21 @@
+import { z } from 'zod';
 import { THEME_IDS } from '@/src/lib/theme/themes';
-import type { ThemeId, ThemeSwitcherMetadata } from '@/src/lib/theme/theme-types';
+import type { ThemeId } from '@/src/lib/theme/theme-types';
 
-export type { ThemeSwitcherMetadata };
+const themeIdSchema = z.string().refine(
+  (val): val is ThemeId => THEME_IDS.has(val as ThemeId),
+  { message: `Must be one of: ${[...THEME_IDS].join(', ')}` },
+);
 
-export function parseThemeSwitcherMetadata(
-  raw: Record<string, unknown> | undefined,
-): ThemeSwitcherMetadata {
-  const safeRaw = raw ?? {};
-  const { visibleThemes, groupLabel } = safeRaw;
+const themeSwitcherMetadataSchema = z.object({
+  visibleThemes: z.array(themeIdSchema).min(1).optional(),
+  groupLabel:    z.string().min(1).optional(),
+});
 
-  if (visibleThemes !== undefined) {
-    const isValid =
-      Array.isArray(visibleThemes) &&
-      visibleThemes.length > 0 &&
-      visibleThemes.every((v) => typeof v === 'string' && THEME_IDS.has(v as ThemeId));
+export type ThemeSwitcherMetadata = z.infer<typeof themeSwitcherMetadataSchema>;
 
-    if (!isValid) {
-      throw new TypeError(
-        `ThemeSwitcherMetadata: "visibleThemes" must be a non-empty array of valid ThemeIds, received ${JSON.stringify(visibleThemes)}`,
-      );
-    }
-  }
+export { themeSwitcherMetadataSchema };
 
-  if (groupLabel !== undefined && (typeof groupLabel !== 'string' || groupLabel.trim() === '')) {
-    throw new TypeError(
-      `ThemeSwitcherMetadata: "groupLabel" must be a non-empty string, received ${JSON.stringify(groupLabel)}`,
-    );
-  }
-
-  return {
-    ...(visibleThemes !== undefined && { visibleThemes: visibleThemes as ThemeId[] }),
-    ...(groupLabel !== undefined && { groupLabel }),
-  };
+export function parseThemeSwitcherMetadata(raw: unknown): ThemeSwitcherMetadata {
+  return themeSwitcherMetadataSchema.parse(raw ?? {});
 }

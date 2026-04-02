@@ -34,7 +34,10 @@ export function MetadataEngineItem({ item }: { item: MetadataSchemaItem }) {
   if (!Component) return null;
 
   return (
-    <ErrorBoundary fallback={<div>Error: {item.type}</div>}>
+    <ErrorBoundary
+      fallback={<div>Error: {item.type}</div>}
+      onError={(error) => console.error(`[MetadataEngine] "${item.type}" failed to render:`, error)}
+    >
       <Suspense fallback={<Skeleton className="h-10 w-full" />}>
         <Component {...buildItemProps(item)} />
       </Suspense>

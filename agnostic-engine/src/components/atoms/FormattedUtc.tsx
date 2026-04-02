@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { formatUtcLongLocal, parseUtcIso } from '@/src/lib/datetime/utc-display';
 
 type FormattedUtcProps = {
@@ -8,13 +9,17 @@ type FormattedUtcProps = {
 };
 
 export function FormattedUtc({ iso }: FormattedUtcProps) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const d = parseUtcIso(iso);
   if (!d) {
-    return <span className="text-zinc-500">—</span>;
+    return <span className="text-[var(--color-muted-foreground)]">—</span>;
   }
+
   return (
     <time dateTime={iso} className="tabular-nums">
-      {formatUtcLongLocal(d)}
+      {mounted ? formatUtcLongLocal(d) : iso}
     </time>
   );
 }
