@@ -15,7 +15,7 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 // ── Storage ───────────────────────────────────────────────────────────────────
 
-const STORAGE_KEY = 'agnostic-theme';
+export const STORAGE_KEY = 'agnostic-theme';
 
 function readStoredTheme(): ThemeId {
   if (typeof window === 'undefined') return DEFAULT_THEME_ID;

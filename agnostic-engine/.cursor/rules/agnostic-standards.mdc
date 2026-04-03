@@ -12,3 +12,4 @@ alwaysApply: true
 - **i18n:** Wrap all text in `t()` when i18n is enabled.
 - **API:** Use the centralized `apiClient` only. No raw `fetch`.
 - **A11y:** 100% ARIA compliance. Semantic HTML only.
+- **Packages:** Always prioritize 'Vanilla' logic over adding new npm packages. If a package is needed, verify its 2026 security standing.

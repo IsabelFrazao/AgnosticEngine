@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useClientReady } from '@/src/hooks/useClientReady';
 import { useTheme } from '@/src/hooks/useTheme';
 import { parseThemeSwitcherMetadata } from '@/src/lib/metadata/parse-theme-switcher-metadata';
 import type { MetadataComponentProps } from '@/src/lib/metadata-types';
@@ -49,10 +49,9 @@ export function ThemeSwitcher({ metadata, requiredPermissions }: MetadataCompone
 
   // Defer rendering until after hydration so that aria-pressed reflects the
   // client-side stored theme, not the server-rendered default ('system').
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const clientReady = useClientReady();
 
-  if (!mounted) return <ThemeSwitcherSkeleton groupLabel={groupLabel} />;
+  if (!clientReady) return <ThemeSwitcherSkeleton groupLabel={groupLabel} />;
 
   const displayThemes = visibleThemes
     ? THEMES.filter((t) => visibleThemes.includes(t.id))

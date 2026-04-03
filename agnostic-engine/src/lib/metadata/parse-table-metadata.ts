@@ -1,9 +1,5 @@
-import { z } from 'zod';
-
-const tableMetadataSchema = z.object({
-  columns: z.array(z.string()).min(1),
-  rows:    z.array(z.record(z.string(), z.unknown())),
-});
+import type { z } from 'zod';
+import { tableMetadataSchema } from '@/src/schemas/atoms/table.schema';
 
 export type TableMetadata = z.infer<typeof tableMetadataSchema>;
 

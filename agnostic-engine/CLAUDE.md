@@ -12,6 +12,10 @@ Treat the following project rules as **non-optional** for any code or config you
 
 @.cursor/rules/solid-atomic-reuse.mdc
 
+@.cursor/rules/security.mdc
+
+@.cursor/prompts/review-logic.md
+
 **Other tools:** Cursor reads `.cursor/rules/` automatically. Claude Code reads this file and `@`-referenced files. **v0 MCP and other external agents do not automatically load these files**—paste a short checklist or point them at this section when you use them, then normalize output in-repo with Claude Code or Cursor.
 
 ## Commands
@@ -61,3 +65,24 @@ Schema (JSON)
 ### Stack
 
 Next.js 16.2.2 · React 19 · TypeScript · Tailwind CSS v4 · TanStack Query v5 · Axios · Zod v4 · date-fns v4 · react-error-boundary
+
+## Security Protocol
+
+No component may render raw metadata without passing through the two-stage zero-trust gate in `MetadataEngineItem`.
+
+### Stage 1 — Schema Validation (Zod)
+`MetadataNodeSchema.safeParse()` validates every item's `id`, `type` (discriminated union), `props`, `permissions`, and recursive `children` before any component receives data. Failures log via `src/lib/logger.ts` and render `<DegradedStateUI>`.
+
+### Stage 2 — Content Sanitization
+`MetadataEngineItem` imports `sanitizeMetadata` from `src/utils/sanitize.ts` (implemented in `src/utils/security.ts`), which recursively strips HTML from string values except bare `<b>`, `<i>`, `<strong>` (attributes removed even on allowed tags). SSR-safe — no DOM dependency.
+
+### ActionRegistry
+All button `actionId` values must be pre-registered in `src/registry/ActionRegistry.ts` before they can execute. An unregistered `actionId` degrades the button to disabled and logs a warning. Never pass callbacks through metadata.
+
+### Logger
+`src/lib/logger.ts` exports a `logger` singleton (currently `console`-backed). All security events use this interface. To integrate Sentry: replace the `consoleLogger` implementation — no call sites change.
+
+### Adding a New Component Type
+1. Add the type key to `COMPONENT_TYPES` in `src/schemas/root.schema.ts` and an atom base schema under `src/schemas/atoms/`
+2. Add it to `COMPONENT_MAP` in `src/components/MetadataEngineItem.tsx`
+3. Add `src/schemas/atoms/{type}.schema.ts` (node base + inner metadata Zod) and `src/lib/metadata/parse-{type}-metadata.ts` that imports the shared schema from atoms

@@ -3,6 +3,8 @@ import {
   parseButtonMetadata,
   type ButtonMetadata,
 } from '@/src/lib/metadata/parse-button-metadata';
+import { ActionRegistry } from '@/src/registry/ActionRegistry';
+import { logger } from '@/src/lib/logger';
 
 export type { ButtonMetadata };
 
@@ -32,7 +34,20 @@ export const ButtonSkeleton = () => (
 
 export function Button({ metadata, requiredPermissions }: MetadataComponentProps) {
   void requiredPermissions;
-  const { labelKey, variant, isDisabled = false } = parseButtonMetadata(metadata);
+  const { labelKey, variant, isDisabled: metaDisabled = false, actionId } = parseButtonMetadata(metadata);
+
+  let onClick: (() => void) | undefined;
+  let isDisabled = metaDisabled;
+
+  if (actionId !== undefined) {
+    const handler = ActionRegistry.resolve(actionId);
+    if (handler) {
+      onClick = handler;
+    } else {
+      isDisabled = true;
+      logger.warn(`Button "${labelKey}": actionId "${actionId}" is not registered.`);
+    }
+  }
 
   return (
     <button
@@ -41,6 +56,7 @@ export function Button({ metadata, requiredPermissions }: MetadataComponentProps
       disabled={isDisabled}
       aria-disabled={isDisabled}
       aria-label={labelKey}
+      onClick={onClick}
     >
       {labelKey}
     </button>

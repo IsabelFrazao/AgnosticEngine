@@ -1,5 +1,24 @@
 [
   {
+    "id": "nested-actions-group",
+    "type": "table",
+    "props": {
+      "metadata": {
+        "columns": ["Section"],
+        "rows": [{ "Section": "Nested children (recursive tree demo)" }]
+      }
+    },
+    "children": [
+      {
+        "id": "nested-child-button",
+        "type": "button",
+        "props": {
+          "metadata": { "labelKey": "Child of table node", "variant": "secondary" }
+        }
+      }
+    ]
+  },
+  {
     "id": "page-theme-switcher",
     "type": "theme-switcher",
     "props": {

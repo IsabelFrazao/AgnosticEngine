@@ -1,0 +1,6 @@
+# Metadata tree (recursive engine)
+
+- **Root schema:** `src/schemas/root.schema.ts` defines `MetadataNodeSchema` (discriminated union on `type` + `children` via `z.lazy`).
+- **Atom branches:** Per-component node bases live in `src/schemas/atoms/*.schema.ts`; extend the union in `root.schema.ts` when adding a type.
+- **Pipeline:** For each node — `MetadataNodeSchema.safeParse` → `sanitizeMetadata` on `props` → render `COMPONENT_MAP[type]` → recurse into `children`. Log validation failures with `logger` only.
+- **Actions:** Button behavior uses `ActionRegistry` only; never wire handlers through schema JSON.

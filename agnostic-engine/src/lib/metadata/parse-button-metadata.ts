@@ -1,10 +1,5 @@
-import { z } from 'zod';
-
-const buttonMetadataSchema = z.object({
-  labelKey:   z.string().min(1),
-  variant:    z.enum(['primary', 'secondary', 'outline']),
-  isDisabled: z.boolean().optional(),
-});
+import type { z } from 'zod';
+import { buttonMetadataSchema } from '@/src/schemas/atoms/button.schema';
 
 export type ButtonMetadata = z.infer<typeof buttonMetadataSchema>;
 

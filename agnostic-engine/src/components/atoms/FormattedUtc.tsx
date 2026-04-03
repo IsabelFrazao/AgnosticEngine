@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useClientReady } from '@/src/hooks/useClientReady';
 import { formatUtcLongLocal, parseUtcIso } from '@/src/lib/datetime/utc-display';
 
 type FormattedUtcProps = {
@@ -9,8 +9,7 @@ type FormattedUtcProps = {
 };
 
 export function FormattedUtc({ iso }: FormattedUtcProps) {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  const clientReady = useClientReady();
 
   const d = parseUtcIso(iso);
   if (!d) {
@@ -19,7 +18,7 @@ export function FormattedUtc({ iso }: FormattedUtcProps) {
 
   return (
     <time dateTime={iso} className="tabular-nums">
-      {mounted ? formatUtcLongLocal(d) : iso}
+      {clientReady ? formatUtcLongLocal(d) : iso}
     </time>
   );
 }
