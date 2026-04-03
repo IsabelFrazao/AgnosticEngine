@@ -3,7 +3,7 @@ import {
   parseButtonMetadata,
   type ButtonMetadata,
 } from '@/src/lib/metadata/parse-button-metadata';
-import { ActionRegistry } from '@/src/registry/ActionRegistry';
+import { ActionRegistry } from '@/src/registry/action-registry';
 import { logger } from '@/src/lib/logger';
 
 export type { ButtonMetadata };

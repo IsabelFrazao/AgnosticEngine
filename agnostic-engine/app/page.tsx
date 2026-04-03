@@ -1,4 +1,4 @@
-import { MetadataEngine } from '@/src/components/MetadataEngine';
+import { MetadataEngine } from '@/src/engines/MetadataEngine';
 import { FormattedUtc } from '@/src/components/atoms/FormattedUtc';
 import { DEMO_UPDATED_AT } from '@/src/data/demo-schema';
 import { mockSchema } from '@/src/data/mock-schema';

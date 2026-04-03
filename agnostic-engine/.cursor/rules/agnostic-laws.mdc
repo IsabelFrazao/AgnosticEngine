@@ -1,0 +1,89 @@
+---
+description: Non-negotiable Agnostic Laws (discovery, purity, validation, folder layout).
+globs: "**/*"
+alwaysApply: true
+---
+
+# AgnosticEngine — Agnostic Laws
+
+These laws are non-negotiable for every file in this repository.
+
+---
+
+## Law of Discovery
+
+Whenever a new Atom is created, ALL FOUR steps are mandatory — no exceptions:
+
+1. Create `src/schemas/atoms/{type}.schema.ts` with:
+   - A `{type}MetadataSchema` (Zod, inner props)
+   - A `{type}AtomNodeBaseSchema` (Zod, full node: id + type literal + props + permissions)
+
+2. Register in `src/schemas/atoms/index.ts`:
+   - Import `{type}AtomNodeBaseSchema`
+   - Add `{type}: {type}AtomNodeBaseSchema` to `ATOM_SCHEMAS`
+
+3. Register in `src/registry/component-registry.ts`:
+   - Import the React component
+   - Add `{type}: ComponentName` to `COMPONENT_MAP`
+
+4. Create `src/lib/metadata/parse-{type}-metadata.ts`:
+   - Import `{type}MetadataSchema` from `src/schemas/atoms/{type}.schema.ts`
+   - Export the inferred `{type}Metadata` type via `z.infer`
+   - Export a `parse{Type}Metadata(raw: unknown): {Type}Metadata` function
+   - The component imports this parser and calls it on its `metadata` prop
+
+`root.schema.ts` and `MetadataEngine` rebuild automatically. No other file changes required.
+
+---
+
+## Law of Purity
+
+Components are Logic-Blind. They render; they do not act.
+
+- Components MUST NOT import action functions directly.
+- All interactive events MUST dispatch an `actionId` string to `ActionRegistry`
+  (`src/registry/action-registry.ts`). The registry resolves the handler.
+- No `eval()`, `new Function()`, or dynamic JS execution via metadata — ever.
+- No hardcoded business logic, labels, or conditions inside components.
+  These belong in the JSON schema or the ActionRegistry.
+
+---
+
+## Law of Validation
+
+No metadata reaches a component's render phase without passing through the full pipeline:
+
+  Raw JSON
+    → `MetadataNodeSchema.safeParse()`    (`src/schemas/root.schema.ts`)
+    → `sanitizeMetadata()`                (`src/utils/sanitize.ts`)
+    → Component render
+
+On any failure:
+    → `logger.error()`                    (`src/lib/logger.ts`)
+    → `<DegradedStateUI>`                 (`src/components/atoms/DegradedStateUI.tsx`)
+
+- NEVER use `dangerouslySetInnerHTML`.
+- NEVER bypass the pipeline with direct prop spreading of raw metadata.
+- NEVER silence errors with try/catch without calling `logger.error()`.
+
+---
+
+## Folder Contract
+
+```
+src/
+  engines/          — MetadataEngine + MetadataEngineItem (lookup & render only)
+  registry/         — action-registry.ts, component-registry.ts (whitelists)
+  schemas/
+    atoms/          — one schema file per atom + index.ts (ATOM_SCHEMAS)
+    root.schema.ts  — dynamic union; never import atoms directly here
+  components/
+    atoms/          — presentational, metadata-driven, zero side effects
+    organisms/      — larger blocks, lazy-loaded
+  lib/
+    metadata/       — parse-{type}-metadata.ts helpers
+    logger.ts       — all error/warn reporting
+  utils/
+    sanitize.ts     — public entry for sanitizeMetadata
+    security.ts     — sanitization implementation
+```

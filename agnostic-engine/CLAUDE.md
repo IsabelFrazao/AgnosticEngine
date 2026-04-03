@@ -35,22 +35,30 @@ This is a **metadata-driven rendering engine** built on Next.js 16 (App Router) 
 
 ### Core Pattern
 
-UI is defined as a schema (array of `MetadataSchemaItem`) and rendered by `MetadataEngine`, which maps `type` → component from `COMPONENT_MAP`. Components never hardcode their data — they always receive a `metadata` prop. Adding a new component means: create the component, add it to `COMPONENT_MAP` in `MetadataEngine.tsx`.
+UI is defined as a schema (array of `MetadataSchemaItem`) and rendered by `MetadataEngine`. The schema and component registries are the two canonical sources of truth — adding a new atom means registering in both. See **Agnostic Laws** below.
 
 ```
 Schema (JSON)
-  └─ MetadataEngine          # src/components/MetadataEngine.tsx
-       ├─ ErrorBoundary       # wraps each item
-       ├─ Suspense            # fallback: <Skeleton>
-       └─ COMPONENT_MAP[type] # button → Button, table → Table (lazy)
+  └─ MetadataEngine              # src/engines/MetadataEngine.tsx
+       └─ MetadataEngineItem     # src/engines/MetadataEngineItem.tsx
+            ├─ MetadataNodeSchema.safeParse()   # src/schemas/root.schema.ts
+            ├─ sanitizeMetadata()               # src/utils/sanitize.ts
+            ├─ COMPONENT_MAP[type]              # src/registry/component-registry.ts
+            ├─ ErrorBoundary + Suspense
+            └─ <DegradedStateUI> on failure
 ```
 
 ### Key Files
 
 - `src/lib/metadata-types.ts` — `MetadataSchemaItem` and `MetadataComponentProps` types
-- `src/components/MetadataEngine.tsx` — orchestrator; register new components here
-- `src/components/atoms/` — Skeleton, Button, FormattedUtc (primitive components)
-- `src/components/organisms/` — Table (lazy-loaded via `lazy()`)
+- `src/schemas/atoms/index.ts` — **ATOM_SCHEMAS**: single source of truth for all atom schemas
+- `src/schemas/root.schema.ts` — recursive discriminated union (auto-built from ATOM_SCHEMAS)
+- `src/registry/component-registry.ts` — **COMPONENT_MAP**: type string → React component
+- `src/registry/action-registry.ts` — action whitelist for button events (`ActionRegistry`)
+- `src/engines/MetadataEngine.tsx` — top-level renderer (iterate only)
+- `src/engines/MetadataEngineItem.tsx` — validate → sanitize → lookup → render
+- `src/components/atoms/` — Skeleton, Button, DegradedStateUI, FormattedUtc, ThemeSwitcher
+- `src/components/organisms/` — Table (lazy-loaded)
 - `src/lib/api.ts` — Axios instance with interceptors; import this for all API calls
 - `src/env.ts` — Zod-validated environment variables; use `env.NEXT_PUBLIC_API_URL` instead of `process.env` directly
 
@@ -59,30 +67,44 @@ Schema (JSON)
 - **All components** accept `metadata: Record<string, unknown>` and `requiredPermissions?: string[]` (RBAC slot — not yet enforced, but the prop must be threaded through)
 - **Dates**: API always returns UTC ISO strings; format for display using `FormattedUtc` or `date-fns`
 - **Environment**: New env vars must be added to `src/env.ts` Zod schema and `.env.example`
-- **Lazy loading**: Organisms should be imported with `lazy()` in MetadataEngine; atoms can be static imports
+- **Lazy loading**: Organisms use `dynamic()` in `component-registry.ts`; atoms are static imports
 - **Path alias**: `@/` resolves to the repo root (e.g., `@/src/components/...`)
 
 ### Stack
 
 Next.js 16.2.2 · React 19 · TypeScript · Tailwind CSS v4 · TanStack Query v5 · Axios · Zod v4 · date-fns v4 · react-error-boundary
 
+## Agnostic Laws
+
+These are non-negotiable. Also enforced via `.cursor/rules/agnostic-laws.mdc` (and the rest of `.cursor/rules/`).
+
+### Law of Discovery
+Whenever a new Atom is created, **all four steps are mandatory**:
+1. Create `src/schemas/atoms/{type}.schema.ts` — `{type}MetadataSchema` (inner props) + `{type}AtomNodeBaseSchema` (full node)
+2. Register in `src/schemas/atoms/index.ts` → `ATOM_SCHEMAS`
+3. Register in `src/registry/component-registry.ts` → `COMPONENT_MAP`
+4. Create `src/lib/metadata/parse-{type}-metadata.ts` — exports `{Type}Metadata` type and `parse{Type}Metadata(raw)` function
+
+`root.schema.ts` and `MetadataEngine` rebuild automatically. No other file changes.
+
+### Law of Purity
+Components are Logic-Blind. All interactive events dispatch an `actionId` string to `ActionRegistry`. No direct function imports. No `eval()` or `new Function()` in metadata.
+
+### Law of Validation
+No metadata reaches a component without passing through:
+`MetadataNodeSchema.safeParse()` → `sanitizeMetadata()` → render  
+On failure: `logger.error()` + `<DegradedStateUI>`. No white screens. No silent catches.
+
 ## Security Protocol
 
-No component may render raw metadata without passing through the two-stage zero-trust gate in `MetadataEngineItem`.
+### Schema Validation (Zod)
+`MetadataNodeSchema.safeParse()` in `MetadataEngineItem` validates every item against the discriminated union of all registered atom schemas. Unknown `type` values never reach a component.
 
-### Stage 1 — Schema Validation (Zod)
-`MetadataNodeSchema.safeParse()` validates every item's `id`, `type` (discriminated union), `props`, `permissions`, and recursive `children` before any component receives data. Failures log via `src/lib/logger.ts` and render `<DegradedStateUI>`.
-
-### Stage 2 — Content Sanitization
-`MetadataEngineItem` imports `sanitizeMetadata` from `src/utils/sanitize.ts` (implemented in `src/utils/security.ts`), which recursively strips HTML from string values except bare `<b>`, `<i>`, `<strong>` (attributes removed even on allowed tags). SSR-safe — no DOM dependency.
+### Content Sanitization
+`sanitizeMetadata()` (`src/utils/sanitize.ts`) recursively strips all HTML from string values except bare `<b>`, `<i>`, `<strong>` — attributes removed even on allowed tags. SSR-safe, no DOM dependency.
 
 ### ActionRegistry
-All button `actionId` values must be pre-registered in `src/registry/ActionRegistry.ts` before they can execute. An unregistered `actionId` degrades the button to disabled and logs a warning. Never pass callbacks through metadata.
+Button `actionId` values must be pre-registered in `src/registry/action-registry.ts`. An unregistered `actionId` degrades the button to disabled and logs a warning.
 
 ### Logger
-`src/lib/logger.ts` exports a `logger` singleton (currently `console`-backed). All security events use this interface. To integrate Sentry: replace the `consoleLogger` implementation — no call sites change.
-
-### Adding a New Component Type
-1. Add the type key to `COMPONENT_TYPES` in `src/schemas/root.schema.ts` and an atom base schema under `src/schemas/atoms/`
-2. Add it to `COMPONENT_MAP` in `src/components/MetadataEngineItem.tsx`
-3. Add `src/schemas/atoms/{type}.schema.ts` (node base + inner metadata Zod) and `src/lib/metadata/parse-{type}-metadata.ts` that imports the shared schema from atoms
+`src/lib/logger.ts` exports a `logger` singleton (console-backed). To integrate Sentry: replace the `consoleLogger` implementation — no call sites change.

@@ -1,29 +1,19 @@
 'use client';
 
 import React, { Suspense } from 'react';
-import dynamic from 'next/dynamic';
 import { ErrorBoundary } from 'react-error-boundary';
-import { Button } from '@/src/components/atoms/Button';
-import { Skeleton } from '@/src/components/atoms/Skeleton';
-import { ThemeSwitcher } from '@/src/components/atoms/ThemeSwitcher';
 import { DegradedStateUI } from '@/src/components/atoms/DegradedStateUI';
+import { Skeleton } from '@/src/components/atoms/Skeleton';
+import { COMPONENT_MAP } from '@/src/registry/component-registry';
 import { MetadataNodeSchema } from '@/src/schemas/root.schema';
 import { sanitizeMetadata } from '@/src/utils/sanitize';
 import { logger } from '@/src/lib/logger';
 import type { MetadataComponentProps, MetadataSchemaItem } from '@/src/lib/metadata-types';
 
-const Table = dynamic(() =>
-  import('@/src/components/organisms/Table').then((m) => ({ default: m.Table })),
-);
-
-type EngineComponent = React.ComponentType<MetadataComponentProps>;
-
-const COMPONENT_MAP: Record<string, EngineComponent> = {
-  button:          Button,
-  table:           Table,
-  'theme-switcher': ThemeSwitcher,
-};
-
+/**
+ * Extracts the two known MetadataComponentProps keys from a validated node.
+ * Spreading the full node would silently forward unknown fields into components.
+ */
 function buildItemProps(item: {
   props?: Record<string, unknown>;
   permissions?: string[] | undefined;
@@ -31,14 +21,24 @@ function buildItemProps(item: {
   const rawMeta = item.props?.metadata;
   return {
     metadata:
-      rawMeta !== undefined && typeof rawMeta === 'object' && rawMeta !== null && !Array.isArray(rawMeta)
+      rawMeta !== undefined &&
+      typeof rawMeta === 'object' &&
+      rawMeta !== null &&
+      !Array.isArray(rawMeta)
         ? (rawMeta as Record<string, unknown>)
         : undefined,
     requiredPermissions: item.permissions,
   };
 }
 
+/**
+ * Validates → sanitizes → renders one metadata node.
+ * Handles child recursion; renders DegradedStateUI on any failure.
+ *
+ * Law of Validation: raw metadata never bypasses this pipeline.
+ */
 export function MetadataEngineItem({ item }: { item: MetadataSchemaItem }) {
+  // Stage 1: Schema validation
   const parsed = MetadataNodeSchema.safeParse(item);
 
   if (!parsed.success) {
@@ -56,19 +56,19 @@ export function MetadataEngineItem({ item }: { item: MetadataSchemaItem }) {
   }
 
   const node = parsed.data;
+
+  // Stage 2: Content sanitization (structural fields are not user content)
   const sanitizedProps = node.props
     ? (sanitizeMetadata(node.props) as Record<string, unknown>)
     : undefined;
 
-  const Component = COMPONENT_MAP[node.type];
+  // Registry lookup — guaranteed by Record<ComponentType, ...> but cast defensively
+  // in case schema and registry drift at runtime.
+  const Component = COMPONENT_MAP[node.type] as (typeof COMPONENT_MAP)[typeof node.type] | undefined;
   if (!Component) {
-    logger.error(`No engine component registered for type "${node.type}"`, { id: node.id });
-    return (
-      <DegradedStateUI itemId={node.id} itemType={node.type} reason="unknown-type" />
-    );
+    logger.error(`No component registered for type "${node.type}"`, { id: node.id });
+    return <DegradedStateUI itemId={node.id} itemType={node.type} reason="unknown-type" />;
   }
-
-  const childItems = node.children;
 
   return (
     <ErrorBoundary
@@ -80,9 +80,9 @@ export function MetadataEngineItem({ item }: { item: MetadataSchemaItem }) {
       <Suspense fallback={<Skeleton className="h-10 w-full" />}>
         <div className="flex flex-col gap-4">
           <Component {...buildItemProps({ ...node, props: sanitizedProps })} />
-          {childItems?.length ? (
+          {node.children?.length ? (
             <div className="flex flex-col gap-4">
-              {childItems.map((child) => (
+              {node.children.map((child) => (
                 <MetadataEngineItem key={child.id} item={child} />
               ))}
             </div>

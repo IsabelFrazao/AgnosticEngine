@@ -1,10 +1,10 @@
 import type { MetadataSchemaItem } from '@/src/lib/metadata-types';
-import { MetadataEngineItem } from '@/src/components/MetadataEngineItem';
+import { MetadataEngineItem } from '@/src/engines/MetadataEngineItem';
 
 /**
- * Renders top-level metadata roots. Each node (including nested `children`) is validated
- * with `MetadataNodeSchema` in `MetadataEngineItem`, then sanitized and rendered — see
- * `src/schemas/root.schema.ts`.
+ * Top-level renderer. Responsibility: iterate a schema array and delegate
+ * each node to MetadataEngineItem. Knows nothing about types, components,
+ * validation, or rendering logic — that belongs in the engine item and registries.
  */
 export function MetadataEngine({ schema }: { schema: MetadataSchemaItem[] }) {
   return (

@@ -18,7 +18,7 @@ alwaysApply: true
 
 - **Atoms** (`src/components/atoms/`): small, presentational, no domain assumptions beyond `metadata` + shared types.
 - **Organisms** (`src/components/organisms/`): larger blocks; still driven by schema/metadata, lazy-loaded from `MetadataEngine` when appropriate.
-- **Orchestration**: register types in `COMPONENT_MAP` in `MetadataEngine.tsx`—do not fork parallel render paths for the same UI role.
+- **Orchestration**: register types in `COMPONENT_MAP` in `src/registry/component-registry.ts` (used by `MetadataEngineItem`)—do not fork parallel render paths for the same UI role.
 
 ## SOLID (practical)
 
