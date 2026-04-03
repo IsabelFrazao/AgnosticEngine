@@ -1,0 +1,51 @@
+---
+description: Keep docs/ up to date whenever structural changes are made to the project.
+globs: "**/*"
+alwaysApply: true
+---
+
+# Documentation Maintenance
+
+The `docs/` folder is the canonical human-readable reference for this project. It must stay accurate.
+
+## When to update docs
+
+After making any of the following changes, update the relevant `docs/` file **in the same task**. Do not leave docs stale.
+
+| Change made | File(s) to update |
+|-------------|-------------------|
+| New atom or organism created | `docs/04-components.md` (add component), `docs/08-project-structure.md` (add to file tree) |
+| Component modified (new props, removed fields, behavior change) | `docs/04-components.md` (update schema table + notes) |
+| New package added or removed | `docs/08-project-structure.md` (stack versions table), `docs/02-getting-started.md` if it affects setup |
+| Engine pipeline changed | `docs/03-how-it-works.md` |
+| New schema field or validation rule | `docs/03-how-it-works.md`, `docs/04-components.md` for the affected component |
+| New theme added or theme system changed | `docs/06-theming.md` |
+| Security model changed (sanitizer, registry, Zod schemas) | `docs/07-security.md` |
+| New environment variable | `docs/02-getting-started.md` (env vars table) |
+| New Cursor rule added | `docs/08-project-structure.md` (.cursor/ section) |
+| New folder or significant file added | `docs/08-project-structure.md` |
+| A TODO item is resolved | `docs/TODOS.md` (remove or mark resolved) |
+| A new known gap or incomplete feature is identified | `docs/TODOS.md` (add it, with severity) |
+
+## What "updating" means
+
+- Keep descriptions accurate — if behavior changed, update the description
+- Keep schema tables accurate — if a field was added/removed/renamed, update the table
+- Keep the file tree in `docs/08-project-structure.md` current
+- Remove entries for things that no longer exist
+- Do NOT add speculative content about future features — document what exists today
+
+## What counts as "relevant enough to document"
+
+Document changes that affect:
+- How to run or set up the project
+- How the engine renders components
+- What components exist and what JSON they accept
+- How security works
+- How themes work
+- What a developer needs to know to add something new
+
+Do NOT document:
+- Internal refactors with no visible behavior change
+- Renaming a variable inside a function
+- Formatting fixes

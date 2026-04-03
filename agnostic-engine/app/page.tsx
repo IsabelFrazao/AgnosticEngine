@@ -1,7 +1,6 @@
 import { MetadataEngine } from '@/src/engines/MetadataEngine';
 import { FormattedUtc } from '@/src/components/atoms/FormattedUtc';
-import { DEMO_UPDATED_AT } from '@/src/data/demo-schema';
-import { mockSchema } from '@/src/data/mock-schema';
+import { DEMO_UPDATED_AT, mockSchema } from '@/src/data/mock-schema';
 
 export default function Home() {
   return (

@@ -108,3 +108,32 @@ Button `actionId` values must be pre-registered in `src/registry/action-registry
 
 ### Logger
 `src/lib/logger.ts` exports a `logger` singleton (console-backed). To integrate Sentry: replace the `consoleLogger` implementation — no call sites change.
+
+## Documentation Maintenance
+
+The `docs/` folder is the canonical reference for this project. **Any task that makes a structural change must update the relevant `docs/` file in the same task.** Do not leave documentation stale.
+
+### When to update docs
+
+| Change | File to update |
+|--------|---------------|
+| New atom or organism created | `docs/04-components.md`, `docs/08-project-structure.md` |
+| Component modified (props, behavior) | `docs/04-components.md` |
+| New package installed or removed | `docs/08-project-structure.md` (stack table), `docs/02-getting-started.md` if it affects setup |
+| Engine pipeline changed | `docs/03-how-it-works.md` |
+| New or changed schema field | `docs/03-how-it-works.md`, `docs/04-components.md` |
+| New theme or theme system change | `docs/06-theming.md` |
+| Security model changed | `docs/07-security.md` |
+| New environment variable | `docs/02-getting-started.md` |
+| New Cursor rule or CLAUDE.md section | `docs/08-project-structure.md` |
+| New folder or significant file added | `docs/08-project-structure.md` |
+| A TODO resolved | `docs/TODOS.md` (remove or mark resolved) |
+| New gap or incomplete feature identified | `docs/TODOS.md` (add with severity) |
+
+### What "update" means
+- Keep descriptions accurate — if behavior changed, rewrite the description
+- Keep schema/props tables in sync with actual code
+- Remove entries for things that no longer exist
+- Do not add speculative future content — document what exists today
+
+The full docs are in `docs/`. The rule is also enforced in `.cursor/rules/docs-maintenance.mdc`.
