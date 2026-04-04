@@ -1,6 +1,6 @@
 'use client';
 
-import React, { Suspense } from 'react';
+import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { DegradedStateUI } from '@/src/components/atoms/DegradedStateUI';
 import { Skeleton } from '@/src/components/atoms/Skeleton';
@@ -73,7 +73,7 @@ export function MetadataEngineItem({ item }: { item: MetadataSchemaItem }) {
   return (
     <ErrorBoundary
       fallback={
-        <DegradedStateUI itemId={node.id} itemType={node.type} reason="invalid-schema" />
+        <DegradedStateUI itemId={node.id} itemType={node.type} reason="render-error" />
       }
       onError={(error) => logger.error(`"${node.type}" failed to render`, error)}
     >
