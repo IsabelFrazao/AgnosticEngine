@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "@/src/env";
 import "./globals.css";
 import { ThemeProvider, STORAGE_KEY } from "@/src/lib/theme/theme-context";
@@ -62,9 +63,9 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: ANTI_FLASH_SCRIPT }} />
-      </head>
+      <Script id="theme-init" strategy="beforeInteractive">
+        {ANTI_FLASH_SCRIPT}
+      </Script>
       <body className="min-h-full flex flex-col">
         <ThemeProvider>{children}</ThemeProvider>
       </body>

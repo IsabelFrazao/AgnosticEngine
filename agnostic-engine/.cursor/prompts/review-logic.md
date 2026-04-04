@@ -8,7 +8,7 @@ Prop Resilience: If the metadata prop is missing a key or receives an invalid ty
 
 The 'Agnostic' Test: Can this component be reused in a completely different brand/industry just by changing the JSON, or is it 'poisoned' by domain-specific code?
 
-Tailwind v4 Compliance: Are styles using hardcoded hex codes/values, or are they strictly using @theme variables (e.g., bg-(--brand-primary))?
+Tailwind v4 Compliance: Are styles using hardcoded hex codes/values, or the legacy `[var(--xxx)]` arbitrary syntax? All CSS variable references must use the Tailwind v4 shorthand (e.g., `bg-(--color-primary)`, `text-(--color-foreground)`). The `[var(--xxx)]` form is a violation even if the variable name is correct.
 
 Event Handling: Does it use an actionId string to trigger events via a registry, or is it trying to execute local side-effects?
 
