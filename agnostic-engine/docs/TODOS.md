@@ -164,21 +164,6 @@ Related to item 7. There is no way to know if users are hitting `DegradedStateUI
 
 ---
 
-### 15. `table` organism uses row index as React key
-
-**Files:** `src/components/organisms/Table.tsx`
-
-```tsx
-{rows.map((row, rowIndex) => (
-  <tr key={rowIndex}>
-```
-
-Using array index as a key is a React anti-pattern when rows can be reordered or filtered. It causes incorrect reconciliation.
-
-**Fix:** Add an optional `rowKey` field to the table metadata schema, or derive a key from the row content.
-
----
-
 ## Summary table
 
 | # | Severity | Issue |
@@ -197,4 +182,5 @@ Using array index as a key is a React anti-pattern when rows can be reordered or
 | 12 | Low | No E2E tests |
 | 13 | Low | `next.config.ts` empty |
 | 14 | Low | No production error observability |
+| ~~15~~ | ~~Low~~ | ~~Table uses row index as React key~~ — **resolved** |
 | 15 | Low | Table uses row index as React key |

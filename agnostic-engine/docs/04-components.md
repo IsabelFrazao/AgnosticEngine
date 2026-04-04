@@ -196,6 +196,7 @@ Renders an HTML `<table>` from columns and rows defined in the schema. Lazy-load
 |-------|------|----------|-------------|
 | `columns` | `string[]` (min 1) | Yes | Column header names, in display order |
 | `rows` | `Record<string, unknown>[]` | Yes | Row data. Keys must match column names. |
+| `caption` | `string` (min 1) | No | Visible table caption rendered as `<caption>`. If omitted, an `aria-label` is auto-generated from column names to maintain A11y compliance. |
 
 #### Notes
 
