@@ -5,34 +5,35 @@ import { useTheme } from '@/src/hooks/useTheme';
 import { parseThemeSwitcherMetadata } from '@/src/lib/metadata/parse-theme-switcher-metadata';
 import type { MetadataComponentProps } from '@/src/lib/metadata-types';
 import { THEMES } from '@/src/lib/theme/themes';
-import type { ThemeId } from '@/src/lib/theme/theme-types';
 
 // ── Styles ────────────────────────────────────────────────────────────────────
 
+// Note: Button.tsx uses a similar base pattern (same radius/ring/typography tokens)
+// but differs in size (px-4 py-2) and has disabled states. Extract a shared
+// buttonBaseClasses() utility to src/lib/ if a third button-like component appears.
 const BUTTON_BASE =
-  'flex items-center gap-1.5 rounded-[var(--radius-brand)] px-3 py-1.5 ' +
+  'flex items-center gap-1.5 rounded-(--radius-brand) px-3 py-1.5 ' +
   'text-sm font-medium transition-colors ' +
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ring)]';
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-ring)';
 
-const BUTTON_ACTIVE = 'bg-[var(--color-primary)] text-[var(--color-primary-foreground)]';
+const BUTTON_ACTIVE = 'bg-(--color-primary) text-(--color-primary-foreground)';
 
 const BUTTON_INACTIVE =
-  'border border-[var(--color-border)] text-[var(--color-foreground)] hover:bg-[var(--color-muted)]';
+  'border border-(--color-border) text-(--color-foreground) hover:bg-(--color-muted)';
 
 // ── Skeleton ──────────────────────────────────────────────────────────────────
 // Mirrors the shape of the real buttons while the component defers rendering
 // until after hydration (prevents server/client aria-pressed mismatch).
-
-const SKELETON_WIDTHS = ['w-20', 'w-16', 'w-16', 'w-20', 'w-20'] as const;
+// Count is derived from THEMES so it stays in sync when themes are added/removed.
 
 function ThemeSwitcherSkeleton({ groupLabel }: { groupLabel: string }) {
   return (
     <div role="group" aria-label={groupLabel} aria-busy="true" className="flex flex-wrap gap-2">
-      {SKELETON_WIDTHS.map((w, i) => (
+      {THEMES.map((t) => (
         <div
-          key={i}
+          key={t.id}
           aria-hidden="true"
-          className={`h-8 ${w} animate-pulse rounded-[var(--radius-brand)] bg-[var(--color-skeleton)]`}
+          className="h-8 w-20 animate-pulse rounded-(--radius-brand) bg-(--color-skeleton)"
         />
       ))}
     </div>
@@ -65,7 +66,10 @@ export function ThemeSwitcher({ metadata, requiredPermissions }: MetadataCompone
           <button
             key={t.id}
             type="button"
-            onClick={() => setTheme(t.id as ThemeId)}
+            // Theme switching is infrastructure (not business logic) and requires
+            // reading `theme` state for aria-pressed — ActionRegistry is bypassed
+            // intentionally here; setTheme is the registry for this concern.
+            onClick={() => setTheme(t.id)}
             aria-pressed={isActive}
             aria-label={`Switch to ${t.label} theme`}
             className={`${BUTTON_BASE} ${isActive ? BUTTON_ACTIVE : BUTTON_INACTIVE}`}

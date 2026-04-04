@@ -6,5 +6,7 @@ export type ThemeSwitcherMetadata = z.infer<typeof themeSwitcherMetadataSchema>;
 export { themeSwitcherMetadataSchema };
 
 export function parseThemeSwitcherMetadata(raw: unknown): ThemeSwitcherMetadata {
+  // `raw` may be undefined when the schema node has no props.metadata — all fields
+  // are optional so an empty object is valid and renders all themes with defaults.
   return themeSwitcherMetadataSchema.parse(raw ?? {});
 }

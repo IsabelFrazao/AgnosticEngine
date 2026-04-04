@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { DEFAULT_THEME_ID, THEME_IDS } from './themes';
 import type { ThemeId } from './theme-types';
 
@@ -49,7 +49,7 @@ function applyTheme(id: ThemeId): void {
 
 // ── Provider ──────────────────────────────────────────────────────────────────
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
+export function ThemeProvider({ children }: { children: ReactNode }) {
   // Lazy initializer: runs once, SSR-safe (returns default on server)
   const [theme, setThemeState] = useState<ThemeId>(readStoredTheme);
 

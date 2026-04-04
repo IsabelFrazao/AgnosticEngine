@@ -7,6 +7,9 @@ import { resolveAction } from '@/src/lib/resolve-action';
 
 export type { ButtonMetadata };
 
+// Note: ThemeSwitcher uses a similar base pattern (same radius/ring/typography tokens)
+// but differs in size (px-3 py-1.5) and layout (flex + gap). Extract a shared
+// buttonBaseClasses() utility to src/lib/ if a third button-like component appears.
 const BASE_CLASSES =
   'rounded-(--radius-brand) px-4 py-2 text-sm font-medium transition-colors ' +
   'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--color-ring) ' +

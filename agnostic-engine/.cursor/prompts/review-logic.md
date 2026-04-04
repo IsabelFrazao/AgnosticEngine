@@ -16,6 +16,8 @@ Extraction: Does this code contain any block that belongs in `src/lib/` rather t
 
 Dead Code: Are there any unused exports, unreachable branches, or imported symbols that are never referenced? These must be removed, not left as "might be useful later."
 
+Undocumented Decisions: Does the code contain any of the following WITHOUT a comment explaining why: an intentional rule exception, a deferred extraction, or a non-obvious default/fallback? If yes, add the comment — not to explain what the code does, but to explain why the decision was made.
+
 Cleanliness: Is the Code completely clean, optimized, parted in generic, reusable components/code and following the S.O.L.I.D. principles? Check for unused imports — specifically `import React from 'react'` used only for types (should be `import type { ... } from 'react'`).
 
 Security: Is this code safe or will it let out confidential information?
