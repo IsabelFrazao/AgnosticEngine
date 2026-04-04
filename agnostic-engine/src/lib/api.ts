@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { env } from '@/src/env';
+import { logger } from '@/src/lib/logger';
 
 export const apiClient = axios.create({
   baseURL: env.NEXT_PUBLIC_API_URL,
@@ -9,9 +10,7 @@ export const apiClient = axios.create({
 apiClient.interceptors.response.use(
   (res) => res,
   (err) => {
-    if (err.response?.status === 401) console.warn('401: Redirect logic here.');
+    if (err.response?.status === 401) logger.warn('401: Redirect logic here.');
     return Promise.reject(err);
   }
 );
-
-export default apiClient;

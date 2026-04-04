@@ -13,7 +13,7 @@ export function FormattedUtc({ iso }: FormattedUtcProps) {
 
   const d = parseUtcIso(iso);
   if (!d) {
-    return <span className="text-[var(--color-muted-foreground)]">—</span>;
+    return <span className="text-(--color-muted-foreground)">—</span>;
   }
 
   return (
