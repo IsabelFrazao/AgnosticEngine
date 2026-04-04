@@ -13,7 +13,7 @@
         "id": "nested-child-button",
         "type": "button",
         "props": {
-          "metadata": { "labelKey": "Child of table node", "variant": "secondary" }
+          "metadata": { "labelKey": "Child of table node", "variant": "secondary", "actionId": "demo:log" }
         }
       }
     ]
@@ -65,7 +65,8 @@
     "props": {
       "metadata": {
         "labelKey": "Publish module",
-        "variant": "primary"
+        "variant": "primary",
+        "actionId": "courses:publish"
       }
     },
     "permissions": ["courses:write"]
@@ -76,7 +77,8 @@
     "props": {
       "metadata": {
         "labelKey": "Save as draft",
-        "variant": "secondary"
+        "variant": "secondary",
+        "actionId": "courses:save-draft"
       }
     },
     "permissions": ["courses:write"]
@@ -87,7 +89,8 @@
     "props": {
       "metadata": {
         "labelKey": "Preview",
-        "variant": "outline"
+        "variant": "outline",
+        "actionId": "courses:preview"
       }
     },
     "permissions": ["courses:read"]
@@ -99,7 +102,8 @@
       "metadata": {
         "labelKey": "Archive",
         "variant": "outline",
-        "isDisabled": true
+        "isDisabled": true,
+        "actionId": "courses:archive"
       }
     },
     "permissions": ["courses:admin"]

@@ -1,5 +1,6 @@
 import type { MetadataSchemaItem } from '@/src/lib/metadata-types';
 import rawSchema from './mock-schema.json';
+import './mock-actions'; // registers mock action handlers for demo buttons
 
 /** Sample UTC ISO string used on the home page and in mock table rows. */
 export const DEMO_UPDATED_AT = '2026-04-01T12:00:00.000Z';
