@@ -130,6 +130,7 @@ lib/
 ├── api.ts                  Axios instance with base URL + 401 interceptor
 ├── logger.ts               AppLogger interface + console implementation (swap for Sentry)
 ├── site-config.ts          SITE_CONFIG: site name and description (white-label entry point)
+├── resolve-action.ts       Centralised ActionRegistry resolution — resolves actionId, handles missing handler (warn + forceDisabled). Use in every interactive component instead of inlining the logic.
 ├── metadata/               Per-component metadata parsers
 │   ├── parse-button-metadata.ts
 │   ├── parse-table-metadata.ts

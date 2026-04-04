@@ -1,3 +1,3 @@
 export const Skeleton = ({ className }: { className?: string }) => (
-  <div className={`animate-pulse rounded-md bg-[var(--color-skeleton)] ${className ?? ''}`} />
+  <div className={`animate-pulse rounded-md bg-(--color-skeleton) ${className ?? ''}`} />
 );

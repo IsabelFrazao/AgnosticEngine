@@ -12,6 +12,10 @@ Tailwind v4 Compliance: Are styles using hardcoded hex codes/values, or the lega
 
 Event Handling: Does it use an actionId string to trigger events via a registry, or is it trying to execute local side-effects?
 
+Extraction: Does this code contain any block that belongs in `src/lib/` rather than inline? Apply the test: "if I added a second component of this type right now, would I copy-paste this block?" If yes, it must be extracted. Specifically flag: logic that accesses a shared singleton (ActionRegistry, logger, apiClient) with conditional branching; data transformation or formatting with no JSX; validation or fallback behaviour shared across sibling components. Also check `src/lib/` first — does a utility already exist that this code is duplicating?
+
+Dead Code: Are there any unused exports, unreachable branches, or imported symbols that are never referenced? These must be removed, not left as "might be useful later."
+
 Cleanliness: Is the Code completely clean, optimized, parted in generic, reusable components/code and following the S.O.L.I.D. principles? Check for unused imports — specifically `import React from 'react'` used only for types (should be `import type { ... } from 'react'`).
 
 Security: Is this code safe or will it let out confidential information?

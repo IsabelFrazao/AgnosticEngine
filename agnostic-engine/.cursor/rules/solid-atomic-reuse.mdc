@@ -33,6 +33,16 @@ alwaysApply: true
 - Before adding a component, search for an existing atom/organism or `COMPONENT_MAP` entry that fits; **extend or compose** instead of duplicating.
 - Shared styling, variants, and validation belong in **one** place (e.g. shared constants, `castToXMetadata`, small helpers)—not copy-pasted across files.
 
+## Mandatory extraction while writing new code
+
+After writing any new component or utility, scan it before marking the task done. Any of the following patterns **must** be extracted to `src/lib/` immediately — not deferred:
+
+- Logic that accesses a shared singleton (ActionRegistry, logger, apiClient) with conditional branching around the result
+- Data transformation, formatting, or parsing logic that is not markup (i.e., has no JSX)
+- Validation or fallback behaviour that would need to be repeated in any sibling component of the same type
+
+**The test:** ask "if I added a second component of this type right now, would I copy-paste this block?" If yes → extract it first.
+
 ## Generic & reusable
 
 - **No hardcoded page copy or routes** inside atoms/organisms; drive labels and config from `metadata` (and i18n keys when i18n is wired).
