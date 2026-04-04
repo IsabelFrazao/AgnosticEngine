@@ -117,6 +117,14 @@ Not a schema component. Rendered automatically by the engine when a component fa
 In **development**: shows the component ID, type, and failure reason.
 In **production**: shows only "Component unavailable".
 
+#### Failure reasons
+
+| `reason` | When it appears |
+|----------|----------------|
+| `'invalid-schema'` | Node failed `MetadataNodeSchema.safeParse()` |
+| `'unknown-type'` | `type` string has no entry in `COMPONENT_MAP` |
+| `'render-error'` | Component threw a runtime error during render (caught by `ErrorBoundary`) |
+
 You never use this directly in a schema.
 
 ---

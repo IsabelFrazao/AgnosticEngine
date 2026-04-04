@@ -1,4 +1,4 @@
-import React from 'react';
+import type { ComponentType as ReactComponentType } from 'react';
 import dynamic from 'next/dynamic';
 import type { MetadataComponentProps } from '@/src/lib/metadata-types';
 import type { ComponentType } from '@/src/schemas/atoms';
@@ -9,7 +9,7 @@ const Table = dynamic(() =>
   import('@/src/components/organisms/Table').then((m) => ({ default: m.Table })),
 );
 
-type EngineComponent = React.ComponentType<MetadataComponentProps>;
+type EngineComponent = ReactComponentType<MetadataComponentProps>;
 
 /**
  * Registry linking `type` strings to React components.

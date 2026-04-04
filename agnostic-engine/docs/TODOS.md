@@ -2,7 +2,7 @@
 
 This file contains an honest assessment of everything that is missing, broken, risky, or incomplete in the current codebase. Items are grouped by severity.
 
-Last updated: 2026-04-03
+Last updated: 2026-04-04
 
 ---
 
@@ -35,21 +35,29 @@ The schema supports it (`"permissions": ["courses:read"]`), the props are typed,
 
 ---
 
-### 3. ActionRegistry has no registered actions
+### 3. ActionRegistry has no registered actions (real features)
 
 **Files:** `src/registry/action-registry.ts`, `src/data/mock-schema.json`
 
-The mock schema has buttons with `"permissions"` set, implying intent to wire actions. The ActionRegistry class is correct, but **no actions are ever registered**. Any button with an `actionId` will silently render as disabled.
+**Partially resolved:** `src/data/mock-actions.ts` now registers 5 mock console-log handlers for all demo buttons, proving the infrastructure works correctly. The critical gap remaining is that **real feature actions** are not yet wired — when building actual features (publish, save, preview, etc.), each must be registered in `ActionRegistry` before its button can function.
 
-This is not visible unless you try to add an `actionId` to a schema node — it will disable the button with a console warning and no feedback to the developer about where to register.
-
-**Fix:** Create `src/registry/registered-actions.ts` that imports `ActionRegistry` and registers real handlers. Import that file early in the app (e.g., `app/layout.tsx`).
+**Fix:** As each feature is built, register its handlers early in the app lifecycle (e.g., a `src/registry/registered-actions.ts` imported in `app/layout.tsx`).
 
 ---
 
 ## High — Significant gaps that limit real use
 
-### 4. No tests exist
+### 4. Recursive children have no depth limit
+
+**Files:** `src/engines/MetadataEngineItem.tsx`
+
+`MetadataEngineItem` calls itself recursively for `node.children` with no maximum depth guard. A deeply nested or circular schema arriving from the database would cause a **call stack overflow** — which bypasses `ErrorBoundary` entirely (error boundaries only catch JS errors thrown during render, not stack overflows).
+
+**Fix:** Pass a `depth` counter through the recursive call. At a configurable max (e.g. 10), render `<DegradedStateUI reason="max-depth-exceeded">` instead of recursing. Requires adding `'max-depth-exceeded'` to `DegradedStateUI`'s `reason` union type.
+
+---
+
+### 5. No tests exist
 
 **Files:** None
 
@@ -66,7 +74,7 @@ There are zero test files in the entire project. The test infrastructure (vitest
 
 ---
 
-### 5. All data is static — no real API integration
+### 6. All data is static — no real API integration
 
 **Files:** `src/lib/api.ts`, `src/data/mock-schema.json`
 
@@ -80,7 +88,7 @@ In a real use case, the schema would be fetched from a CMS or backend API and pa
 
 ## Medium — Code quality and observability gaps
 
-### 6. Logger outputs to `console` only
+### 7. Logger outputs to `console` only
 
 **Files:** `src/lib/logger.ts`
 
@@ -90,7 +98,7 @@ The logger is a console wrapper. In production, errors are invisible unless some
 
 ---
 
-### 7. `FormattedUtc` is not used in the Table component
+### 8. `FormattedUtc` is not used in the Table component
 
 **Files:** `src/components/organisms/Table.tsx`, `src/components/atoms/FormattedUtc.tsx`
 
@@ -102,7 +110,7 @@ Table cells are rendered with `String(row[c] ?? '')`. UTC date strings in table 
 
 ---
 
-### 8. No HTTP security headers
+### 9. No HTTP security headers
 
 **Files:** `next.config.ts`
 
@@ -112,7 +120,7 @@ Table cells are rendered with `String(row[c] ?? '')`. UTC date strings in table 
 
 ---
 
-### 9. No CI/CD pipeline
+### 10. No CI/CD pipeline
 
 **Files:** `.github/` (does not exist)
 
@@ -124,7 +132,7 @@ There is no GitHub Actions (or equivalent) configuration. Linting and tests only
 
 ## Low — Polish and future-readiness
 
-### 10. Internationalization (i18n) is not implemented
+### 11. Internationalization (i18n) is not implemented
 
 **Files:** `app/layout.tsx`
 
@@ -136,7 +144,7 @@ Two explicit `TODO(i18n)` comments exist in `layout.tsx`:
 
 ---
 
-### 11. No Playwright or end-to-end tests
+### 12. No Playwright or end-to-end tests
 
 The pre-commit hook runs unit tests only. There are no browser-level tests verifying that the actual rendered output matches expectations, themes apply correctly, or the anti-flash script works.
 
@@ -144,19 +152,19 @@ The pre-commit hook runs unit tests only. There are no browser-level tests verif
 
 ---
 
-### 12. `next.config.ts` is entirely empty
+### 13. `next.config.ts` is entirely empty
 
 Beyond security headers (item 9), `next.config.ts` has no configuration at all — no image optimization domains, no redirects, no experimental features. This is fine now but will need attention before production deployment.
 
 ---
 
-### 13. No error monitoring in production
+### 14. No error monitoring in production
 
 Related to item 7. There is no way to know if users are hitting `DegradedStateUI` states in production. Silent failures are invisible.
 
 ---
 
-### 14. `table` organism uses row index as React key
+### 15. `table` organism uses row index as React key
 
 **Files:** `src/components/organisms/Table.tsx`
 
@@ -177,15 +185,16 @@ Using array index as a key is a React anti-pattern when rows can be reordered or
 |---|----------|-------|
 | 1 | Critical | `vitest` not installed — commits and `npm test` fail |
 | 2 | Critical | RBAC: `requiredPermissions` is ignored everywhere |
-| 3 | Critical | ActionRegistry has no registered actions |
-| 4 | High | Zero tests |
-| 5 | High | No real API integration — all data is static mock |
-| 6 | Medium | Logger is console-only — no production error monitoring |
-| 7 | Medium | Table cells do not use `FormattedUtc` for date values |
-| 8 | Medium | No HTTP security headers in `next.config.ts` |
-| 9 | Medium | No CI/CD pipeline |
-| 10 | Low | i18n not implemented (lang, font subsets hardcoded) |
-| 11 | Low | No E2E tests |
-| 12 | Low | `next.config.ts` empty |
-| 13 | Low | No production error observability |
-| 14 | Low | Table uses row index as React key |
+| 3 | Critical | ActionRegistry: mock actions registered; real feature actions still missing |
+| 4 | High | Recursive children have no depth limit — stack overflow risk |
+| 5 | High | Zero tests |  
+| 6 | High | No real API integration — all data is static mock |
+| 7 | Medium | Logger is console-only — no production error monitoring |
+| 8 | Medium | Table cells do not use `FormattedUtc` for date values |
+| 9 | Medium | No HTTP security headers in `next.config.ts` |
+| 10 | Medium | No CI/CD pipeline |
+| 11 | Low | i18n not implemented (lang, font subsets hardcoded) |
+| 12 | Low | No E2E tests |
+| 13 | Low | `next.config.ts` empty |
+| 14 | Low | No production error observability |
+| 15 | Low | Table uses row index as React key |

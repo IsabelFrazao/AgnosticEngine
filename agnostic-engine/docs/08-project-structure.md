@@ -37,7 +37,7 @@ app/
 └── globals.css   All CSS: theme tokens (CSS variables), Tailwind v4 setup, base styles
 ```
 
-**`app/layout.tsx`** — Sets up the page shell. Loads Google fonts (Geist), wraps children in `ThemeProvider`, and injects the anti-flash theme script before React hydrates.
+**`app/layout.tsx`** — Sets up the page shell. Loads Google fonts (Geist), wraps children in `ThemeProvider`, and injects the anti-flash theme script via `<Script strategy="beforeInteractive">` before React hydrates.
 
 **`app/page.tsx`** — The only real page. Renders `MetadataEngine` with `mockSchema` as input. This is intentionally thin — the page should never contain business logic.
 
@@ -175,6 +175,7 @@ Static mock and demo data. Only used during development and demo scenarios.
 |------|-------------|
 | `mock-schema.json` | JSON schema used by the live demo page (`app/page.tsx`) |
 | `mock-schema.ts` | Imports and types `mock-schema.json`; exports `mockSchema` and `DEMO_UPDATED_AT` for the page |
+| `mock-actions.ts` | Side-effect module — registers 5 mock `ActionRegistry` handlers for all demo buttons. Imported by `mock-schema.ts` so handlers are always available when the mock schema is used. |
 
 ---
 
@@ -191,7 +192,7 @@ Rules that Cursor AI and other agents always apply when working in this repo.
 | File | What it enforces |
 |------|-----------------|
 | `rules/agnostic-laws.mdc` | The Three Laws: Discovery, Purity, Validation, and folder layout |
-| `rules/agnostic-standards.mdc` | Senior coding standards: TanStack Query, date-fns, ARIA, API client, i18n |
+| `rules/agnostic-standards.mdc` | Senior coding standards: TanStack Query, date-fns, ARIA, API client, i18n, Tailwind v4 CSS variable syntax (`(--xxx)`), React type-only imports |
 | `rules/security.mdc` | Zero-trust rendering, schema-first, action decoupling, error observability |
 | `rules/solid-atomic-reuse.mdc` | SOLID principles, atomic layout, no duplication, generic components |
 | `rules/metadata-tree.mdc` | The recursive engine pipeline in concise form |
