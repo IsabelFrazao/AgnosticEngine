@@ -8,6 +8,7 @@ Every folder and file explained.
 
 ```
 agnostic-engine/
+├── .github/               CI workflows (lint, typecheck, test)
 ├── app/                    Next.js App Router pages and layouts
 ├── src/                    All application source code
 ├── docs/                   This documentation
@@ -237,3 +238,5 @@ Rules that Cursor AI and other agents always apply when working in this repo.
 | react-error-boundary | ^6.1.1 | Component error isolation |
 | Husky | ^9.1.7 | Git hooks |
 | lint-staged | ^16.4.0 | Run linting/tests only on staged files |
+| Vitest | ^4.1.5 | Unit and integration test runner |
+| jsdom | ^27.0.1 | Browser-like environment for frontend tests |
