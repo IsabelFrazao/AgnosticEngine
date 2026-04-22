@@ -226,7 +226,7 @@ Rules that Cursor AI and other agents always apply when working in this repo.
 
 | Package | Version | Purpose |
 |---------|---------|---------|
-| Next.js | 16.2.2 | Framework (App Router) |
+| Next.js | 16.2.4 | Framework (App Router) |
 | React | 19.2.4 | UI library |
 | TypeScript | ^5 | Type safety |
 | Tailwind CSS | ^4 | Styling (CSS variables + utilities) |
