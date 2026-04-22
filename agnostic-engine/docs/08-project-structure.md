@@ -42,7 +42,7 @@ app/
 ├── globals.css         All CSS: theme tokens (CSS variables), Tailwind v4 setup, base styles
 └── api/
     ├── __tests__/
-    │   └── routes.test.ts  Contract tests for API response shapes and schemaVersion
+    │   └── routes.test.ts  Contract tests: schemaVersion on happy paths, 404 for unknown page
     ├── layout/
     │   └── route.ts    GET /api/layout — returns shared layout schema
     ├── pages/

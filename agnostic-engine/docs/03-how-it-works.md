@@ -134,6 +134,8 @@ Adding `nav` to a page entry makes it appear in the sidebar automatically (Law o
 
 RSC pages and route handlers both consume **`src/lib/services/*`** (`getPagesManifest`, `getPageEntry`, `getLayout`, `getNavManifest`, `getCurrentUserPermissions`). Those functions validate with Zod and normalize schema versions; they read mock data today so you can later swap the implementation to `apiClient` or server-only DB access without changing page components.
 
+HTTP contract smoke tests live in `app/api/__tests__/routes.test.ts` (schema shape + 404 behavior).
+
 ---
 
 ## The Three Laws

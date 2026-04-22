@@ -31,4 +31,15 @@ describe('API schema version contracts', () => {
     expect(response.status).toBe(200);
     expect(body.schemaVersion).toBe('1.0');
   });
+
+  it('returns 404 JSON for unknown page slug', async () => {
+    const response = await getPageBySlug({} as NextRequest, {
+      params: Promise.resolve({ slug: ['does-not-exist'] }),
+    });
+    const body = await response.json();
+
+    expect(response.status).toBe(404);
+    expect(body.error).toBe('Page not found');
+    expect(body.path).toBe('/does-not-exist');
+  });
 });
