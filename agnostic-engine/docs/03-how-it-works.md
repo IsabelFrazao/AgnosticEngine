@@ -25,19 +25,23 @@ MetadataEngineItem                src/engines/MetadataEngineItem.tsx
     │          Validates the item against all known component schemas.
     │          If invalid → logs error + renders DegradedStateUI. Stops here.
     │
-    ├─ Step 2: sanitizeMetadata()
+    ├─ Step 2: Permission check
+    │          `node.permissions` is evaluated against current user permissions.
+    │          If missing permissions → logs warning + renders DegradedStateUI. Stops here.
+    │
+    ├─ Step 3: sanitizeMetadata()
     │          Strips dangerous HTML from all string values in props.
     │          Only <b>, <i>, <strong> are allowed (no attributes).
     │
-    ├─ Step 3: COMPONENT_MAP[node.type]
+    ├─ Step 4: COMPONENT_MAP[node.type]
     │          Looks up the React component registered for this type.
     │          If unknown type → logs error + renders DegradedStateUI. Stops here.
     │
-    ├─ Step 4: Render inside ErrorBoundary + Suspense
+    ├─ Step 5: Render inside ErrorBoundary + Suspense
     │          ErrorBoundary catches any crash → DegradedStateUI.
     │          Suspense shows a Skeleton while lazy-loaded components load.
     │
-    └─ Step 5: Recurse into node.children (if any)
+    └─ Step 6: Recurse into node.children (if any)
                Each child goes through this same pipeline.
 ```
 
@@ -69,7 +73,7 @@ A schema is an array. Each node looks like this:
 | `id` | Yes | Unique string identifier for this node |
 | `type` | Yes | Which component to render (`"button"`, `"table"`, `"theme-switcher"`) |
 | `props.metadata` | No | Component-specific configuration (varies by type) |
-| `permissions` | No | RBAC permission strings (slot exists, enforcement not yet built) |
+| `permissions` | No | RBAC permission strings. Nodes render only when the current user has all required permissions. |
 | `children` | No | Array of child nodes — same format, rendered inside this component |
 
 ---
@@ -208,6 +212,7 @@ The root schema (`src/schemas/root.schema.ts`) is a **recursive discriminated un
 | Failure | What the user sees | What gets logged |
 |---------|-------------------|-----------------|
 | Invalid schema (wrong type, missing required field) | "Component unavailable" box | `logger.error` with Zod issues |
+| Missing required permissions | "Component unavailable" box | `logger.warn` with missing permissions |
 | Unknown `type` string | "Component unavailable" box | `logger.error` with the unknown type |
 | Component throws during render | "Component unavailable" box | `logger.error` with the error |
 | `actionId` not registered | Button renders disabled | `logger.warn` with the `actionId` |

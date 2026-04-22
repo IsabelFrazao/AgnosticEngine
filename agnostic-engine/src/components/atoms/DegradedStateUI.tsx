@@ -1,7 +1,7 @@
 type Props = {
   itemId:   string;
   itemType: string;
-  reason:   'invalid-schema' | 'unknown-type' | 'render-error';
+  reason:   'invalid-schema' | 'unknown-type' | 'render-error' | 'insufficient-permissions';
 };
 
 export function DegradedStateUI({ itemId, itemType, reason }: Props) {

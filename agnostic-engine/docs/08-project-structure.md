@@ -21,6 +21,7 @@ agnostic-engine/
 ├── tsconfig.json           TypeScript configuration
 ├── eslint.config.mjs       ESLint rules
 ├── postcss.config.mjs      PostCSS (for Tailwind v4)
+├── vitest.config.ts        Vitest config (path aliases + test runtime)
 ├── package.json            Dependencies and scripts
 └── CLAUDE.md               Instructions for Claude Code AI agent
 ```
@@ -150,6 +151,7 @@ lib/
 ├── metadata-types.ts       MetadataSchemaItem and MetadataComponentProps type aliases
 ├── api.ts                  Axios instance with base URL + 401 interceptor
 ├── logger.ts               AppLogger interface + console implementation (swap for Sentry)
+├── permissions.ts          Pure permission evaluator for metadata node access checks
 ├── site-config.ts          SITE_CONFIG: site name and description (white-label entry point)
 ├── resolve-action.ts       Centralised ActionRegistry resolution — resolves actionId, handles missing handler (warn + forceDisabled). Use in every interactive component instead of inlining the logic.
 ├── metadata/               Per-component metadata parsers
@@ -197,6 +199,7 @@ Static mock and demo data. Only used during development and demo scenarios.
 |------|-------------|
 | `mock-data.ts` | Exports `MOCK_LAYOUT` and `MOCK_PAGES` — the full schema in the new two-level structure. Replaces the old `mock-schema.json` + `mock-schema.ts`. Also imports `mock-actions.ts` as a side-effect. |
 | `mock-actions.ts` | Side-effect module — registers 5 mock `ActionRegistry` handlers for all demo buttons. Imported by `mock-data.ts` so handlers are always available when mock data is used. |
+| `mock-auth.ts` | Demo-only current user permissions used by the engine to enforce node-level access rules. |
 
 ---
 

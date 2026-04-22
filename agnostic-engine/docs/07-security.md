@@ -44,6 +44,19 @@ The sanitizer runs **after** Zod validation, so by the time it runs, it is worki
 
 ---
 
+## Layer 2.5 — Permission enforcement
+
+**Where:** `src/engines/MetadataEngineItem.tsx`, using `evaluatePermissionAccess` from `src/lib/permissions.ts`
+
+Before rendering a validated node, the engine checks `node.permissions` against the current user's permission set.
+
+- If all required permissions are present, rendering continues.
+- If any permission is missing, the engine logs a warning and renders `DegradedStateUI` with `insufficient-permissions`.
+
+This keeps access control decisions centralized in the engine boundary rather than duplicated in each component.
+
+---
+
 ## Layer 3 — ActionRegistry whitelist
 
 **Where:** `src/registry/action-registry.ts`
@@ -117,7 +130,7 @@ Access environment variables via `env.NEXT_PUBLIC_API_URL` (the validated object
 
 | Gap | Risk | Tracking |
 |-----|------|---------|
-| RBAC / permissions | `requiredPermissions` prop is passed but `void`-ed — no access control enforced | [TODOS.md](./TODOS.md) |
+| Route-level RBAC | Component nodes are enforced, but page/route gating is not yet tied to real auth/session identity | [TODOS.md](./TODOS.md) |
 | Sentry / remote logging | Errors only go to `console` in production | [TODOS.md](./TODOS.md) |
 | Content Security Policy headers | `next.config.ts` is empty — no CSP headers set | [TODOS.md](./TODOS.md) |
 | Rate limiting / auth | No API routes with auth yet | [TODOS.md](./TODOS.md) |

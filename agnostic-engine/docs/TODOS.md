@@ -21,15 +21,15 @@ This issue is resolved. `vitest`, `@vitest/ui`, and `jsdom` are now in `devDepen
 
 ---
 
-### 2. RBAC is wired but completely unimplemented
+### 2. RBAC is only partially implemented
 
 **Files:** Every component (`Button.tsx`, `Table.tsx`, `ThemeSwitcher.tsx`)
 
-Every component receives `requiredPermissions?: string[]` and immediately does `void requiredPermissions`. This means **any user can see any component regardless of permissions**.
+`MetadataEngineItem` now enforces node-level `permissions` before render. If the current user lacks required permissions, the node degrades to `DegradedStateUI` and logs a warning.
 
-The schema supports it (`"permissions": ["courses:read"]`), the props are typed, but nothing enforces it.
+Remaining gap: this still uses demo permissions (`src/data/mock-auth.ts`). Real auth/session-backed permissions and route-level gating are not implemented yet.
 
-**Fix:** Implement a permission check in `MetadataEngineItem` before rendering. Requires an auth context or a `currentUserPermissions` prop/hook.
+**Fix:** Replace mock permissions with authenticated permissions from API/session and enforce page-level access control at route boundaries.
 
 ---
 

@@ -1,6 +1,7 @@
 import { MetadataEngine } from '@/src/engines/MetadataEngine';
 import { FormattedUtc } from '@/src/components/atoms/FormattedUtc';
 import { DEMO_UPDATED_AT, MOCK_PAGES } from '@/src/data/mock-data';
+import { MOCK_CURRENT_USER_PERMISSIONS } from '@/src/data/mock-auth';
 
 const homePage = MOCK_PAGES['/'];
 
@@ -23,7 +24,10 @@ export default function Home() {
           </header>
         )}
         <section className="rounded-xl border border-(--color-border) bg-(--color-surface) p-6 shadow-sm">
-          <MetadataEngine schema={homePage.components} />
+          <MetadataEngine
+            schema={homePage.components}
+            currentUserPermissions={MOCK_CURRENT_USER_PERMISSIONS}
+          />
         </section>
       </main>
     </div>

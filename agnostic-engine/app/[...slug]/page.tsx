@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { MetadataEngine } from '@/src/engines/MetadataEngine';
 import { MOCK_PAGES } from '@/src/data/mock-data';
+import { MOCK_CURRENT_USER_PERMISSIONS } from '@/src/data/mock-auth';
 
 type PageProps = { params: Promise<{ slug: string[] }> };
 
@@ -39,7 +40,10 @@ export default async function DynamicPage({ params }: PageProps) {
 
         {page.components.length > 0 ? (
           <section className="rounded-xl border border-(--color-border) bg-(--color-surface) p-6 shadow-sm">
-            <MetadataEngine schema={page.components} />
+            <MetadataEngine
+              schema={page.components}
+              currentUserPermissions={MOCK_CURRENT_USER_PERMISSIONS}
+            />
           </section>
         ) : (
           <section className="rounded-xl border border-(--color-border) border-dashed bg-(--color-surface) p-12 text-center">

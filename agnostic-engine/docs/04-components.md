@@ -10,7 +10,7 @@ All components receive the same two props:
 ```ts
 type MetadataComponentProps = {
   metadata?: Record<string, unknown>;   // component-specific config from the schema
-  requiredPermissions?: string[];        // RBAC slot (not yet enforced)
+  requiredPermissions?: string[];        // forwarded context; enforcement happens in MetadataEngineItem
 };
 ```
 
@@ -66,7 +66,7 @@ Renders a `<button>` element. Resolves its click handler from `ActionRegistry` i
 #### Notes
 
 - If `actionId` is set but not registered in `ActionRegistry`, the button is **automatically disabled** and a warning is logged. The schema remains valid.
-- RBAC: `requiredPermissions` is threaded through but not yet enforced. See [TODOS.md](./TODOS.md).
+- RBAC: component-level permissions are enforced by `MetadataEngineItem` before render. If permissions are missing, the node degrades to `DegradedStateUI`.
 
 ---
 
@@ -122,6 +122,7 @@ In **production**: shows only "Component unavailable".
 | `reason` | When it appears |
 |----------|----------------|
 | `'invalid-schema'` | Node failed `MetadataNodeSchema.safeParse()` |
+| `'insufficient-permissions'` | Current user is missing one or more `permissions` required by the node |
 | `'unknown-type'` | `type` string has no entry in `COMPONENT_MAP` |
 | `'render-error'` | Component threw a runtime error during render (caught by `ErrorBoundary`) |
 

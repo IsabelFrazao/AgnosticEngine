@@ -8,6 +8,7 @@ import { COMPONENT_MAP } from '@/src/registry/component-registry';
 import { MetadataNodeSchema } from '@/src/schemas/root.schema';
 import { sanitizeMetadata } from '@/src/utils/sanitize';
 import { logger } from '@/src/lib/logger';
+import { evaluatePermissionAccess } from '@/src/lib/permissions';
 import type { MetadataComponentProps, MetadataSchemaItem } from '@/src/lib/metadata-types';
 
 /**
@@ -37,7 +38,13 @@ function buildItemProps(item: {
  *
  * Law of Validation: raw metadata never bypasses this pipeline.
  */
-export function MetadataEngineItem({ item }: { item: MetadataSchemaItem }) {
+export function MetadataEngineItem({
+  item,
+  currentUserPermissions,
+}: {
+  item: MetadataSchemaItem;
+  currentUserPermissions?: string[];
+}) {
   // Stage 1: Schema validation
   const parsed = MetadataNodeSchema.safeParse(item);
 
@@ -56,6 +63,22 @@ export function MetadataEngineItem({ item }: { item: MetadataSchemaItem }) {
   }
 
   const node = parsed.data;
+  const access = evaluatePermissionAccess(node.permissions, currentUserPermissions);
+
+  if (!access.allowed) {
+    logger.warn(`Permission denied for "${node.type}"`, {
+      id: node.id,
+      requiredPermissions: node.permissions ?? [],
+      missingPermissions: access.missingPermissions,
+    });
+    return (
+      <DegradedStateUI
+        itemId={node.id}
+        itemType={node.type}
+        reason="insufficient-permissions"
+      />
+    );
+  }
 
   // Stage 2: Content sanitization (structural fields are not user content)
   const sanitizedProps = node.props
@@ -83,7 +106,11 @@ export function MetadataEngineItem({ item }: { item: MetadataSchemaItem }) {
           {node.children?.length ? (
             <div className="flex flex-col gap-4">
               {node.children.map((child) => (
-                <MetadataEngineItem key={child.id} item={child} />
+                <MetadataEngineItem
+                  key={child.id}
+                  item={child}
+                  currentUserPermissions={currentUserPermissions}
+                />
               ))}
             </div>
           ) : null}
