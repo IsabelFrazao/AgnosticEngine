@@ -1,0 +1,73 @@
+---
+description: Law of Derivation — pages map is the single source of truth for content AND navigation.
+globs: "**/*"
+alwaysApply: true
+---
+
+# AgnosticEngine — Law of Derivation
+
+## The Law
+
+The `pages` map (`src/data/mock-data.ts`, and later the real DB/API) is the **only** source of truth for both page content and sidebar navigation.
+
+**Corollaries — non-negotiable:**
+
+1. **Presence implies navigability.** A page entry with a `nav` property automatically appears in the sidebar. Removing `nav` makes it unlisted (still reachable by URL). No other step required.
+
+2. **Sub-menus are declared on the child, not the parent.** A page with `nav.parent` set to another page's slug is automatically nested under that parent in the sidebar. The parent page schema is not touched.
+
+3. **Never declare sidebar items separately from pages.** There is no `sidebar.items` array. The sidebar derives itself entirely from the `pages` map. Duplication between pages and nav is a violation of this law.
+
+4. **`sidebar.extras` is the escape hatch — not the pattern.** External links, section dividers, and any non-page nav items go in `layout.sidebar.extras`. This is the only exception and must remain exceptional.
+
+---
+
+## Schema contract
+
+```typescript
+// Adding a page to the sidebar = adding nav to the page entry
+{
+  "/my-page": {
+    title: "My Page",
+    nav: { label: "My Page", order: 2 },   // ← this is all it takes
+    components: [...],
+  }
+}
+
+// Adding a sub-menu item = adding parent to the child's nav
+{
+  "/my-page/sub": {
+    title: "Sub",
+    nav: { label: "Sub", order: 0, parent: "/my-page" },  // ← nested automatically
+    components: [...],
+  }
+}
+```
+
+### `nav.order` is a data sort key — NOT CSS `order`
+Items are sorted in JavaScript before being written to the DOM. DOM order = visual order = tab order = screen reader order. No accessibility concern.
+
+---
+
+## Sidebar derivation algorithm
+
+```
+pages map
+  → filter: nav !== undefined
+  → split: roots (no parent) vs children (have parent)
+  → attach children to parent, sort each group by nav.order
+  → merge roots with sidebar.extras (sorted by order)
+  → render <nav> in final order
+```
+
+The Sidebar (`src/components/organisms/Sidebar.tsx`) implements this. It receives a `NavManifest` (pages without component arrays) and `SidebarExtraItem[]`. No business logic lives inside.
+
+---
+
+## Violations to reject in code review
+
+- A nav link declared anywhere other than `pages[slug].nav`
+- A page slug hardcoded inside `Sidebar.tsx` or any layout component
+- `sidebar.extras` used for pages that exist in the `pages` map
+- `nav.order` applied as a CSS property (use it only as a JS sort key)
+- Parent page modified when adding a child page

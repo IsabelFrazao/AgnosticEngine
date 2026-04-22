@@ -6,6 +6,10 @@ import "./globals.css";
 import { ThemeProvider, STORAGE_KEY } from "@/src/lib/theme/theme-context";
 import { DEFAULT_THEME_ID, THEME_IDS } from "@/src/lib/theme/themes";
 import { SITE_CONFIG } from "@/src/lib/site-config";
+import { QueryProvider } from "@/src/components/providers/QueryProvider";
+import { Sidebar } from "@/src/components/organisms/Sidebar";
+import { MOCK_LAYOUT, MOCK_PAGES } from "@/src/data/mock-data";
+import type { NavManifest } from "@/src/schemas/page.schema";
 
 // TODO(i18n): replace "latin" with the full subset list once i18n is wired.
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -50,6 +54,22 @@ function buildAntiFlashScript(
 
 const ANTI_FLASH_SCRIPT = buildAntiFlashScript(STORAGE_KEY, THEME_IDS, DEFAULT_THEME_ID);
 
+/**
+ * Strip component arrays from the pages manifest before passing across the
+ * RSC → client boundary. The Sidebar only needs nav metadata, not page content.
+ * This keeps the serialised payload small regardless of how large pages grow.
+ */
+function buildNavManifest(): NavManifest {
+  return Object.fromEntries(
+    Object.entries(MOCK_PAGES).map(([slug, page]) => [
+      slug,
+      { title: page.title, nav: page.nav, permissions: page.permissions },
+    ]),
+  );
+}
+
+const NAV_MANIFEST = buildNavManifest();
+
 export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
@@ -66,8 +86,20 @@ export default function RootLayout({
       <Script id="theme-init" strategy="beforeInteractive">
         {ANTI_FLASH_SCRIPT}
       </Script>
-      <body className="min-h-full flex flex-col">
-        <ThemeProvider>{children}</ThemeProvider>
+      <body className="flex h-full">
+        <QueryProvider>
+          <ThemeProvider>
+            {/* Law of Derivation: sidebar nav is derived from the pages manifest.
+                NAV_MANIFEST is computed server-side; extras come from layout config. */}
+            <Sidebar
+              navManifest={NAV_MANIFEST}
+              extras={MOCK_LAYOUT.sidebar.extras}
+            />
+            <div className="flex min-h-full flex-1 flex-col overflow-y-auto">
+              {children}
+            </div>
+          </ThemeProvider>
+        </QueryProvider>
       </body>
     </html>
   );

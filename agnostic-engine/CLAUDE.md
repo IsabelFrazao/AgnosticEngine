@@ -8,11 +8,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Treat the following project rules as **non-optional** for any code or config you add or change (same bar as Cursor’s always-on rules). They apply to components, hooks, `src/lib/` utilities, services, and parsers.
 
+@.cursor/rules/agnostic-laws.mdc
+
 @.cursor/rules/agnostic-standards.mdc
 
 @.cursor/rules/solid-atomic-reuse.mdc
 
 @.cursor/rules/security.mdc
+
+@.cursor/rules/law-of-derivation.mdc
+
+@.cursor/rules/metadata-tree.mdc
+
+@.cursor/rules/docs-maintenance.mdc
 
 @.cursor/prompts/review-logic.md
 
@@ -94,6 +102,14 @@ Components are Logic-Blind. All interactive events dispatch an `actionId` string
 No metadata reaches a component without passing through:
 `MetadataNodeSchema.safeParse()` → `sanitizeMetadata()` → render  
 On failure: `logger.error()` + `<DegradedStateUI>`. No white screens. No silent catches.
+
+### Law of Derivation
+The `pages` map is the **only** source of truth for page content AND sidebar navigation. Also enforced via `.cursor/rules/law-of-derivation.mdc`.
+1. A page entry with `nav` automatically appears in the sidebar — no other step.
+2. A page entry with `nav.parent` is automatically nested under its parent — parent page is not touched.
+3. Never declare sidebar items separately from pages. The sidebar derives itself from the `pages` map.
+4. `layout.sidebar.extras` is the only exception: non-page items (external links, dividers). Use sparingly.
+5. `nav.order` is a JavaScript sort key applied before DOM render — not a CSS property. No accessibility concern.
 
 ## Security Protocol
 

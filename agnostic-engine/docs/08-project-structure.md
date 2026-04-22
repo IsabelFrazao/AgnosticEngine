@@ -32,14 +32,28 @@ This is the Next.js App Router entry point. Minimal by design — pages are thin
 
 ```
 app/
-├── layout.tsx    Root HTML shell: fonts, ThemeProvider, anti-flash script, SEO metadata
-├── page.tsx      Home page — imports mock schema and passes it to MetadataEngine
-└── globals.css   All CSS: theme tokens (CSS variables), Tailwind v4 setup, base styles
+├── layout.tsx          Root HTML shell: fonts, QueryProvider, ThemeProvider, Sidebar, anti-flash script
+├── page.tsx            Home page — reads MOCK_PAGES['/'] and passes components to MetadataEngine
+├── [...slug]/
+│   └── page.tsx        Catch-all dynamic route — resolves any slug against MOCK_PAGES
+├── globals.css         All CSS: theme tokens (CSS variables), Tailwind v4 setup, base styles
+└── api/
+    ├── layout/
+    │   └── route.ts    GET /api/layout — returns shared layout schema
+    ├── pages/
+    │   └── route.ts    GET /api/pages  — returns pages manifest (no component arrays)
+    └── page/
+        └── [...slug]/
+            └── route.ts  GET /api/page/:slug — returns full page entry; 404 if missing
 ```
 
-**`app/layout.tsx`** — Sets up the page shell. Loads Google fonts (Geist), wraps children in `ThemeProvider`, and injects the anti-flash theme script via `<Script strategy="beforeInteractive">` before React hydrates.
+**`app/layout.tsx`** — Sets up the full app shell. Wraps children in `QueryProvider` (TanStack Query infrastructure) and `ThemeProvider`. Computes `NavManifest` server-side from `MOCK_PAGES` and passes it to `Sidebar`. Anti-flash theme script runs before React hydrates.
 
-**`app/page.tsx`** — The only real page. Renders `MetadataEngine` with `mockSchema` as input. This is intentionally thin — the page should never contain business logic.
+**`app/page.tsx`** — Home page (`/`). Reads components from `MOCK_PAGES['/']`. Intentionally thin — no business logic.
+
+**`app/[...slug]/page.tsx`** — Dynamic renderer for all non-root pages. Joins slug segments into a path (`["courses","modules"]` → `"/courses/modules"`), looks it up in `MOCK_PAGES`, renders via `MetadataEngine`. Returns 404 if not found.
+
+**`app/api/`** — Next.js Route Handlers that define the API contract. Currently serve `MOCK_PAGES` and `MOCK_LAYOUT`. Replace the data source when a real backend is ready — no consumer changes needed.
 
 **`app/globals.css`** — Contains the entire token system: 5 complete theme blocks (`:root`, `[data-theme="dark"]`, etc.), plus the Tailwind v4 `@theme` mapping that connects CSS vars to utility classes.
 
@@ -91,6 +105,7 @@ All Zod validation schemas. The discriminated union is built automatically — y
 ```
 schemas/
 ├── root.schema.ts        Recursive discriminated union — auto-built from ATOM_SCHEMAS
+├── page.schema.ts        Page/layout schemas: PageNavItem, PageManifestEntry, PagesManifest, LayoutSchema, NavManifest
 └── atoms/
     ├── index.ts          ATOM_SCHEMAS: single source of truth for all atom schemas
     ├── button.schema.ts  Schema for type: "button"
@@ -100,11 +115,13 @@ schemas/
 
 **Adding a new atom:** create a new `{type}.schema.ts` file and add it to `atoms/index.ts`. `root.schema.ts` updates automatically.
 
+**`page.schema.ts`** — Defines the two-level schema structure: `Layout` (shared shell) and `PagesManifest` (content + nav). `NavManifest` is a slim view of `PagesManifest` without component arrays, used to cross the RSC → client boundary safely.
+
 ---
 
 ### `src/components/`
 
-All React components. Two sub-levels: atoms (small, static) and organisms (larger, lazy-loaded).
+All React components. Three sub-levels: atoms, organisms, and providers.
 
 ```
 components/
@@ -114,8 +131,11 @@ components/
 │   ├── DegradedStateUI.tsx "Component unavailable" fallback for failures
 │   ├── Skeleton.tsx        Animated grey placeholder for loading states
 │   └── FormattedUtc.tsx    Formats a UTC ISO string for the user's local timezone
-└── organisms/
-    └── Table.tsx           HTML table rendered from columns + rows metadata
+├── organisms/
+│   ├── Table.tsx           HTML table rendered from columns + rows metadata
+│   └── Sidebar.tsx         Nav sidebar — derives menu items from NavManifest (Law of Derivation)
+└── providers/
+    └── QueryProvider.tsx   TanStack Query QueryClientProvider wrapper ('use client')
 ```
 
 ---
@@ -174,9 +194,8 @@ Static mock and demo data. Only used during development and demo scenarios.
 
 | File | What it does |
 |------|-------------|
-| `mock-schema.json` | JSON schema used by the live demo page (`app/page.tsx`) |
-| `mock-schema.ts` | Imports and types `mock-schema.json`; exports `mockSchema` and `DEMO_UPDATED_AT` for the page |
-| `mock-actions.ts` | Side-effect module — registers 5 mock `ActionRegistry` handlers for all demo buttons. Imported by `mock-schema.ts` so handlers are always available when the mock schema is used. |
+| `mock-data.ts` | Exports `MOCK_LAYOUT` and `MOCK_PAGES` — the full schema in the new two-level structure. Replaces the old `mock-schema.json` + `mock-schema.ts`. Also imports `mock-actions.ts` as a side-effect. |
+| `mock-actions.ts` | Side-effect module — registers 5 mock `ActionRegistry` handlers for all demo buttons. Imported by `mock-data.ts` so handlers are always available when mock data is used. |
 
 ---
 
@@ -193,6 +212,7 @@ Rules that Cursor AI and other agents always apply when working in this repo.
 | File | What it enforces |
 |------|-----------------|
 | `rules/agnostic-laws.mdc` | The Three Laws: Discovery, Purity, Validation, and folder layout |
+| `rules/law-of-derivation.mdc` | Law of Derivation: pages map as single source of truth for content + nav; sub-menu derivation; extras escape hatch |
 | `rules/agnostic-standards.mdc` | Senior coding standards: TanStack Query, date-fns, ARIA, API client, i18n, Tailwind v4 CSS variable syntax (`(--xxx)`), React type-only imports |
 | `rules/security.mdc` | Zero-trust rendering, schema-first, action decoupling, error observability |
 | `rules/solid-atomic-reuse.mdc` | SOLID principles, atomic layout, no duplication, generic components |
@@ -212,7 +232,7 @@ Rules that Cursor AI and other agents always apply when working in this repo.
 | Tailwind CSS | ^4 | Styling (CSS variables + utilities) |
 | Zod | ^4.3.6 | Schema validation |
 | Axios | ^1.14.0 | HTTP client |
-| TanStack Query | ^5.96.1 | Data fetching and caching (not yet used) |
+| TanStack Query | ^5.96.1 | Data fetching and caching (QueryProvider wired; hooks ready for use) |
 | date-fns | ^4.1.0 | Date formatting |
 | react-error-boundary | ^6.1.1 | Component error isolation |
 | Husky | ^9.1.7 | Git hooks |

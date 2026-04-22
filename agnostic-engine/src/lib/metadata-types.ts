@@ -7,3 +7,16 @@ export type MetadataComponentProps = {
   metadata?: Record<string, unknown>;
   requiredPermissions?: string[];
 };
+
+// Re-export page/layout types so consumers import from one place.
+export type {
+  PageNavItem,
+  PageNavMeta,
+  NavManifest,
+  PageHeader,
+  PageManifestEntry,
+  PagesManifest,
+  SidebarExtraItem,
+  SidebarConfig,
+  Layout,
+} from '@/src/schemas/page.schema';

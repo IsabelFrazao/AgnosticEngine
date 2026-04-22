@@ -74,6 +74,50 @@ A schema is an array. Each node looks like this:
 
 ---
 
+## The schema shape
+
+The full schema has two top-level keys served by the API:
+
+```
+GET /api/layout   → shared shell (navbar, footer, notifications, sidebar config)
+GET /api/pages    → pages manifest (slug, title, nav, permissions — no components)
+GET /api/page/:slug → full page (header + components for that slug only)
+```
+
+### `layout`
+
+```json
+{
+  "sidebar": { "extras": [{ "label": "Docs", "href": "...", "order": 99 }] },
+  "navbar": [],
+  "footer": [],
+  "notifications": []
+}
+```
+
+### `pages` — single source of truth for content AND navigation
+
+```json
+{
+  "/courses": {
+    "title": "Courses",
+    "nav": { "label": "Courses", "order": 1 },
+    "permissions": ["courses:read"],
+    "header": { "title": "Courses", "description": "Manage modules." },
+    "components": [ ...MetadataNode[] ]
+  },
+  "/courses/modules": {
+    "title": "Modules",
+    "nav": { "label": "Modules", "order": 0, "parent": "/courses" },
+    "components": []
+  }
+}
+```
+
+Adding `nav` to a page entry makes it appear in the sidebar automatically (Law of Derivation). Adding `nav.parent` nests it under a parent — no other file changes needed.
+
+---
+
 ## The Three Laws
 
 These are non-negotiable rules enforced in code, Cursor rules, and CLAUDE.md.
@@ -99,6 +143,15 @@ Components are **logic-blind**. They render things; they do not make decisions.
 - No `eval()`, no `new Function()`, no dynamic code execution via metadata.
 
 This means you can change what "Publish" does without touching the button component.
+
+### Law of Derivation
+
+The `pages` map is the **only** source of truth for both page content and sidebar navigation.
+
+- A page with `nav` is automatically listed in the sidebar. No other step required.
+- A page with `nav.parent` is automatically nested under its parent. The parent entry is not touched.
+- `sidebar.extras` is the only exception: non-page items (external links). Use sparingly.
+- `nav.order` is a JavaScript sort key applied before DOM render — not a CSS property.
 
 ### Law of Validation
 

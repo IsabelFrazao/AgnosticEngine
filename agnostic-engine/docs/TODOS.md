@@ -74,15 +74,9 @@ There are zero test files in the entire project. The test infrastructure (vitest
 
 ---
 
-### 6. All data is static — no real API integration
+### ~~6. All data is static — no real API integration~~ — **resolved**
 
-**Files:** `src/lib/api.ts`, `src/data/mock-schema.json`
-
-`apiClient` (Axios) and TanStack Query are installed and configured, but **no component or page ever calls an API**. The schema is hardcoded JSON.
-
-In a real use case, the schema would be fetched from a CMS or backend API and passed to `MetadataEngine`.
-
-**Fix:** Add a data-fetching layer. Example: create `src/lib/services/schema-service.ts` that fetches the schema from `NEXT_PUBLIC_API_URL` using `apiClient`. Use TanStack Query in the page component to handle loading/error states.
+API route handlers are now defined (`app/api/layout/route.ts`, `app/api/pages/route.ts`, `app/api/page/[...slug]/route.ts`). They serve `MOCK_LAYOUT` and `MOCK_PAGES` and establish the API contract. `QueryProvider` is wired. To connect a real backend: replace the data source in the route handlers — no consumer changes needed.
 
 ---
 
@@ -164,6 +158,18 @@ Related to item 7. There is no way to know if users are hitting `DegradedStateUI
 
 ---
 
+### 15. Sidebar nav icons not rendered
+
+**Files:** `src/schemas/page.schema.ts`, `src/components/organisms/Sidebar.tsx`
+
+`PageNavItem.icon` is defined in the schema and parsed by Zod, but the Sidebar does not render it — no icon library is installed. The field is reserved for future use.
+
+**Severity:** Low
+
+**Fix:** Install an icon library (e.g. `lucide-react`, which is zero-config with React 19). Update `NavItem` in `Sidebar.tsx` to render `icon` if present. Verify 2026 security standing before adding the dependency.
+
+---
+
 ## Summary table
 
 | # | Severity | Issue |
@@ -173,7 +179,7 @@ Related to item 7. There is no way to know if users are hitting `DegradedStateUI
 | 3 | Critical | ActionRegistry: mock actions registered; real feature actions still missing |
 | 4 | High | Recursive children have no depth limit — stack overflow risk |
 | 5 | High | Zero tests |  
-| 6 | High | No real API integration — all data is static mock |
+| ~~6~~ | ~~High~~ | ~~No real API integration~~ — **resolved**: API routes + QueryProvider wired |
 | 7 | Medium | Logger is console-only — no production error monitoring |
 | 8 | Medium | Table cells do not use `FormattedUtc` for date values |
 | 9 | Medium | No HTTP security headers in `next.config.ts` |
@@ -184,3 +190,4 @@ Related to item 7. There is no way to know if users are hitting `DegradedStateUI
 | 14 | Low | No production error observability |
 | ~~15~~ | ~~Low~~ | ~~Table uses row index as React key~~ — **resolved** |
 | 15 | Low | Table uses row index as React key |
+| 16 | Low | Sidebar nav icons not rendered — `PageNavItem.icon` parsed but unused (no icon library installed) |
