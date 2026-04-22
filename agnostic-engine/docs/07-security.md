@@ -93,7 +93,7 @@ export const logger: AppLogger = consoleLogger;
 ```
 
 Rules:
-- **Never use `console.log` directly** — always use `logger.error` or `logger.warn`
+- **Never use `console.log` directly** — always use `logger.info`, `logger.warn`, or `logger.error`
 - Never `catch` an error silently without calling `logger.error`
 
 ---

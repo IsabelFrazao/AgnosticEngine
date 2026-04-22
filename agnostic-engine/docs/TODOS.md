@@ -37,7 +37,7 @@ The schema supports it (`"permissions": ["courses:read"]`), the props are typed,
 
 **Files:** `src/registry/action-registry.ts`, `src/data/mock-schema.json`
 
-**Partially resolved:** `src/data/mock-actions.ts` now registers 5 mock console-log handlers for all demo buttons, proving the infrastructure works correctly. The critical gap remaining is that **real feature actions** are not yet wired — when building actual features (publish, save, preview, etc.), each must be registered in `ActionRegistry` before its button can function.
+**Partially resolved:** `src/data/mock-actions.ts` now registers 5 mock logger-backed handlers for all demo buttons, proving the infrastructure works correctly. The critical gap remaining is that **real feature actions** are not yet wired — when building actual features (publish, save, preview, etc.), each must be registered in `ActionRegistry` before its button can function.
 
 **Fix:** As each feature is built, register its handlers early in the app lifecycle (e.g., a `src/registry/registered-actions.ts` imported in `app/layout.tsx`).
 
