@@ -45,30 +45,21 @@ Remaining gap: this still uses demo permissions (`src/data/mock-auth.ts`). Real 
 
 ## High — Significant gaps that limit real use
 
-### 4. Recursive children have no depth limit
+### ~~4. Recursive children have no depth limit~~ — **resolved**
 
-**Files:** `src/engines/MetadataEngineItem.tsx`
+**Files:** `src/engines/MetadataEngineItem.tsx`, `src/lib/metadata/engine-limits.ts`
 
-`MetadataEngineItem` calls itself recursively for `node.children` with no maximum depth guard. A deeply nested or circular schema arriving from the database would cause a **call stack overflow** — which bypasses `ErrorBoundary` entirely (error boundaries only catch JS errors thrown during render, not stack overflows).
-
-**Fix:** Pass a `depth` counter through the recursive call. At a configurable max (e.g. 10), render `<DegradedStateUI reason="max-depth-exceeded">` instead of recursing. Requires adding `'max-depth-exceeded'` to `DegradedStateUI`'s `reason` union type.
+Depth is capped via `MAX_METADATA_TREE_DEPTH`, and repeated `id` values on the ancestor path degrade with `cycle-detected` instead of recursing until stack overflow.
 
 ---
 
-### 5. No tests exist
+### 5. Test coverage is still thin
 
-**Files:** None
+**Files:** `src/**/__tests__`, `app/api/__tests__`
 
-There are zero test files in the entire project. The test infrastructure (vitest, lint-staged config) exists but is empty. Critical paths with no test coverage:
+Vitest is wired and several suites exist (permissions, schema version, HTTP header helpers, engine guards, API contracts). Large parts of the codebase remain untested (sanitizer, parsers, `ActionRegistry`, theme/hydration hooks).
 
-- `sanitizeMetadata()` — the security-critical HTML sanitizer
-- `MetadataEngineItem` — the entire engine pipeline
-- `parseButtonMetadata`, `parseTableMetadata` — parsers that could silently fail
-- `ActionRegistry` — register/resolve/duplicate-key behavior
-- `useClientReady` — SSR/hydration correctness
-- `ThemeProvider` — localStorage read/write, invalid stored value handling
-
-**Fix:** Install vitest, write unit tests for utils and parsers first (they are pure functions and easiest to test). Then integration tests for the engine.
+**Fix:** Expand unit tests for pure utilities first, then engine and security-critical paths.
 
 ---
 
@@ -185,8 +176,8 @@ Related to item 8. There is no way to know if users are hitting `DegradedStateUI
 | ~~1~~ | ~~Critical~~ | ~~`vitest` not installed — commits and `npm test` fail~~ — **resolved** |
 | 2 | Critical | RBAC is only partial — node checks exist, route/session-level authz is still missing |
 | 3 | Critical | ActionRegistry: mock actions registered; real feature actions still missing |
-| 4 | High | Recursive children have no depth limit — stack overflow risk |
-| 5 | High | Test coverage is still minimal for engine and API paths |
+| ~~4~~ | ~~High~~ | ~~Recursive children have no depth limit~~ — **resolved** |
+| 5 | High | Test coverage is still thin (sanitizer, parsers, ActionRegistry, theme) |
 | 6 | High | Schema versioning is partial (single-version contract, no multi-version migration yet) |
 | ~~7~~ | ~~High~~ | ~~No real API integration~~ — **resolved**: API routes + QueryProvider wired |
 | 8 | Medium | Logger is console-only — no production error monitoring |

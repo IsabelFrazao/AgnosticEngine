@@ -8,6 +8,11 @@ import { COMPONENT_MAP } from '@/src/registry/component-registry';
 import { MetadataNodeSchema } from '@/src/schemas/root.schema';
 import { sanitizeMetadata } from '@/src/utils/sanitize';
 import { logger } from '@/src/lib/logger';
+import {
+  extendMetadataAncestorIds,
+  MAX_METADATA_TREE_DEPTH,
+  resolveMetadataAncestorIds,
+} from '@/src/lib/metadata/engine-limits';
 import { evaluatePermissionAccess } from '@/src/lib/permissions';
 import type { MetadataComponentProps, MetadataSchemaItem } from '@/src/lib/metadata-types';
 
@@ -41,9 +46,13 @@ function buildItemProps(item: {
 export function MetadataEngineItem({
   item,
   currentUserPermissions,
+  depth = 0,
+  ancestorIds,
 }: {
   item: MetadataSchemaItem;
   currentUserPermissions?: string[];
+  depth?: number;
+  ancestorIds?: ReadonlySet<string>;
 }) {
   // Stage 1: Schema validation
   const parsed = MetadataNodeSchema.safeParse(item);
@@ -63,6 +72,32 @@ export function MetadataEngineItem({
   }
 
   const node = parsed.data;
+  const resolvedAncestors = resolveMetadataAncestorIds(ancestorIds);
+
+  if (resolvedAncestors.has(node.id)) {
+    logger.warn(`Metadata cycle detected at "${node.type}"`, {
+      id: node.id,
+    });
+    return (
+      <DegradedStateUI itemId={node.id} itemType={node.type} reason="cycle-detected" />
+    );
+  }
+
+  if (depth >= MAX_METADATA_TREE_DEPTH) {
+    logger.warn(`Max metadata depth exceeded for "${node.type}"`, {
+      id: node.id,
+      depth,
+      maxDepth: MAX_METADATA_TREE_DEPTH,
+    });
+    return (
+      <DegradedStateUI
+        itemId={node.id}
+        itemType={node.type}
+        reason="max-depth-exceeded"
+      />
+    );
+  }
+
   const access = evaluatePermissionAccess(node.permissions, currentUserPermissions);
 
   if (!access.allowed) {
@@ -110,6 +145,8 @@ export function MetadataEngineItem({
                   key={child.id}
                   item={child}
                   currentUserPermissions={currentUserPermissions}
+                  depth={depth + 1}
+                  ancestorIds={extendMetadataAncestorIds(resolvedAncestors, node.id)}
                 />
               ))}
             </div>

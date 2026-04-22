@@ -20,6 +20,7 @@ export function MetadataEngine({
           key={item.id}
           item={item}
           currentUserPermissions={currentUserPermissions}
+          depth={0}
         />
       ))}
     </div>

@@ -88,7 +88,9 @@ The two files that make the engine work. Do not add business logic here.
 | File | Purpose |
 |------|---------|
 | `MetadataEngine.tsx` | Top-level: iterates a schema array. No logic — delegates every item to `MetadataEngineItem`. |
-| `MetadataEngineItem.tsx` | Per-node: validate → sanitize → lookup → render → recurse into children. |
+| `MetadataEngineItem.tsx` | Per-node: validate → cycle/depth guard → permission → sanitize → lookup → render → recurse into children. |
+| `__tests__/MetadataEngineItem.test.tsx` | Permission enforcement coverage |
+| `__tests__/MetadataEngineItem.guards.test.tsx` | Depth and cycle guard coverage (mocks max depth in tests) |
 
 ---
 
@@ -162,6 +164,7 @@ lib/
 │   ├── migrate-layout.ts   Normalizes and validates layout schemaVersion
 │   ├── migrate-page-manifest-entry.ts  Normalizes and validates page schemaVersion
 │   ├── schema-version.ts   Supported schema versions and validation helpers
+│   ├── engine-limits.ts    Max metadata tree depth + ancestor path helpers for cycle checks
 │   ├── parse-button-metadata.ts
 │   ├── parse-table-metadata.ts
 │   └── parse-theme-switcher-metadata.ts

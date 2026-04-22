@@ -25,23 +25,27 @@ MetadataEngineItem                src/engines/MetadataEngineItem.tsx
     │          Validates the item against all known component schemas.
     │          If invalid → logs error + renders DegradedStateUI. Stops here.
     │
-    ├─ Step 2: Permission check
+    ├─ Step 2: Cycle + depth guard
+    │          Detects repeated `id` on the ancestor path, then enforces `MAX_METADATA_TREE_DEPTH`.
+    │          If violated → logs warning + renders DegradedStateUI. Stops here.
+    │
+    ├─ Step 3: Permission check
     │          `node.permissions` is evaluated against current user permissions.
     │          If missing permissions → logs warning + renders DegradedStateUI. Stops here.
     │
-    ├─ Step 3: sanitizeMetadata()
+    ├─ Step 4: sanitizeMetadata()
     │          Strips dangerous HTML from all string values in props.
     │          Only <b>, <i>, <strong> are allowed (no attributes).
     │
-    ├─ Step 4: COMPONENT_MAP[node.type]
+    ├─ Step 5: COMPONENT_MAP[node.type]
     │          Looks up the React component registered for this type.
     │          If unknown type → logs error + renders DegradedStateUI. Stops here.
     │
-    ├─ Step 5: Render inside ErrorBoundary + Suspense
+    ├─ Step 6: Render inside ErrorBoundary + Suspense
     │          ErrorBoundary catches any crash → DegradedStateUI.
     │          Suspense shows a Skeleton while lazy-loaded components load.
     │
-    └─ Step 6: Recurse into node.children (if any)
+    └─ Step 7: Recurse into node.children (if any)
                Each child goes through this same pipeline.
 ```
 
@@ -207,7 +211,7 @@ The root schema (`src/schemas/root.schema.ts`) is a **recursive discriminated un
 
 - You never need to touch `root.schema.ts` when adding a new atom type.
 - TypeScript and Zod both enforce the valid shapes at compile time and runtime.
-- The `children` field is added to every atom via `z.lazy`, enabling infinite nesting.
+- The `children` field is added to every atom via `z.lazy`, enabling recursive trees. At render time, `MetadataEngineItem` caps depth and blocks cycles so pathological metadata cannot blow the stack.
 
 ---
 
@@ -217,6 +221,8 @@ The root schema (`src/schemas/root.schema.ts`) is a **recursive discriminated un
 |---------|-------------------|-----------------|
 | Invalid schema (wrong type, missing required field) | "Component unavailable" box | `logger.error` with Zod issues |
 | Missing required permissions | "Component unavailable" box | `logger.warn` with missing permissions |
+| Max tree depth exceeded | "Component unavailable" box | `logger.warn` with depth + limit |
+| Metadata cycle (repeated `id` on path) | "Component unavailable" box | `logger.warn` with node id |
 | Unknown `type` string | "Component unavailable" box | `logger.error` with the unknown type |
 | Component throws during render | "Component unavailable" box | `logger.error` with the error |
 | `actionId` not registered | Button renders disabled | `logger.warn` with the `actionId` |
