@@ -1,6 +1,5 @@
 import { NextResponse, type NextRequest } from 'next/server';
-import { MOCK_PAGES } from '@/src/data/mock-data';
-import { migratePageManifestEntry } from '@/src/lib/metadata/migrate-page-manifest-entry';
+import { getPageEntry } from '@/src/lib/services/pages';
 
 type RouteContext = { params: Promise<{ slug: string[] }> };
 
@@ -11,7 +10,6 @@ type RouteContext = { params: Promise<{ slug: string[] }> };
  * The slug segments are joined to reconstruct the page key (e.g. ["courses","modules"] → "/courses/modules").
  *
  * Returns 404 JSON if the slug is not in the pages manifest.
- * Replace MOCK_PAGES with a real DB/CMS query when the backend is ready.
  */
 export async function GET(
   _req: NextRequest,
@@ -19,17 +17,18 @@ export async function GET(
 ): Promise<NextResponse> {
   const { slug } = await params;
   const path = `/${slug.join('/')}`;
-  const page = MOCK_PAGES[path];
-
-  if (!page) {
-    return NextResponse.json({ error: 'Page not found', path }, { status: 404 });
-  }
 
   try {
-    return NextResponse.json(migratePageManifestEntry(page));
+    const page = getPageEntry(path);
+
+    if (!page) {
+      return NextResponse.json({ error: 'Page not found', path }, { status: 404 });
+    }
+
+    return NextResponse.json(page);
   } catch (error) {
     return NextResponse.json(
-      { error: 'Invalid page schema version', path, details: String(error) },
+      { error: 'Invalid page payload', path, details: String(error) },
       { status: 500 },
     );
   }

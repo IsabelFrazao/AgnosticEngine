@@ -1,11 +1,11 @@
 import { MetadataEngine } from '@/src/engines/MetadataEngine';
 import { FormattedUtc } from '@/src/components/atoms/FormattedUtc';
-import { DEMO_UPDATED_AT, MOCK_PAGES } from '@/src/data/mock-data';
-import { MOCK_CURRENT_USER_PERMISSIONS } from '@/src/data/mock-auth';
-
-const homePage = MOCK_PAGES['/'];
+import { getCurrentUserPermissions } from '@/src/lib/services/current-user';
+import { DEMO_UPDATED_AT, getHomePageEntry } from '@/src/lib/services/pages';
 
 export default function Home() {
+  const homePage = getHomePageEntry();
+
   return (
     <div className="flex min-h-full flex-col bg-(--background) font-sans">
       <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-6 py-16">
@@ -26,7 +26,7 @@ export default function Home() {
         <section className="rounded-xl border border-(--color-border) bg-(--color-surface) p-6 shadow-sm">
           <MetadataEngine
             schema={homePage.components}
-            currentUserPermissions={MOCK_CURRENT_USER_PERMISSIONS}
+            currentUserPermissions={[...getCurrentUserPermissions()]}
           />
         </section>
       </main>

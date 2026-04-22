@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { MetadataEngine } from '@/src/engines/MetadataEngine';
-import { MOCK_PAGES } from '@/src/data/mock-data';
-import { MOCK_CURRENT_USER_PERMISSIONS } from '@/src/data/mock-auth';
+import { getCurrentUserPermissions } from '@/src/lib/services/current-user';
+import { getPageEntry, getStaticPathParams } from '@/src/lib/services/pages';
 
 type PageProps = { params: Promise<{ slug: string[] }> };
 
@@ -13,12 +13,11 @@ type PageProps = { params: Promise<{ slug: string[] }> };
  *   ["courses","modules"] → "/courses/modules"
  *
  * Returns Next.js 404 if the slug has no entry in the pages manifest.
- * Replace MOCK_PAGES with an API fetch when the backend is ready.
  */
 export default async function DynamicPage({ params }: PageProps) {
   const { slug } = await params;
   const path = `/${slug.join('/')}`;
-  const page = MOCK_PAGES[path];
+  const page = getPageEntry(path);
 
   if (!page) notFound();
 
@@ -42,7 +41,7 @@ export default async function DynamicPage({ params }: PageProps) {
           <section className="rounded-xl border border-(--color-border) bg-(--color-surface) p-6 shadow-sm">
             <MetadataEngine
               schema={page.components}
-              currentUserPermissions={MOCK_CURRENT_USER_PERMISSIONS}
+              currentUserPermissions={[...getCurrentUserPermissions()]}
             />
           </section>
         ) : (
@@ -58,10 +57,5 @@ export default async function DynamicPage({ params }: PageProps) {
 }
 
 export async function generateStaticParams() {
-  return Object.keys(MOCK_PAGES)
-    .filter(slug => slug !== '/')
-    .map(slug => ({
-      // Remove leading "/" and split into segments
-      slug: slug.replace(/^\//, '').split('/'),
-    }));
+  return getStaticPathParams();
 }

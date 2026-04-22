@@ -36,9 +36,9 @@ This is the Next.js App Router entry point. Minimal by design — pages are thin
 ```
 app/
 ├── layout.tsx          Root HTML shell: fonts, QueryProvider, ThemeProvider, Sidebar, anti-flash script
-├── page.tsx            Home page — reads MOCK_PAGES['/'] and passes components to MetadataEngine
+├── page.tsx            Home page — loads "/" via `getHomePageEntry()` and passes components to MetadataEngine
 ├── [...slug]/
-│   └── page.tsx        Catch-all dynamic route — resolves any slug against MOCK_PAGES
+│   └── page.tsx        Catch-all dynamic route — resolves slug via `getPageEntry()`
 ├── globals.css         All CSS: theme tokens (CSS variables), Tailwind v4 setup, base styles
 └── api/
     ├── __tests__/
@@ -52,13 +52,13 @@ app/
             └── route.ts  GET /api/page/:slug — returns full page entry; 404 if missing
 ```
 
-**`app/layout.tsx`** — Sets up the full app shell. Wraps children in `QueryProvider` (TanStack Query infrastructure) and `ThemeProvider`. Computes `NavManifest` server-side from `MOCK_PAGES` and passes it to `Sidebar`. Anti-flash theme script runs before React hydrates.
+**`app/layout.tsx`** — Sets up the full app shell. Wraps children in `QueryProvider` (TanStack Query infrastructure) and `ThemeProvider`. Loads layout shell and `NavManifest` via `src/lib/services` and passes them to `Sidebar`. Anti-flash theme script runs before React hydrates.
 
-**`app/page.tsx`** — Home page (`/`). Reads components from `MOCK_PAGES['/']`. Intentionally thin — no business logic.
+**`app/page.tsx`** — Home page (`/`). Loads the root page entry through the pages service. Intentionally thin — no business logic.
 
-**`app/[...slug]/page.tsx`** — Dynamic renderer for all non-root pages. Joins slug segments into a path (`["courses","modules"]` → `"/courses/modules"`), looks it up in `MOCK_PAGES`, renders via `MetadataEngine`. Returns 404 if not found.
+**`app/[...slug]/page.tsx`** — Dynamic renderer for all non-root pages. Joins slug segments into a path (`["courses","modules"]` → `"/courses/modules"`), resolves the page via the pages service, renders via `MetadataEngine`. Returns 404 if not found.
 
-**`app/api/`** — Next.js Route Handlers that define the API contract. Currently serve `MOCK_PAGES` and `MOCK_LAYOUT`. Replace the data source when a real backend is ready — no consumer changes needed.
+**`app/api/`** — Next.js Route Handlers that define the HTTP contract. Handlers delegate to the same `src/lib/services` loaders as the App Router (mock-backed today). Point those services at a real backend when ready.
 
 **`app/globals.css`** — Contains the entire token system: 5 complete theme blocks (`:root`, `[data-theme="dark"]`, etc.), plus the Tailwind v4 `@theme` mapping that connects CSS vars to utility classes.
 
@@ -160,6 +160,11 @@ lib/
 ├── http-security-headers.ts  CSP and baseline response security headers for `next.config`
 ├── site-config.ts          SITE_CONFIG: site name and description (white-label entry point)
 ├── resolve-action.ts       Centralised ActionRegistry resolution — resolves actionId, handles missing handler (warn + forceDisabled). Use in every interactive component instead of inlining the logic.
+├── services/               Typed loaders for pages, layout, and session permissions (mock-backed; swap for API/DB)
+│   ├── pages.ts            Validated pages manifest, nav slice, static params helpers
+│   ├── layout.ts           Validated shared layout document
+│   ├── current-user.ts     Effective permission list (demo stub)
+│   └── __tests__/          Service contract tests
 ├── metadata/               Per-component metadata parsers
 │   ├── migrate-layout.ts   Normalizes and validates layout schemaVersion
 │   ├── migrate-page-manifest-entry.ts  Normalizes and validates page schemaVersion
