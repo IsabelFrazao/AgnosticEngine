@@ -111,6 +111,25 @@ Rules:
 
 ---
 
+## Layer 6 — HTTP security headers
+
+**Where:** `next.config.ts` (uses `getSecurityHeaders` from `src/lib/http-security-headers.ts`)
+
+Responses include a baseline policy suitable for this app:
+
+- **Content-Security-Policy** — `default-src 'self'`, tight `frame-ancestors`, `connect-src 'self'`, and (in development only) `'unsafe-eval'` for Next.js tooling. Tighten further when you add third-party scripts, analytics, or CDNs.
+- **X-Content-Type-Options: nosniff**
+- **X-Frame-Options: DENY** (paired with `frame-ancestors 'none'` in CSP)
+- **Referrer-Policy: strict-origin-when-cross-origin**
+- **Permissions-Policy** — disables camera, microphone, and geolocation by default
+- **Strict-Transport-Security** — applied only when `NODE_ENV !== 'development'`
+
+**Where:** `middleware.ts` (root)
+
+Thin pass-through today — intended extension point for auth, tenancy, and rate limiting without scattering logic across routes.
+
+---
+
 ## Environment variables
 
 **Where:** `src/env.ts`
@@ -132,8 +151,8 @@ Access environment variables via `env.NEXT_PUBLIC_API_URL` (the validated object
 |-----|------|---------|
 | Route-level RBAC | Component nodes are enforced, but page/route gating is not yet tied to real auth/session identity | [TODOS.md](./TODOS.md) |
 | Sentry / remote logging | Errors only go to `console` in production | [TODOS.md](./TODOS.md) |
-| Content Security Policy headers | `next.config.ts` is empty — no CSP headers set | [TODOS.md](./TODOS.md) |
-| Rate limiting / auth | No API routes with auth yet | [TODOS.md](./TODOS.md) |
+| CSP tuning for third parties | Baseline CSP is strict; any new external script or iframe host must be reflected in `src/lib/http-security-headers.ts` | [TODOS.md](./TODOS.md) |
+| Rate limiting / auth | Middleware is a scaffold only — no enforcement on `/api` yet | [TODOS.md](./TODOS.md) |
 
 ---
 
@@ -146,4 +165,5 @@ Access environment variables via `env.NEXT_PUBLIC_API_URL` (the validated object
 | Arbitrary code cannot be triggered via button metadata | ActionRegistry whitelist |
 | A failing component cannot crash the whole page | ErrorBoundary per node |
 | Invalid environment config is caught at startup | Zod-validated `src/env.ts` |
+| Baseline transport security headers on responses | `next.config.ts` + `src/lib/http-security-headers.ts` |
 | All failures are observable | Centralized `logger` |

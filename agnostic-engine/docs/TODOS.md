@@ -112,13 +112,13 @@ Table cells are rendered with `String(row[c] ?? '')`. UTC date strings in table 
 
 ---
 
-### 10. No HTTP security headers
+### ~~10. No HTTP security headers~~ — **partially resolved**
 
-**Files:** `next.config.ts`
+**Files:** `next.config.ts`, `middleware.ts`, `src/lib/http-security-headers.ts`
 
-`next.config.ts` is empty. There are no HTTP headers configured — no Content Security Policy, no `X-Frame-Options`, no `X-Content-Type-Options`, no HSTS.
+Baseline CSP and standard security headers are applied via `next.config.ts`, backed by reusable helpers in `src/lib/http-security-headers.ts`. Root `middleware.ts` is a pass-through scaffold for future auth and rate limiting.
 
-**Fix:** Add a `headers()` function in `next.config.ts` with a strict CSP and standard security headers.
+**Follow-up:** Tune CSP when adding third-party scripts, embeds, or CDNs; implement real checks in `middleware.ts`.
 
 ---
 
@@ -154,9 +154,9 @@ The pre-commit hook runs unit tests only. There are no browser-level tests verif
 
 ---
 
-### 14. `next.config.ts` is entirely empty
+### 14. `next.config.ts` only defines security headers
 
-Beyond security headers (item 9), `next.config.ts` has no configuration at all — no image optimization domains, no redirects, no experimental features. This is fine now but will need attention before production deployment.
+Beyond security headers (item 10), `next.config.ts` has no image optimization domains, redirects, or experimental flags yet. That is fine for now but will need attention before production deployment.
 
 ---
 
@@ -191,11 +191,11 @@ Related to item 8. There is no way to know if users are hitting `DegradedStateUI
 | ~~7~~ | ~~High~~ | ~~No real API integration~~ — **resolved**: API routes + QueryProvider wired |
 | 8 | Medium | Logger is console-only — no production error monitoring |
 | 9 | Medium | Table cells do not use `FormattedUtc` for date values |
-| 10 | Medium | No HTTP security headers in `next.config.ts` |
+| ~~10~~ | ~~Medium~~ | ~~No HTTP security headers in `next.config.ts`~~ — **partially resolved** (baseline CSP + headers; CSP tuning TBD) |
 | ~~11~~ | ~~Medium~~ | ~~No CI/CD pipeline~~ — **resolved** |
 | 12 | Low | i18n not implemented (lang, font subsets hardcoded) |
 | 13 | Low | No E2E tests |
-| 14 | Low | `next.config.ts` empty |
+| 14 | Low | `next.config.ts` only has security headers so far |
 | 15 | Low | No production error observability |
 | ~~15~~ | ~~Low~~ | ~~Table uses row index as React key~~ — **resolved** |
 | 16 | Low | Sidebar nav icons not rendered — `PageNavItem.icon` parsed but unused (no icon library installed) |

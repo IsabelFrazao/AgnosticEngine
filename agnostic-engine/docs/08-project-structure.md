@@ -17,7 +17,8 @@ agnostic-engine/
 ├── .husky/                 Git hooks
 ├── .env.example            Environment variable template
 ├── .env.local              Your local config (not committed)
-├── next.config.ts          Next.js configuration
+├── middleware.ts           Next.js middleware (scaffold for auth / rate limits)
+├── next.config.ts          Next.js configuration + security headers
 ├── tsconfig.json           TypeScript configuration
 ├── eslint.config.mjs       ESLint rules
 ├── postcss.config.mjs      PostCSS (for Tailwind v4)
@@ -154,6 +155,7 @@ lib/
 ├── api.ts                  Axios instance with base URL + 401 interceptor
 ├── logger.ts               AppLogger interface + console implementation (swap for Sentry)
 ├── permissions.ts          Pure permission evaluator for metadata node access checks
+├── http-security-headers.ts  CSP and baseline response security headers for `next.config`
 ├── site-config.ts          SITE_CONFIG: site name and description (white-label entry point)
 ├── resolve-action.ts       Centralised ActionRegistry resolution — resolves actionId, handles missing handler (warn + forceDisabled). Use in every interactive component instead of inlining the logic.
 ├── metadata/               Per-component metadata parsers
