@@ -11,7 +11,7 @@ agnostic-engine/
 ├── .github/               CI workflows (lint, typecheck, test)
 ├── app/                    Next.js App Router pages and layouts
 ├── src/                    All application source code
-├── docs/                   This documentation
+├── docs/                   This documentation (see `HARDENING-SESSION-REPORT.md` for phased hardening status)
 ├── public/                 Static assets (SVGs, favicon)
 ├── .cursor/                AI agent rules and prompts
 ├── .husky/                 Git hooks
