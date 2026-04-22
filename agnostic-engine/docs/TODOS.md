@@ -2,13 +2,13 @@
 
 This file contains an honest assessment of everything that is missing, broken, risky, or incomplete in the current codebase. Items are grouped by severity.
 
-Last updated: 2026-04-04
+Last updated: 2026-04-22
 
 ---
 
 ## Critical — Will break in production or break the build
 
-### 1. `vitest` is not installed
+### ~~1. `vitest` is not installed~~ — **resolved**
 
 **Files:** `package.json`, `.husky/pre-commit`, `package.json` (lint-staged)
 
@@ -17,9 +17,7 @@ Last updated: 2026-04-04
 - `lint-staged` config runs `vitest run --related --passWithNoTests`
 - `.husky/pre-commit` runs `npm test`
 
-But `vitest` is **not in `devDependencies`**. Running `npm test` or making any commit will fail with "vitest: command not found".
-
-**Fix:** `npm install -D vitest @vitest/ui jsdom`
+This issue is resolved. `vitest`, `@vitest/ui`, and `jsdom` are now in `devDependencies`, and `npm test` is wired to `vitest run`.
 
 ---
 
@@ -174,7 +172,7 @@ Related to item 7. There is no way to know if users are hitting `DegradedStateUI
 
 | # | Severity | Issue |
 |---|----------|-------|
-| 1 | Critical | `vitest` not installed — commits and `npm test` fail |
+| ~~1~~ | ~~Critical~~ | ~~`vitest` not installed — commits and `npm test` fail~~ — **resolved** |
 | 2 | Critical | RBAC: `requiredPermissions` is ignored everywhere |
 | 3 | Critical | ActionRegistry: mock actions registered; real feature actions still missing |
 | 4 | High | Recursive children have no depth limit — stack overflow risk |

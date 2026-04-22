@@ -67,9 +67,8 @@ Open [http://localhost:3000](http://localhost:3000) in your browser. You should 
 | `npm run build` | Create a production-optimised build |
 | `npm run start` | Serve the production build (run `build` first) |
 | `npm run lint` | Run ESLint across all TypeScript/JavaScript files |
-| `npm test` | Run Vitest tests for staged files (used by pre-commit hook) |
-
-> **Warning:** `npm test` requires `vitest` to be installed as a dev dependency. It is currently missing from `package.json`. See [TODOS.md](./TODOS.md) — this is a known critical issue.
+| `npm test` | Run the full Vitest suite once |
+| `npm run test:watch` | Run Vitest in watch mode during development |
 
 ---
 
@@ -102,6 +101,6 @@ This is configured in `tsconfig.json` under `paths`.
 | Problem | Fix |
 |---------|-----|
 | App crashes on startup with "Invalid environment variables" | Create `.env.local` with a valid `NEXT_PUBLIC_API_URL` |
-| `npm test` fails with "vitest not found" | `npm install -D vitest` (known issue, see TODOS) |
+| `npm test` fails with "No test files found" | Add at least one `*.test.ts`/`*.test.tsx` file under `src/` |
 | Pre-commit hook fails | Run `npm run lint` manually, fix the errors, re-stage |
 | Port 3000 already in use | Next.js will try 3001, 3002, etc. automatically |
