@@ -63,7 +63,12 @@ function buildNavManifest(): NavManifest {
   return Object.fromEntries(
     Object.entries(MOCK_PAGES).map(([slug, page]) => [
       slug,
-      { title: page.title, nav: page.nav, permissions: page.permissions },
+      {
+        schemaVersion: page.schemaVersion,
+        title: page.title,
+        nav: page.nav,
+        permissions: page.permissions,
+      },
     ]),
   );
 }

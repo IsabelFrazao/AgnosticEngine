@@ -1,5 +1,9 @@
 import { z } from 'zod';
 import { MetadataNodeSchema } from '@/src/schemas/root.schema';
+import { CURRENT_SCHEMA_VERSION } from '@/src/lib/metadata/schema-version';
+
+export const SchemaVersionSchema = z.literal(CURRENT_SCHEMA_VERSION);
+export type SchemaVersion = z.infer<typeof SchemaVersionSchema>;
 
 // ---------------------------------------------------------------------------
 // Sidebar nav item — declared on the page, not on the sidebar
@@ -60,6 +64,7 @@ export type PageHeader = z.infer<typeof PageHeaderSchema>;
 // ---------------------------------------------------------------------------
 
 export const PageManifestEntrySchema = z.object({
+  schemaVersion: SchemaVersionSchema.default(CURRENT_SCHEMA_VERSION),
   title:       z.string().min(1),
   /**
    * Presence = page appears in sidebar.
@@ -89,6 +94,7 @@ export type PagesManifest = z.infer<typeof PagesManifestSchema>;
 // ---------------------------------------------------------------------------
 
 export const LayoutSchema = z.object({
+  schemaVersion:  SchemaVersionSchema.default(CURRENT_SCHEMA_VERSION),
   sidebar:       SidebarConfigSchema.default({ extras: [] }),
   navbar:        z.array(MetadataNodeSchema).default([]),
   footer:        z.array(MetadataNodeSchema).default([]),
@@ -102,5 +108,5 @@ export type Layout = z.infer<typeof LayoutSchema>;
 // Passed server→client across the RSC boundary to the Sidebar component.
 // ---------------------------------------------------------------------------
 
-export type PageNavMeta = Pick<PageManifestEntry, 'title' | 'nav' | 'permissions'>;
+export type PageNavMeta = Pick<PageManifestEntry, 'schemaVersion' | 'title' | 'nav' | 'permissions'>;
 export type NavManifest = Record<string, PageNavMeta>;

@@ -10,6 +10,7 @@ export const DEMO_UPDATED_AT = '2026-04-01T12:00:00.000Z';
 // ---------------------------------------------------------------------------
 
 export const MOCK_LAYOUT: Layout = {
+  schemaVersion: '1.0',
   sidebar: {
     extras: [
       // Non-page link — the only legitimate use of sidebar.extras.
@@ -33,6 +34,7 @@ export const MOCK_LAYOUT: Layout = {
 
 export const MOCK_PAGES: PagesManifest = {
   '/': {
+    schemaVersion: '1.0',
     title:       'Home',
     nav:         { label: 'Home', order: 0 },
     permissions: [],
@@ -71,6 +73,7 @@ export const MOCK_PAGES: PagesManifest = {
   },
 
   '/courses': {
+    schemaVersion: '1.0',
     title:       'Courses',
     nav:         { label: 'Courses', order: 1 },
     permissions: ['courses:read'],
@@ -125,6 +128,7 @@ export const MOCK_PAGES: PagesManifest = {
   // Sub-menu item: nav.parent nests it under /courses automatically.
   // No change to the /courses entry above is needed.
   '/courses/modules': {
+    schemaVersion: '1.0',
     title:       'Modules',
     nav:         { label: 'Modules', order: 0, parent: '/courses' },
     permissions: ['courses:read'],

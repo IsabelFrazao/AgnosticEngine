@@ -10,6 +10,7 @@ export type MetadataComponentProps = {
 
 // Re-export page/layout types so consumers import from one place.
 export type {
+  SchemaVersion,
   PageNavItem,
   PageNavMeta,
   NavManifest,

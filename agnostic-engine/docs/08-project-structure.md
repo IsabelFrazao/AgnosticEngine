@@ -40,6 +40,8 @@ app/
 │   └── page.tsx        Catch-all dynamic route — resolves any slug against MOCK_PAGES
 ├── globals.css         All CSS: theme tokens (CSS variables), Tailwind v4 setup, base styles
 └── api/
+    ├── __tests__/
+    │   └── routes.test.ts  Contract tests for API response shapes and schemaVersion
     ├── layout/
     │   └── route.ts    GET /api/layout — returns shared layout schema
     ├── pages/
@@ -155,6 +157,9 @@ lib/
 ├── site-config.ts          SITE_CONFIG: site name and description (white-label entry point)
 ├── resolve-action.ts       Centralised ActionRegistry resolution — resolves actionId, handles missing handler (warn + forceDisabled). Use in every interactive component instead of inlining the logic.
 ├── metadata/               Per-component metadata parsers
+│   ├── migrate-layout.ts   Normalizes and validates layout schemaVersion
+│   ├── migrate-page-manifest-entry.ts  Normalizes and validates page schemaVersion
+│   ├── schema-version.ts   Supported schema versions and validation helpers
 │   ├── parse-button-metadata.ts
 │   ├── parse-table-metadata.ts
 │   └── parse-theme-switcher-metadata.ts

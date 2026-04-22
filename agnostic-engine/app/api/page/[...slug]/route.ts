@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { MOCK_PAGES } from '@/src/data/mock-data';
+import { migratePageManifestEntry } from '@/src/lib/metadata/migrate-page-manifest-entry';
 
 type RouteContext = { params: Promise<{ slug: string[] }> };
 
@@ -24,5 +25,12 @@ export async function GET(
     return NextResponse.json({ error: 'Page not found', path }, { status: 404 });
   }
 
-  return NextResponse.json(page);
+  try {
+    return NextResponse.json(migratePageManifestEntry(page));
+  } catch (error) {
+    return NextResponse.json(
+      { error: 'Invalid page schema version', path, details: String(error) },
+      { status: 500 },
+    );
+  }
 }

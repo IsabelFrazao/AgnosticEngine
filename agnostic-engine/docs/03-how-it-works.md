@@ -84,14 +84,15 @@ The full schema has two top-level keys served by the API:
 
 ```
 GET /api/layout   → shared shell (navbar, footer, notifications, sidebar config)
-GET /api/pages    → pages manifest (slug, title, nav, permissions — no components)
-GET /api/page/:slug → full page (header + components for that slug only)
+GET /api/pages    → pages manifest (slug, schemaVersion, title, nav, permissions — no components)
+GET /api/page/:slug → full page (schemaVersion + header + components for that slug only)
 ```
 
 ### `layout`
 
 ```json
 {
+  "schemaVersion": "1.0",
   "sidebar": { "extras": [{ "label": "Docs", "href": "...", "order": 99 }] },
   "navbar": [],
   "footer": [],
@@ -104,6 +105,7 @@ GET /api/page/:slug → full page (header + components for that slug only)
 ```json
 {
   "/courses": {
+    "schemaVersion": "1.0",
     "title": "Courses",
     "nav": { "label": "Courses", "order": 1 },
     "permissions": ["courses:read"],
@@ -111,6 +113,7 @@ GET /api/page/:slug → full page (header + components for that slug only)
     "components": [ ...MetadataNode[] ]
   },
   "/courses/modules": {
+    "schemaVersion": "1.0",
     "title": "Modules",
     "nav": { "label": "Modules", "order": 0, "parent": "/courses" },
     "components": []
@@ -119,6 +122,7 @@ GET /api/page/:slug → full page (header + components for that slug only)
 ```
 
 Adding `nav` to a page entry makes it appear in the sidebar automatically (Law of Derivation). Adding `nav.parent` nests it under a parent — no other file changes needed.
+`schemaVersion` is validated and normalized by API migration helpers before payloads are returned.
 
 ---
 
