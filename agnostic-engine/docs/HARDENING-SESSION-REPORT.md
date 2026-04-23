@@ -244,4 +244,22 @@ Validation run:
 
 ---
 
+### Phase 1.9 completion note
+
+Shipped in this continuation:
+
+- Added sanitizer coverage in `src/utils/__tests__/sanitize.test.ts`.
+- Added parser coverage in `src/lib/metadata/__tests__/parsers.test.ts`.
+- Added registry behavior coverage in `src/registry/__tests__/action-registry.test.ts`.
+- Updated TODO/docs to reflect improved coverage and remaining hook/integration gaps.
+
+Validation run:
+
+- `npm run lint`
+- `npx tsc --noEmit`
+- `npm test`
+- `npm run build`
+
+---
+
 *End of report — continue by appending dated log entries after each shipped hardening phase.*

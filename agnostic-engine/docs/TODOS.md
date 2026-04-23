@@ -53,13 +53,15 @@ Depth is capped via `MAX_METADATA_TREE_DEPTH`, and repeated `id` values on the a
 
 ---
 
-### 5. Test coverage is still thin
+### ~~5. Test coverage is still thin~~ — **partially resolved**
 
 **Files:** `src/**/__tests__`, `app/api/__tests__`
 
-Vitest is wired and several suites exist (permissions, schema version, HTTP header helpers, engine guards, API contracts). Large parts of the codebase remain untested (sanitizer, parsers, `ActionRegistry`, theme/hydration hooks).
+Vitest is wired and several suites exist (permissions, schema version, HTTP header helpers, engine guards, API contracts). Coverage now includes sanitizer behavior, metadata parsers, ActionRegistry semantics, and action bootstrap idempotence.
 
-**Fix:** Expand unit tests for pure utilities first, then engine and security-critical paths.
+Remaining gap: theme/hydration hooks and richer integration-level render paths still need deeper coverage.
+
+**Fix:** Add hook-level tests (`useTheme`, hydration edge cases) and targeted integration tests around degraded-state rendering and route authorization.
 
 ---
 
@@ -177,7 +179,7 @@ Related to item 8. There is no way to know if users are hitting `DegradedStateUI
 | 2 | Critical | RBAC is partially resolved — route/API checks exist, but identity source is still demo-fallback without real session integration |
 | 3 | Critical | ActionRegistry bootstrapping is resolved, but handlers are still demo stubs rather than real feature logic |
 | ~~4~~ | ~~High~~ | ~~Recursive children have no depth limit~~ — **resolved** |
-| 5 | High | Test coverage is still thin (sanitizer, parsers, ActionRegistry, theme) |
+| 5 | High | Test coverage improved (sanitizer/parsers/ActionRegistry), but theme/hydration and deeper integration paths still need coverage |
 | 6 | High | Schema versioning is partial (single-version contract, no multi-version migration yet) |
 | ~~7~~ | ~~High~~ | ~~No real API integration~~ — **resolved**: API routes + QueryProvider wired |
 | 8 | Medium | Logger is console-only — no production error monitoring |

@@ -103,6 +103,7 @@ The two whitelists that control what can and cannot happen.
 | `component-registry.ts` | Maps `type` strings → React components (`COMPONENT_MAP`). TypeScript ensures completeness. |
 | `action-registry.ts` | Maps `actionId` strings → event handlers (`ActionRegistry`). A singleton class. |
 | `registered-actions.ts` | Single bootstrap point for action handler registration (imported once in `app/layout.tsx`). |
+| `__tests__/` | Registry contract tests (`action-registry` behavior + bootstrap idempotence). |
 
 ---
 
