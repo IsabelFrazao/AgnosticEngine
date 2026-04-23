@@ -11,6 +11,7 @@ import { Sidebar } from "@/src/components/organisms/Sidebar";
 import { getLayout } from "@/src/lib/services/layout";
 import { getAuthorizedNavManifest } from "@/src/lib/services/pages";
 import { getCurrentUserPermissions } from "@/src/lib/services/current-user";
+import "@/src/registry/registered-actions";
 
 // TODO(i18n): replace "latin" with the full subset list once i18n is wired.
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });

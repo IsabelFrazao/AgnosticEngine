@@ -52,7 +52,7 @@ app/
             └── route.ts  GET /api/page/:slug — returns full page entry; 404 if missing
 ```
 
-**`app/layout.tsx`** — Sets up the full app shell. Wraps children in `QueryProvider` (TanStack Query infrastructure) and `ThemeProvider`. Loads layout shell and `NavManifest` via `src/lib/services` and passes them to `Sidebar`. Anti-flash theme script runs before React hydrates.
+**`app/layout.tsx`** — Sets up the full app shell. Wraps children in `QueryProvider` (TanStack Query infrastructure) and `ThemeProvider`. Loads layout shell and permission-filtered `NavManifest` via `src/lib/services`, registers app actions once via `src/registry/registered-actions.ts`, and passes nav/extras to `Sidebar`. Anti-flash theme script runs before React hydrates.
 
 **`app/page.tsx`** — Home page (`/`). Loads the root page entry through the pages service. Intentionally thin — no business logic.
 
@@ -102,6 +102,7 @@ The two whitelists that control what can and cannot happen.
 |------|---------|
 | `component-registry.ts` | Maps `type` strings → React components (`COMPONENT_MAP`). TypeScript ensures completeness. |
 | `action-registry.ts` | Maps `actionId` strings → event handlers (`ActionRegistry`). A singleton class. |
+| `registered-actions.ts` | Single bootstrap point for action handler registration (imported once in `app/layout.tsx`). |
 
 ---
 
@@ -212,8 +213,7 @@ Static mock and demo data. Only used during development and demo scenarios.
 
 | File | What it does |
 |------|-------------|
-| `mock-data.ts` | Exports `MOCK_LAYOUT` and `MOCK_PAGES` — the full schema in the new two-level structure. Replaces the old `mock-schema.json` + `mock-schema.ts`. Also imports `mock-actions.ts` as a side-effect. |
-| `mock-actions.ts` | Side-effect module — registers 5 mock `ActionRegistry` handlers for all demo buttons. Imported by `mock-data.ts` so handlers are always available when mock data is used. |
+| `mock-data.ts` | Exports `MOCK_LAYOUT` and `MOCK_PAGES` — the full schema in the new two-level structure. Replaces the old `mock-schema.json` + `mock-schema.ts`. |
 | `mock-auth.ts` | Demo-only current user permissions used by the engine to enforce node-level access rules. |
 
 ---

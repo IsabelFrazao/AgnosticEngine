@@ -226,4 +226,22 @@ Validation run:
 
 ---
 
+### Phase 1.8 completion note
+
+Shipped in this continuation:
+
+- Added `src/registry/registered-actions.ts` as the single action bootstrap entrypoint.
+- Moved action registration out of mock data side-effects and into app startup (`app/layout.tsx` import).
+- Removed `src/data/mock-actions.ts` to avoid hidden registration coupling.
+- Added bootstrap tests in `src/registry/__tests__/registered-actions.test.ts`.
+
+Validation run:
+
+- `npm run lint`
+- `npx tsc --noEmit`
+- `npm test`
+- `npm run build`
+
+---
+
 *End of report — continue by appending dated log entries after each shipped hardening phase.*

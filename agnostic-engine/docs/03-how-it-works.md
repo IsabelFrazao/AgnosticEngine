@@ -132,7 +132,7 @@ Adding `nav` to a page entry makes it appear in the sidebar automatically (Law o
 
 ## Data loading (App Router + API)
 
-RSC pages and route handlers both consume **`src/lib/services/*`** (`getPagesManifest`, `getPageEntry`, `getLayout`, `getNavManifest`, `getCurrentUserPermissions`). Those functions validate with Zod and normalize schema versions; they read mock data today so you can later swap the implementation to `apiClient` or server-only DB access without changing page components.
+RSC pages and route handlers both consume **`src/lib/services/*`** (`getPagesManifest`, `getPageEntry`, `getLayout`, `getAuthorizedNavManifest`, `getCurrentUserPermissions`). Those functions validate with Zod, normalize schema versions, and enforce page-level permission checks at route boundaries. They read mock data today so you can later swap the implementation to `apiClient` or server-only DB access without changing page components.
 
 HTTP contract smoke tests live in `app/api/__tests__/routes.test.ts` (schema shape + 404 behavior).
 
@@ -202,6 +202,8 @@ export const COMPONENT_MAP: Record<ComponentType, EngineComponent> = {
 ### ActionRegistry (`src/registry/action-registry.ts`)
 
 Maps an `actionId` string to an event handler function. Buttons that specify an `actionId` look it up here. If the `actionId` is not registered, the button renders as disabled and logs a warning. No code can be injected via the schema.
+
+Registration is centralized in `src/registry/registered-actions.ts`, imported once by `app/layout.tsx`. This avoids hidden side-effects in data files and keeps action bootstrapping at the application boundary.
 
 ```ts
 ActionRegistry.register({

@@ -33,13 +33,13 @@ Remaining gap: effective permissions still fall back to demo values (`src/data/m
 
 ---
 
-### 3. ActionRegistry has no registered actions (real features)
+### ~~3. ActionRegistry has no registered actions (real features)~~ — **partially resolved**
 
-**Files:** `src/registry/action-registry.ts`, `src/data/mock-schema.json`
+**Files:** `src/registry/action-registry.ts`, `src/registry/registered-actions.ts`
 
-**Partially resolved:** `src/data/mock-actions.ts` now registers 5 mock logger-backed handlers for all demo buttons, proving the infrastructure works correctly. The critical gap remaining is that **real feature actions** are not yet wired — when building actual features (publish, save, preview, etc.), each must be registered in `ActionRegistry` before its button can function.
+**Partially resolved:** action bootstrap is now centralized in `src/registry/registered-actions.ts` and imported once in `app/layout.tsx`, so handlers are registered at app startup through a single, explicit boundary. The critical gap remaining is that handlers are still demo logger-backed; **real feature actions** are not yet wired.
 
-**Fix:** As each feature is built, register its handlers early in the app lifecycle (e.g., a `src/registry/registered-actions.ts` imported in `app/layout.tsx`).
+**Fix:** Replace demo handlers in `registered-actions.ts` with real feature handlers as publish/save/preview flows are implemented.
 
 ---
 
@@ -175,7 +175,7 @@ Related to item 8. There is no way to know if users are hitting `DegradedStateUI
 |---|----------|-------|
 | ~~1~~ | ~~Critical~~ | ~~`vitest` not installed — commits and `npm test` fail~~ — **resolved** |
 | 2 | Critical | RBAC is partially resolved — route/API checks exist, but identity source is still demo-fallback without real session integration |
-| 3 | Critical | ActionRegistry: mock actions registered; real feature actions still missing |
+| 3 | Critical | ActionRegistry bootstrapping is resolved, but handlers are still demo stubs rather than real feature logic |
 | ~~4~~ | ~~High~~ | ~~Recursive children have no depth limit~~ — **resolved** |
 | 5 | High | Test coverage is still thin (sanitizer, parsers, ActionRegistry, theme) |
 | 6 | High | Schema versioning is partial (single-version contract, no multi-version migration yet) |

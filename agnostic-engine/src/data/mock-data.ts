@@ -1,5 +1,4 @@
 import type { Layout, PagesManifest } from '@/src/schemas/page.schema';
-import './mock-actions'; // registers all demo action handlers
 
 /** Sample UTC ISO string used on the home page demo. */
 export const DEMO_UPDATED_AT = '2026-04-01T12:00:00.000Z';
