@@ -49,7 +49,39 @@ const reporterTransport: LogTransport = {
   },
 };
 
-let activeTransports: readonly LogTransport[] = [consoleTransport, reporterTransport];
+function createRemoteTransportFromEnv(): LogTransport | null {
+  if (typeof window !== 'undefined') return null;
+
+  const ingestUrl = process.env.AE_LOG_INGEST_URL;
+  if (!ingestUrl) return null;
+  const ingestToken = process.env.AE_LOG_INGEST_TOKEN;
+
+  return {
+    log: (entry) => {
+      // Intentional convention break: observability sinks can target third-party
+      // endpoints, so this transport cannot use the app's API client base URL.
+      void fetch(ingestUrl, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          ...(ingestToken ? { authorization: `Bearer ${ingestToken}` } : {}),
+        },
+        body: JSON.stringify(entry),
+      }).catch((remoteError) => {
+        console.error('[AgnosticEngine][ERROR] Remote log transport failed', remoteError);
+      });
+    },
+  };
+}
+
+function getDefaultTransports(): readonly LogTransport[] {
+  const remoteTransport = createRemoteTransportFromEnv();
+  return remoteTransport
+    ? [consoleTransport, reporterTransport, remoteTransport]
+    : [consoleTransport, reporterTransport];
+}
+
+let activeTransports: readonly LogTransport[] = getDefaultTransports();
 
 function dispatchLog(level: LogLevel, message: string, context?: unknown): void {
   const entry: LogEntry = {

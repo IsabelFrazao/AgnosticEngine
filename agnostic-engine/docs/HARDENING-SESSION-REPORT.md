@@ -282,4 +282,22 @@ Validation run:
 
 ---
 
+### Phase 2.1 completion note
+
+Shipped in this continuation:
+
+- Added configurable server-side remote log forwarding via `AE_LOG_INGEST_URL` (+ optional `AE_LOG_INGEST_TOKEN`) in `src/lib/logger.ts`.
+- Kept structured transport architecture while making production forwarding configurable without code changes.
+- Updated environment schema and examples (`src/env.ts`, `.env.example`) and onboarding docs (`docs/02-getting-started.md`).
+- Updated security/TODO docs to reflect current observability state and remaining provider-native adapter work.
+
+Validation run:
+
+- `npm run lint`
+- `npx tsc --noEmit`
+- `npm test`
+- `npm run build`
+
+---
+
 *End of report — continue by appending dated log entries after each shipped hardening phase.*

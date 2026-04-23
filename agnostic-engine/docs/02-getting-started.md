@@ -31,7 +31,7 @@ npm install
 
 ## 3. Set up environment variables
 
-The project requires one environment variable. Copy the example file and fill it in:
+The project requires one environment variable and supports optional observability variables. Copy the example file and fill it in:
 
 ```bash
 cp .env.example .env.local
@@ -43,7 +43,16 @@ Open `.env.local` and set:
 NEXT_PUBLIC_API_URL=http://localhost:3000/api
 ```
 
-This points the HTTP client at the local dev server. It is validated at startup by Zod — the app will refuse to start if this value is missing or not a valid URL.
+Optional (server-side observability sink):
+
+```
+AE_LOG_INGEST_URL=https://logs.example.com/ingest
+AE_LOG_INGEST_TOKEN=<secret-token>
+```
+
+`NEXT_PUBLIC_API_URL` points the HTTP client at the local dev server. It is validated at startup by Zod — the app will refuse to start if this value is missing or not a valid URL.
+
+If `AE_LOG_INGEST_URL` is set, the logger will also POST structured server-side log events to that endpoint (optionally authenticated with `AE_LOG_INGEST_TOKEN`).
 
 > **Note:** There is no real API yet. The app currently uses static mock data. This variable is required by the schema validation even so. See [TODOS.md](./TODOS.md) for context.
 
@@ -100,7 +109,7 @@ This is configured in `tsconfig.json` under `paths`.
 
 | Problem | Fix |
 |---------|-----|
-| App crashes on startup with "Invalid environment variables" | Create `.env.local` with a valid `NEXT_PUBLIC_API_URL` |
+| App crashes on startup with "Invalid environment variables" | Create `.env.local` with a valid `NEXT_PUBLIC_API_URL` and valid URL format for `AE_LOG_INGEST_URL` if set |
 | `npm test` fails with "No test files found" | Add at least one `*.test.ts`/`*.test.tsx` file under `src/` |
 | Pre-commit hook fails | Run `npm run lint` manually, fix the errors, re-stage |
 | Port 3000 already in use | Next.js will try 3001, 3002, etc. automatically |

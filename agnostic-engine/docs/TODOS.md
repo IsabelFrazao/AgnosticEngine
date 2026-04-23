@@ -89,9 +89,9 @@ API route handlers are now defined (`app/api/layout/route.ts`, `app/api/pages/ro
 
 The logger now emits structured `LogEntry` objects through pluggable transports and includes an external reporter hook path (`globalThis.__AGNOSTIC_ENGINE_REPORTER__`). This provides a stable backend seam for production observability without changing logger call sites.
 
-Remaining gap: no concrete Sentry/Datadog transport module is wired at bootstrap yet.
+Remaining gap: provider-native SDK adapters (Sentry/Datadog) are still not wired; current remote sink path is generic env-based forwarding.
 
-**Fix:** Add provider-specific transport(s) and call `setLoggerTransports(...)` in app bootstrap for each deployment environment.
+**Fix:** Add provider-specific transport(s) and call `setLoggerTransports(...)` in app bootstrap for each deployment environment. Keep `AE_LOG_INGEST_URL` as fallback/bridge.
 
 ---
 
@@ -184,13 +184,13 @@ Related to item 8. Observability plumbing now exists, but production deployments
 | 5 | High | Test coverage improved (sanitizer/parsers/ActionRegistry), but theme/hydration and deeper integration paths still need coverage |
 | 6 | High | Schema versioning is partial (single-version contract, no multi-version migration yet) |
 | ~~7~~ | ~~High~~ | ~~No real API integration~~ — **resolved**: API routes + QueryProvider wired |
-| 8 | Medium | Logger transport seam exists; remote sink transport wiring is still pending for production monitoring |
+| 8 | Medium | Logger transport seam and generic remote forwarding exist; provider-native monitoring adapters are still pending |
 | 9 | Medium | Table cells do not use `FormattedUtc` for date values |
 | ~~10~~ | ~~Medium~~ | ~~No HTTP security headers in `next.config.ts`~~ — **partially resolved** (baseline CSP + headers; CSP tuning TBD) |
 | ~~11~~ | ~~Medium~~ | ~~No CI/CD pipeline~~ — **resolved** |
 | 12 | Low | i18n not implemented (lang, font subsets hardcoded) |
 | 13 | Low | No E2E tests |
 | 14 | Low | `next.config.ts` only has security headers so far |
-| 15 | Low | Production observability is partially resolved; provider transport wiring is still required per environment |
+| 15 | Low | Production observability is partially resolved; provider-native transport wiring is still required per environment |
 | ~~15~~ | ~~Low~~ | ~~Table uses row index as React key~~ — **resolved** |
 | 16 | Low | Sidebar nav icons not rendered — `PageNavItem.icon` parsed but unused (no icon library installed) |

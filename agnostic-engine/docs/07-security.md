@@ -130,6 +130,7 @@ setLoggerTransports([consoleTransport, sentryTransport]);
 ```
 
 Use `setLoggerTransports(...)` at application bootstrap to switch to Sentry/Datadog/New Relic adapters without changing call sites across the app.
+Additionally, server runtimes can enable built-in remote forwarding by setting `AE_LOG_INGEST_URL` (and optional `AE_LOG_INGEST_TOKEN`).
 
 Rules:
 - **Never use `console.log` directly** — always use `logger.info`, `logger.warn`, or `logger.error`
@@ -176,7 +177,7 @@ Access environment variables via `env.NEXT_PUBLIC_API_URL` (the validated object
 | Gap | Risk | Tracking |
 |-----|------|---------|
 | Session-backed identity provider | Route and API permission checks are implemented, but effective permissions still fall back to demo defaults when no real auth/session source is connected | [TODOS.md](./TODOS.md) |
-| Remote sink adapter wiring | Structured logger transports are in place, but a concrete Sentry/Datadog transport module is not yet connected in bootstrap | [TODOS.md](./TODOS.md) |
+| Provider-native adapter wiring | Generic remote sink forwarding is available (`AE_LOG_INGEST_URL`), but provider-native Sentry/Datadog SDK adapters are not yet connected | [TODOS.md](./TODOS.md) |
 | CSP tuning for third parties | Baseline CSP is strict; any new external script or iframe host must be reflected in `src/lib/http-security-headers.ts` | [TODOS.md](./TODOS.md) |
 | Rate limiting / auth | Middleware is a scaffold only — no enforcement on `/api` yet | [TODOS.md](./TODOS.md) |
 
