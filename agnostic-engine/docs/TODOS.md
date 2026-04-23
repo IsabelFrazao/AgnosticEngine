@@ -95,15 +95,15 @@ Remaining gap: provider-native SDK adapters (Sentry/Datadog) are still not wired
 
 ---
 
-### 9. `FormattedUtc` is not used in the Table component
+### ~~9. `FormattedUtc` is not used in the Table component~~ — **resolved**
 
 **Files:** `src/components/organisms/Table.tsx`, `src/components/atoms/FormattedUtc.tsx`
 
-Table cells are rendered with `String(row[c] ?? '')`. UTC date strings in table data display as raw ISO strings (`"2026-03-28T09:00:00.000Z"`) instead of formatted local times.
+Table now detects ISO UTC strings in cell values and renders them with `FormattedUtc`.
 
-`FormattedUtc` exists and works correctly — it just is not used in `Table`.
+Non-date values remain unchanged and render as plain strings.
 
-**Fix:** Detect ISO date strings in table cell values and render them with `FormattedUtc`. Or add a column type hint to the table schema.
+**Status:** Resolved by wiring `FormattedUtc` into `Table` value rendering path.
 
 ---
 
@@ -185,7 +185,7 @@ Related to item 8. Observability plumbing now exists, but production deployments
 | 6 | High | Schema versioning is partial (single-version contract, no multi-version migration yet) |
 | ~~7~~ | ~~High~~ | ~~No real API integration~~ — **resolved**: API routes + QueryProvider wired |
 | 8 | Medium | Logger transport seam and generic remote forwarding exist; provider-native monitoring adapters are still pending |
-| 9 | Medium | Table cells do not use `FormattedUtc` for date values |
+| ~~9~~ | ~~Medium~~ | ~~Table cells do not use `FormattedUtc` for date values~~ — **resolved** |
 | ~~10~~ | ~~Medium~~ | ~~No HTTP security headers in `next.config.ts`~~ — **partially resolved** (baseline CSP + headers; CSP tuning TBD) |
 | ~~11~~ | ~~Medium~~ | ~~No CI/CD pipeline~~ — **resolved** |
 | 12 | Low | i18n not implemented (lang, font subsets hardcoded) |

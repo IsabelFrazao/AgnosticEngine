@@ -1,5 +1,15 @@
+import type { ReactNode } from 'react';
 import type { MetadataComponentProps } from '@/src/lib/metadata-types';
 import { parseTableMetadata } from '@/src/lib/metadata/parse-table-metadata';
+import { FormattedUtc } from '@/src/components/atoms/FormattedUtc';
+import { parseUtcIso } from '@/src/lib/datetime/utc-display';
+
+function renderTableCellValue(value: unknown): ReactNode {
+  if (typeof value === 'string' && parseUtcIso(value)) {
+    return <FormattedUtc iso={value} />;
+  }
+  return String(value ?? '');
+}
 
 export function Table({ metadata, requiredPermissions }: MetadataComponentProps) {
   void requiredPermissions;
@@ -34,7 +44,7 @@ export function Table({ metadata, requiredPermissions }: MetadataComponentProps)
                 key={c}
                 className="border border-(--color-table-border) px-3 py-2"
               >
-                {String(row[c] ?? '')}
+                {renderTableCellValue(row[c])}
               </td>
             ))}
           </tr>

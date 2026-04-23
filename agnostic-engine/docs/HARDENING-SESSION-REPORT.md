@@ -300,4 +300,22 @@ Validation run:
 
 ---
 
+### Phase 2.2 completion note
+
+Shipped in this continuation:
+
+- Wired `FormattedUtc` into `src/components/organisms/Table.tsx` for ISO UTC cell values.
+- Preserved plain-string rendering for non-date cell values.
+- Added server-render test coverage in `src/components/organisms/__tests__/Table.test.tsx`.
+- Updated component/TODO docs to mark the table date-formatting gap as resolved.
+
+Validation run:
+
+- `npm run lint`
+- `npx tsc --noEmit`
+- `npm test`
+- `npm run build`
+
+---
+
 *End of report — continue by appending dated log entries after each shipped hardening phase.*

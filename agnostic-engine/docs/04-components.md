@@ -157,7 +157,7 @@ Takes an ISO 8601 UTC string and displays it formatted for the user's local time
 // Renders: "April 1st, 2026 at 12:00 PM" (locale-dependent)
 ```
 
-This component is **not yet wired into Table** — table cells display raw strings. See [TODOS.md](./TODOS.md).
+This component is wired into `Table` for ISO UTC strings; non-date values remain plain text.
 
 ---
 
@@ -204,7 +204,7 @@ Renders an HTML `<table>` from columns and rows defined in the schema. Lazy-load
 #### Notes
 
 - Row values are rendered as plain strings via `String(value ?? '')`.
-- Date values are **not** auto-formatted — they display as raw strings. `FormattedUtc` is not currently used here. See [TODOS.md](./TODOS.md).
+- ISO UTC date strings are auto-rendered with `FormattedUtc`; non-date values remain plain text.
 - Columns not present in `columns` array are ignored even if present in a row.
 
 ---
@@ -217,4 +217,4 @@ These exist in the codebase but are not registered in `COMPONENT_MAP`. They are 
 |-----------|---------|
 | `Skeleton` | `MetadataEngineItem` (Suspense fallback) |
 | `DegradedStateUI` | `MetadataEngineItem` (validation failure) |
-| `FormattedUtc` | `app/page.tsx` (demo date display) |
+| `FormattedUtc` | `app/page.tsx` (demo date display), `src/components/organisms/Table.tsx` (table ISO date cells) |
