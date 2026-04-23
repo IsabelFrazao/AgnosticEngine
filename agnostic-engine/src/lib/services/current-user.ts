@@ -15,7 +15,8 @@ function parsePermissionList(raw: string | null | undefined): string[] {
  * Resolution order (first non-empty wins):
  * 1) Explicit request header (`x-ae-permissions`)
  * 2) Cookie (`ae_permissions`)
- * 3) Local demo fallback (`MOCK_CURRENT_USER_PERMISSIONS`)
+ * 3) Development fallback (`MOCK_CURRENT_USER_PERMISSIONS`) in dev only
+ * 4) Empty permission set (secure default)
  */
 function resolvePermissions(
   headerValue: string | null | undefined,
@@ -27,7 +28,11 @@ function resolvePermissions(
   const fromCookie = parsePermissionList(cookieValue);
   if (fromCookie.length > 0) return fromCookie;
 
-  return MOCK_CURRENT_USER_PERMISSIONS;
+  if (process.env.NODE_ENV === 'development') {
+    return MOCK_CURRENT_USER_PERMISSIONS;
+  }
+
+  return [];
 }
 
 export function getCurrentUserPermissionsFromRequest(request: Request): readonly string[] {

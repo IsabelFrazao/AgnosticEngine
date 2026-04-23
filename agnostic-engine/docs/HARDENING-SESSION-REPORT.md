@@ -318,4 +318,24 @@ Validation run:
 
 ---
 
+### Phase 2.3 completion note
+
+Shipped in this continuation:
+
+- Hardened permission resolution in `src/lib/services/current-user.ts`:
+  - header/cookie remain first-class inputs
+  - demo fallback is now development-only
+  - non-dev default is empty permissions (secure by default)
+- Updated API contract tests to provide explicit permissions for protected page access and to verify omitted-permission behavior.
+- Updated security/TODO docs to reflect secure defaults and remaining real session integration gap.
+
+Validation run:
+
+- `npm run lint`
+- `npx tsc --noEmit`
+- `npm test`
+- `npm run build`
+
+---
+
 *End of report — continue by appending dated log entries after each shipped hardening phase.*

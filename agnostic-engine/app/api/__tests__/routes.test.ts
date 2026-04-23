@@ -13,7 +13,11 @@ describe('API schema version contracts', () => {
   });
 
   it('returns pages manifest with schemaVersion for each entry', async () => {
-    const response = getPages(new Request('http://localhost/api/pages'));
+    const response = getPages(
+      new Request('http://localhost/api/pages', {
+        headers: { 'x-ae-permissions': 'courses:read' },
+      }),
+    );
     const body = await response.json();
 
     expect(response.status).toBe(200);
@@ -22,9 +26,14 @@ describe('API schema version contracts', () => {
   });
 
   it('returns page payload with schemaVersion', async () => {
-    const response = await getPageBySlug(new Request('http://localhost/api/page/courses'), {
-      params: Promise.resolve({ slug: ['courses'] }),
-    });
+    const response = await getPageBySlug(
+      new Request('http://localhost/api/page/courses', {
+        headers: { 'x-ae-permissions': 'courses:read' },
+      }),
+      {
+        params: Promise.resolve({ slug: ['courses'] }),
+      },
+    );
     const body = await response.json();
 
     expect(response.status).toBe(200);
@@ -64,6 +73,14 @@ describe('API schema version contracts', () => {
         headers: { 'x-ae-permissions': 'profile:read' },
       }),
     );
+    const body = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(Object.keys(body)).toEqual(['/']);
+  });
+
+  it('returns only public pages when permissions are omitted', async () => {
+    const response = getPages(new Request('http://localhost/api/pages'));
     const body = await response.json();
 
     expect(response.status).toBe(200);

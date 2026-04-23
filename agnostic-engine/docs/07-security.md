@@ -71,7 +71,8 @@ Identity/permission resolution currently supports:
 
 1. `x-ae-permissions` request header (highest precedence)
 2. `ae_permissions` cookie
-3. Local fallback (`MOCK_CURRENT_USER_PERMISSIONS`) for demo/dev continuity
+3. Development-only fallback (`MOCK_CURRENT_USER_PERMISSIONS`) when `NODE_ENV=development`
+4. Secure default empty permission set when no identity data is provided
 
 This keeps authorization logic inside service boundaries instead of scattering ad hoc checks across components and handlers.
 
@@ -176,7 +177,7 @@ Access environment variables via `env.NEXT_PUBLIC_API_URL` (the validated object
 
 | Gap | Risk | Tracking |
 |-----|------|---------|
-| Session-backed identity provider | Route and API permission checks are implemented, but effective permissions still fall back to demo defaults when no real auth/session source is connected | [TODOS.md](./TODOS.md) |
+| Session-backed identity provider | Route and API permission checks are implemented with secure empty-default behavior, but real authenticated identity/session integration is still pending | [TODOS.md](./TODOS.md) |
 | Provider-native adapter wiring | Generic remote sink forwarding is available (`AE_LOG_INGEST_URL`), but provider-native Sentry/Datadog SDK adapters are not yet connected | [TODOS.md](./TODOS.md) |
 | CSP tuning for third parties | Baseline CSP is strict; any new external script or iframe host must be reflected in `src/lib/http-security-headers.ts` | [TODOS.md](./TODOS.md) |
 | Rate limiting / auth | Middleware is a scaffold only — no enforcement on `/api` yet | [TODOS.md](./TODOS.md) |

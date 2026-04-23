@@ -27,9 +27,9 @@ This issue is resolved. `vitest`, `@vitest/ui`, and `jsdom` are now in `devDepen
 
 `MetadataEngineItem` enforces node-level `permissions` before render. RSC page routes and API page routes now also enforce page-level access checks, and `/api/pages` is permission-filtered per request.
 
-Remaining gap: effective permissions still fall back to demo values (`src/data/mock-auth.ts`) when no real auth/session provider is configured.
+Remaining gap: there is still no real authenticated identity/session provider; permissions can be passed by request header/cookie and default to empty when missing (dev keeps demo fallback).
 
-**Fix:** Replace fallback demo permissions with authenticated session/API-derived permissions as the default source of truth.
+**Fix:** Integrate authenticated session/API-derived permissions as the default source of truth and remove development-only fallback when identity is wired.
 
 ---
 
@@ -178,7 +178,7 @@ Related to item 8. Observability plumbing now exists, but production deployments
 | # | Severity | Issue |
 |---|----------|-------|
 | ~~1~~ | ~~Critical~~ | ~~`vitest` not installed — commits and `npm test` fail~~ — **resolved** |
-| 2 | Critical | RBAC is partially resolved — route/API checks exist, but identity source is still demo-fallback without real session integration |
+| 2 | Critical | RBAC boundaries are in place with secure default permissions, but identity/session source is still not integrated with real auth |
 | 3 | Critical | ActionRegistry bootstrapping is resolved, but handlers are still demo stubs rather than real feature logic |
 | ~~4~~ | ~~High~~ | ~~Recursive children have no depth limit~~ — **resolved** |
 | 5 | High | Test coverage improved (sanitizer/parsers/ActionRegistry), but theme/hydration and deeper integration paths still need coverage |
