@@ -1,10 +1,16 @@
 import { MetadataEngine } from '@/src/engines/MetadataEngine';
 import { FormattedUtc } from '@/src/components/atoms/FormattedUtc';
 import { getCurrentUserPermissions } from '@/src/lib/services/current-user';
-import { DEMO_UPDATED_AT, getHomePageEntry } from '@/src/lib/services/pages';
+import { notFound } from 'next/navigation';
+import { DEMO_UPDATED_AT, canAccessPageEntry, getHomePageEntry } from '@/src/lib/services/pages';
 
-export default function Home() {
+export default async function Home() {
   const homePage = getHomePageEntry();
+  const currentUserPermissions = await getCurrentUserPermissions();
+
+  if (!canAccessPageEntry(homePage, [...currentUserPermissions])) {
+    notFound();
+  }
 
   return (
     <div className="flex min-h-full flex-col bg-(--background) font-sans">
@@ -26,7 +32,7 @@ export default function Home() {
         <section className="rounded-xl border border-(--color-border) bg-(--color-surface) p-6 shadow-sm">
           <MetadataEngine
             schema={homePage.components}
-            currentUserPermissions={[...getCurrentUserPermissions()]}
+            currentUserPermissions={[...currentUserPermissions]}
           />
         </section>
       </main>

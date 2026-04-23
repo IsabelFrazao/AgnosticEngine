@@ -1,4 +1,5 @@
 import { DEMO_UPDATED_AT, MOCK_PAGES } from '@/src/data/mock-data';
+import { evaluatePermissionAccess } from '@/src/lib/permissions';
 import { migratePageManifestEntry } from '@/src/lib/metadata/migrate-page-manifest-entry';
 import {
   PagesManifestSchema,
@@ -46,8 +47,34 @@ export function getNavManifest(): NavManifest {
   );
 }
 
+/** Permission-aware nav view for the current user. */
+export function getAuthorizedNavManifest(currentUserPermissions: string[]): NavManifest {
+  const pages = loadPagesManifest();
+
+  return Object.fromEntries(
+    Object.entries(pages)
+      .filter(([, page]) => evaluatePermissionAccess(page.permissions, currentUserPermissions).allowed)
+      .map(([slug, page]) => [
+        slug,
+        {
+          schemaVersion: page.schemaVersion,
+          title: page.title,
+          nav: page.nav,
+          permissions: page.permissions,
+        },
+      ]),
+  );
+}
+
 export function getPageEntry(path: string): PageManifestEntry | undefined {
   return loadPagesManifest()[path];
+}
+
+export function canAccessPageEntry(
+  page: PageManifestEntry,
+  currentUserPermissions: string[],
+): boolean {
+  return evaluatePermissionAccess(page.permissions, currentUserPermissions).allowed;
 }
 
 export function getHomePageEntry(): PageManifestEntry {

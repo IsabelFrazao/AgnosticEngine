@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
-import { getNavManifest } from '@/src/lib/services/pages';
+import { getCurrentUserPermissionsFromRequest } from '@/src/lib/services/current-user';
+import { getAuthorizedNavManifest } from '@/src/lib/services/pages';
 
 /**
  * GET /api/pages
@@ -10,9 +11,10 @@ import { getNavManifest } from '@/src/lib/services/pages';
  *
  * Backed by `getNavManifest()` today; point that service at a real DB/API when ready.
  */
-export function GET(): NextResponse {
+export function GET(request: Request): NextResponse {
   try {
-    return NextResponse.json(getNavManifest());
+    const currentUserPermissions = getCurrentUserPermissionsFromRequest(request);
+    return NextResponse.json(getAuthorizedNavManifest([...currentUserPermissions]));
   } catch (error) {
     return NextResponse.json(
       { error: 'Invalid pages manifest', details: String(error) },

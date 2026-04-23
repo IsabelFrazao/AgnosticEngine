@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation';
 import { MetadataEngine } from '@/src/engines/MetadataEngine';
 import { getCurrentUserPermissions } from '@/src/lib/services/current-user';
-import { getPageEntry, getStaticPathParams } from '@/src/lib/services/pages';
+import { canAccessPageEntry, getPageEntry, getStaticPathParams } from '@/src/lib/services/pages';
 
 type PageProps = { params: Promise<{ slug: string[] }> };
 
@@ -18,8 +18,10 @@ export default async function DynamicPage({ params }: PageProps) {
   const { slug } = await params;
   const path = `/${slug.join('/')}`;
   const page = getPageEntry(path);
+  const currentUserPermissions = await getCurrentUserPermissions();
 
   if (!page) notFound();
+  if (!canAccessPageEntry(page, [...currentUserPermissions])) notFound();
 
   return (
     <div className="flex min-h-full flex-col bg-(--background) font-sans">
@@ -41,7 +43,7 @@ export default async function DynamicPage({ params }: PageProps) {
           <section className="rounded-xl border border-(--color-border) bg-(--color-surface) p-6 shadow-sm">
             <MetadataEngine
               schema={page.components}
-              currentUserPermissions={[...getCurrentUserPermissions()]}
+              currentUserPermissions={[...currentUserPermissions]}
             />
           </section>
         ) : (

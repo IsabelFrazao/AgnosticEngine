@@ -4,7 +4,7 @@
 
 **Repo note:** Git history is on the parent repository `AgnosticEngine`; paths below are under `agnostic-engine/` unless stated otherwise.
 
-**Last updated:** 2026-04-22
+**Last updated:** 2026-04-23
 
 ---
 
@@ -167,4 +167,63 @@ Use **`docs/TODOS.md`** as the living gap list; align it when you close items.
 
 ---
 
-*End of report — safe to extend this file with dated “continuation log” entries as you ship more phases.*
+## Continuation log — 2026-04-23
+
+### Current status checkpoint
+
+- Phase **0.1 -> 1.6** is complete and shipped (see commit table above).
+- Remaining risk is now concentrated in **auth/session boundaries**, **test depth**, and **production observability**.
+- App Router and API routes already share service-level loaders, which is the correct seam for replacing mocks with real data incrementally.
+
+### Recommended next phases (senior/scalable order)
+
+| Phase | Priority | Why now | Deliverable |
+|-------|----------|---------|-------------|
+| **1.7 Auth boundary hardening** | Critical | Closes largest production/security gap (`docs/TODOS.md` item 2) | Session-backed `getCurrentUserPermissions()` + route-level enforcement for pages and API |
+| **1.8 Action registration bootstrap** | Critical | Prevents feature drift where buttons exist without executable handlers (item 3) | Central `registered-actions` bootstrap imported once at app startup |
+| **1.9 Test depth expansion** | High | Reduces regression risk before data/auth complexity increases (item 5) | Focused unit suites for sanitizer/parsers/ActionRegistry + route auth cases |
+| **2.0 Observability upgrade** | Medium | Makes degraded and error states visible in production (items 8/15) | Replace logger backend with Sentry/Datadog implementation |
+
+### Architectural constraints to keep
+
+1. **One permission source**: all UI/API checks derive from one session-auth provider abstraction (avoid per-route ad hoc checks).
+2. **One data seam**: App Router and API must continue to consume `src/lib/services/*` only.
+3. **One action bootstrap**: register actions from a single entrypoint to avoid duplicate/late registration.
+4. **One migration path**: when `schemaVersion` moves to `2.0`, keep explicit `1.0 -> 2.0` migration helpers.
+
+### Suggested first PR (small but high leverage)
+
+Scope:
+
+- Implement `src/lib/services/current-user.ts` against real auth/session provider (keep return contract stable).
+- Add page-level and API-level authorization checks using that service contract.
+- Add tests for allowed/denied route cases.
+- Update `docs/07-security.md` and `docs/TODOS.md` in the same PR.
+
+Exit criteria:
+
+- Unauthorized users cannot access protected routes or API payloads.
+- Existing node-level `MetadataEngineItem` permission checks remain intact (defense in depth).
+- CI remains green (`lint`, `tsc --noEmit`, `npm test`).
+
+---
+
+### Phase 1.7 completion note
+
+Shipped in this continuation:
+
+- Session-aware permission resolution via `src/lib/services/current-user.ts` (header/cookie with demo fallback).
+- Route-level page gating in `app/page.tsx` and `app/[...slug]/page.tsx`.
+- API authorization in `app/api/page/[...slug]/route.ts` and permission-filtered nav payload in `app/api/pages/route.ts`.
+- Added/updated tests in `app/api/__tests__/routes.test.ts` and `src/lib/services/__tests__/pages.test.ts`.
+
+Validation run:
+
+- `npm run lint`
+- `npx tsc --noEmit`
+- `npm test`
+- `npm run build`
+
+---
+
+*End of report — continue by appending dated log entries after each shipped hardening phase.*

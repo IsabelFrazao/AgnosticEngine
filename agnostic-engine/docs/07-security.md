@@ -44,7 +44,7 @@ The sanitizer runs **after** Zod validation, so by the time it runs, it is worki
 
 ---
 
-## Layer 2.5 — Permission enforcement
+## Layer 2.5 — Permission enforcement (component boundary)
 
 **Where:** `src/engines/MetadataEngineItem.tsx`, using `evaluatePermissionAccess` from `src/lib/permissions.ts`
 
@@ -53,7 +53,27 @@ Before rendering a validated node, the engine checks `node.permissions` against 
 - If all required permissions are present, rendering continues.
 - If any permission is missing, the engine logs a warning and renders `DegradedStateUI` with `insufficient-permissions`.
 
-This keeps access control decisions centralized in the engine boundary rather than duplicated in each component.
+This keeps node-level access control centralized in the engine boundary rather than duplicated in each component.
+
+---
+
+## Layer 2.6 — Route and API authorization boundary
+
+**Where:** `src/lib/services/current-user.ts`, `src/lib/services/pages.ts`, `app/page.tsx`, `app/[...slug]/page.tsx`, `app/api/pages/route.ts`, `app/api/page/[...slug]/route.ts`
+
+The application now enforces page-level permissions at route boundaries in addition to node-level checks:
+
+- **RSC pages** (`/` and `/[...slug]`) resolve current permissions and block unauthorized page access with `notFound()`.
+- **API routes** enforce the same page permission contract and return `403` for unauthorized page payload requests.
+- **Navigation payloads** from `/api/pages` are permission-filtered so clients only receive allowed pages.
+
+Identity/permission resolution currently supports:
+
+1. `x-ae-permissions` request header (highest precedence)
+2. `ae_permissions` cookie
+3. Local fallback (`MOCK_CURRENT_USER_PERMISSIONS`) for demo/dev continuity
+
+This keeps authorization logic inside service boundaries instead of scattering ad hoc checks across components and handlers.
 
 ---
 
@@ -149,7 +169,7 @@ Access environment variables via `env.NEXT_PUBLIC_API_URL` (the validated object
 
 | Gap | Risk | Tracking |
 |-----|------|---------|
-| Route-level RBAC | Component nodes are enforced, but page/route gating is not yet tied to real auth/session identity | [TODOS.md](./TODOS.md) |
+| Session-backed identity provider | Route and API permission checks are implemented, but effective permissions still fall back to demo defaults when no real auth/session source is connected | [TODOS.md](./TODOS.md) |
 | Sentry / remote logging | Errors only go to `console` in production | [TODOS.md](./TODOS.md) |
 | CSP tuning for third parties | Baseline CSP is strict; any new external script or iframe host must be reflected in `src/lib/http-security-headers.ts` | [TODOS.md](./TODOS.md) |
 | Rate limiting / auth | Middleware is a scaffold only — no enforcement on `/api` yet | [TODOS.md](./TODOS.md) |

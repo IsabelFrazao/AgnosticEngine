@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
+  canAccessPageEntry,
+  getAuthorizedNavManifest,
   getHomePageEntry,
   getNavManifest,
   getPageEntry,
@@ -27,6 +29,17 @@ describe('pages service', () => {
   it('getNavManifest carries schemaVersion per slug', () => {
     const nav = getNavManifest();
     expect(nav['/'].schemaVersion).toBe('1.0');
+  });
+
+  it('getAuthorizedNavManifest filters out inaccessible pages', () => {
+    const nav = getAuthorizedNavManifest(['profile:read']);
+    expect(Object.keys(nav)).toEqual(['/']);
+  });
+
+  it('canAccessPageEntry denies pages with missing permissions', () => {
+    const courses = getPageEntry('/courses');
+    expect(courses).toBeDefined();
+    expect(canAccessPageEntry(courses!, ['profile:read'])).toBe(false);
   });
 
   it('getStaticPathParams omits root', () => {

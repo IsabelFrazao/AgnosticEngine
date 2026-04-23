@@ -21,15 +21,15 @@ This issue is resolved. `vitest`, `@vitest/ui`, and `jsdom` are now in `devDepen
 
 ---
 
-### 2. RBAC is only partially implemented
+### ~~2. RBAC is only partially implemented~~ — **partially resolved**
 
 **Files:** Every component (`Button.tsx`, `Table.tsx`, `ThemeSwitcher.tsx`)
 
-`MetadataEngineItem` now enforces node-level `permissions` before render. If the current user lacks required permissions, the node degrades to `DegradedStateUI` and logs a warning.
+`MetadataEngineItem` enforces node-level `permissions` before render. RSC page routes and API page routes now also enforce page-level access checks, and `/api/pages` is permission-filtered per request.
 
-Remaining gap: this still uses demo permissions (`src/data/mock-auth.ts`). Real auth/session-backed permissions and route-level gating are not implemented yet.
+Remaining gap: effective permissions still fall back to demo values (`src/data/mock-auth.ts`) when no real auth/session provider is configured.
 
-**Fix:** Replace mock permissions with authenticated permissions from API/session and enforce page-level access control at route boundaries.
+**Fix:** Replace fallback demo permissions with authenticated session/API-derived permissions as the default source of truth.
 
 ---
 
@@ -174,7 +174,7 @@ Related to item 8. There is no way to know if users are hitting `DegradedStateUI
 | # | Severity | Issue |
 |---|----------|-------|
 | ~~1~~ | ~~Critical~~ | ~~`vitest` not installed — commits and `npm test` fail~~ — **resolved** |
-| 2 | Critical | RBAC is only partial — node checks exist, route/session-level authz is still missing |
+| 2 | Critical | RBAC is partially resolved — route/API checks exist, but identity source is still demo-fallback without real session integration |
 | 3 | Critical | ActionRegistry: mock actions registered; real feature actions still missing |
 | ~~4~~ | ~~High~~ | ~~Recursive children have no depth limit~~ — **resolved** |
 | 5 | High | Test coverage is still thin (sanitizer, parsers, ActionRegistry, theme) |

@@ -9,7 +9,8 @@ import { SITE_CONFIG } from "@/src/lib/site-config";
 import { QueryProvider } from "@/src/components/providers/QueryProvider";
 import { Sidebar } from "@/src/components/organisms/Sidebar";
 import { getLayout } from "@/src/lib/services/layout";
-import { getNavManifest } from "@/src/lib/services/pages";
+import { getAuthorizedNavManifest } from "@/src/lib/services/pages";
+import { getCurrentUserPermissions } from "@/src/lib/services/current-user";
 
 // TODO(i18n): replace "latin" with the full subset list once i18n is wired.
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -55,11 +56,13 @@ function buildAntiFlashScript(
 const ANTI_FLASH_SCRIPT = buildAntiFlashScript(STORAGE_KEY, THEME_IDS, DEFAULT_THEME_ID);
 
 const shellLayout = getLayout();
-const NAV_MANIFEST = getNavManifest();
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const currentUserPermissions = await getCurrentUserPermissions();
+  const navManifest = getAuthorizedNavManifest([...currentUserPermissions]);
+
   return (
     // suppressHydrationWarning is intentional: the anti-flash script mutates
     // data-theme on <html> before React hydrates, causing a controlled mismatch.
@@ -79,7 +82,7 @@ export default function RootLayout({
             {/* Law of Derivation: sidebar nav is derived from the pages manifest.
                 NAV_MANIFEST is computed server-side; extras come from layout config. */}
             <Sidebar
-              navManifest={NAV_MANIFEST}
+              navManifest={navManifest}
               extras={shellLayout.sidebar.extras}
             />
             <div className="flex min-h-full flex-1 flex-col overflow-y-auto">
