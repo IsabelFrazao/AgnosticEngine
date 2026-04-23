@@ -118,12 +118,18 @@ This prevents a single broken component from crashing the entire application.
 
 **Where:** `src/lib/logger.ts`
 
-All security-relevant events (validation failures, unknown types, unregistered actions) are routed through the `logger` singleton. Currently it writes to the browser/Node console. The logger is designed for easy replacement:
+All security-relevant events (validation failures, unknown types, unregistered actions) are routed through the `logger` singleton. The logger now uses a **transport pipeline**:
+
+- `consoleTransport` for local/dev visibility
+- `reporterTransport` that forwards `LogEntry` objects to a global reporter hook (`globalThis.__AGNOSTIC_ENGINE_REPORTER__`)
+
+Each log call emits structured data (`level`, `message`, `context`, `timestamp`, `source`) so external providers can ingest events consistently.
 
 ```ts
-// Swap this export to send to Sentry, Datadog, etc.
-export const logger: AppLogger = consoleLogger;
+setLoggerTransports([consoleTransport, sentryTransport]);
 ```
+
+Use `setLoggerTransports(...)` at application bootstrap to switch to Sentry/Datadog/New Relic adapters without changing call sites across the app.
 
 Rules:
 - **Never use `console.log` directly** — always use `logger.info`, `logger.warn`, or `logger.error`
@@ -170,7 +176,7 @@ Access environment variables via `env.NEXT_PUBLIC_API_URL` (the validated object
 | Gap | Risk | Tracking |
 |-----|------|---------|
 | Session-backed identity provider | Route and API permission checks are implemented, but effective permissions still fall back to demo defaults when no real auth/session source is connected | [TODOS.md](./TODOS.md) |
-| Sentry / remote logging | Errors only go to `console` in production | [TODOS.md](./TODOS.md) |
+| Remote sink adapter wiring | Structured logger transports are in place, but a concrete Sentry/Datadog transport module is not yet connected in bootstrap | [TODOS.md](./TODOS.md) |
 | CSP tuning for third parties | Baseline CSP is strict; any new external script or iframe host must be reflected in `src/lib/http-security-headers.ts` | [TODOS.md](./TODOS.md) |
 | Rate limiting / auth | Middleware is a scaffold only — no enforcement on `/api` yet | [TODOS.md](./TODOS.md) |
 

@@ -2,7 +2,7 @@
 
 This file contains an honest assessment of everything that is missing, broken, risky, or incomplete in the current codebase. Items are grouped by severity.
 
-Last updated: 2026-04-22
+Last updated: 2026-04-23
 
 ---
 
@@ -83,13 +83,15 @@ API route handlers are now defined (`app/api/layout/route.ts`, `app/api/pages/ro
 
 ## Medium — Code quality and observability gaps
 
-### 8. Logger outputs to `console` only
+### ~~8. Logger outputs to `console` only~~ — **partially resolved**
 
 **Files:** `src/lib/logger.ts`
 
-The logger is a console wrapper. In production, errors are invisible unless someone has their browser console open. The Sentry integration is mentioned in comments but not implemented.
+The logger now emits structured `LogEntry` objects through pluggable transports and includes an external reporter hook path (`globalThis.__AGNOSTIC_ENGINE_REPORTER__`). This provides a stable backend seam for production observability without changing logger call sites.
 
-**Fix:** Integrate a real error monitoring service (Sentry, Datadog, etc.) by replacing `consoleLogger` with a Sentry-backed implementation. The interface is already designed for this.
+Remaining gap: no concrete Sentry/Datadog transport module is wired at bootstrap yet.
+
+**Fix:** Add provider-specific transport(s) and call `setLoggerTransports(...)` in app bootstrap for each deployment environment.
 
 ---
 
@@ -153,9 +155,9 @@ Beyond security headers (item 10), `next.config.ts` has no image optimization do
 
 ---
 
-### 15. No error monitoring in production
+### ~~15. No error monitoring in production~~ — **partially resolved**
 
-Related to item 8. There is no way to know if users are hitting `DegradedStateUI` states in production. Silent failures are invisible.
+Related to item 8. Observability plumbing now exists, but production deployments still need an actual remote sink transport enabled to collect degraded/error events.
 
 ---
 
@@ -182,13 +184,13 @@ Related to item 8. There is no way to know if users are hitting `DegradedStateUI
 | 5 | High | Test coverage improved (sanitizer/parsers/ActionRegistry), but theme/hydration and deeper integration paths still need coverage |
 | 6 | High | Schema versioning is partial (single-version contract, no multi-version migration yet) |
 | ~~7~~ | ~~High~~ | ~~No real API integration~~ — **resolved**: API routes + QueryProvider wired |
-| 8 | Medium | Logger is console-only — no production error monitoring |
+| 8 | Medium | Logger transport seam exists; remote sink transport wiring is still pending for production monitoring |
 | 9 | Medium | Table cells do not use `FormattedUtc` for date values |
 | ~~10~~ | ~~Medium~~ | ~~No HTTP security headers in `next.config.ts`~~ — **partially resolved** (baseline CSP + headers; CSP tuning TBD) |
 | ~~11~~ | ~~Medium~~ | ~~No CI/CD pipeline~~ — **resolved** |
 | 12 | Low | i18n not implemented (lang, font subsets hardcoded) |
 | 13 | Low | No E2E tests |
 | 14 | Low | `next.config.ts` only has security headers so far |
-| 15 | Low | No production error observability |
+| 15 | Low | Production observability is partially resolved; provider transport wiring is still required per environment |
 | ~~15~~ | ~~Low~~ | ~~Table uses row index as React key~~ — **resolved** |
 | 16 | Low | Sidebar nav icons not rendered — `PageNavItem.icon` parsed but unused (no icon library installed) |

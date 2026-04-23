@@ -104,8 +104,8 @@ Order after validation:
 
 ### Observability
 
-- `src/lib/logger.ts` — `info` / `warn` / `error` (console-backed; swap for Sentry later)
-- `src/data/mock-actions.ts` — demo actions log via `logger`
+- `src/lib/logger.ts` — structured logger with transport pipeline (`console` + optional external reporter hook), plus `setLoggerTransports(...)` for provider wiring
+- `src/registry/registered-actions.ts` — demo actions emit through centralized logger
 
 ### Tests
 
@@ -138,7 +138,7 @@ Not done in this series (intentionally):
 1. **Real auth / session** — replace `getCurrentUserPermissions()` and add **route-level** RBAC (pages/API), not only node-level.
 2. **Database + publish model** — builder writes drafts; renderer reads published snapshots; avoid two apps writing the same tables without versioning.
 3. **Monorepo** — `apps/*` + `packages/*` after stabilizing contracts (your earlier plan).
-4. **Deeper tests** — `sanitizeMetadata`, parsers, `ActionRegistry`, E2E (Playwright).
+4. **Deeper tests** — theme/hydration hooks and broader integration/E2E (Playwright).
 5. **CSP tuning** — when adding third-party scripts, analytics, or embeds.
 6. **`apiClient` in services** — when the backend is real, server loaders may use internal DB helpers; browser may use `apiClient` per project rules.
 
@@ -252,6 +252,26 @@ Shipped in this continuation:
 - Added parser coverage in `src/lib/metadata/__tests__/parsers.test.ts`.
 - Added registry behavior coverage in `src/registry/__tests__/action-registry.test.ts`.
 - Updated TODO/docs to reflect improved coverage and remaining hook/integration gaps.
+
+Validation run:
+
+- `npm run lint`
+- `npx tsc --noEmit`
+- `npm test`
+- `npm run build`
+
+---
+
+### Phase 2.0 completion note
+
+Shipped in this continuation:
+
+- Replaced single console logger backend with a transport-based logger core in `src/lib/logger.ts`.
+- Added structured `LogEntry` events (`level`, `message`, `context`, `timestamp`, `source`) for consistent ingestion.
+- Added external reporter hook support (`globalThis.__AGNOSTIC_ENGINE_REPORTER__`) to wire Sentry/Datadog-style sinks without call-site changes.
+- Added `setLoggerTransports(...)` to switch transports at bootstrap/environment boundaries.
+- Added logger transport tests in `src/lib/__tests__/logger.test.ts`.
+- Updated security/structure/TODO docs to reflect the new observability seam and remaining provider wiring work.
 
 Validation run:
 

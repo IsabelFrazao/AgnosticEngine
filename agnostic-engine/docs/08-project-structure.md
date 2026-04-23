@@ -157,7 +157,7 @@ Pure logic, types, and services. No JSX. Grouped by concern.
 lib/
 ├── metadata-types.ts       MetadataSchemaItem and MetadataComponentProps type aliases
 ├── api.ts                  Axios instance with base URL + 401 interceptor
-├── logger.ts               AppLogger interface + console implementation (swap for Sentry)
+├── logger.ts               Structured logger with pluggable transports (`setLoggerTransports`) and external reporter hook support
 ├── permissions.ts          Pure permission evaluator for metadata node access checks
 ├── http-security-headers.ts  CSP and baseline response security headers for `next.config`
 ├── site-config.ts          SITE_CONFIG: site name and description (white-label entry point)
