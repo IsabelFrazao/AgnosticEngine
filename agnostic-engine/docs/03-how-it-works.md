@@ -138,6 +138,7 @@ HTTP contract smoke tests live in `apps/renderer/app/api/__tests__/routes.test.t
 
 Builder writes and publishes through **`apps/builder/app/api/draft`** and **`apps/builder/app/api/publish`**, which call draft repository contracts in `@agnostic/data-access`.
 Builder palette/inspector defaults are now generated from `@agnostic/component-catalog`, and renderer registry parity is enforced with catalog contract tests.
+Shared UTC display/hydration-safe UI primitives now live in `@agnostic/ui-kit` and are consumed by both renderer and builder.
 
 ---
 

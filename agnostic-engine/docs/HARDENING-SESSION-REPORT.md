@@ -102,6 +102,12 @@ Order after validation:
 - Renderer registry consumes catalog type keys.
 - Builder palette/inspector surfaces are generated from the same catalog contract.
 
+### Shared UI kit
+
+- Cross-app presentational primitives now live in `packages/ui-kit`.
+- Renderer and builder both consume `FormattedUtc` from `@agnostic/ui-kit`.
+- Hydration-safe `useClientReady` and UTC parse/format helpers moved behind the same package boundary.
+
 ### Security transport
 
 - `src/lib/http-security-headers.ts` — CSP + headers (dev allows `'unsafe-eval'` for Next)
@@ -1037,6 +1043,44 @@ Notes:
 
 - Builder remains the write path (draft + publish), renderer remains read-only from published snapshots.
 - Storage is transitional (filesystem) and is still planned to be replaced by a transactional DB-backed adapter in later phases.
+
+---
+
+### Phase M7 completion note
+
+Shipped in this continuation:
+
+- Added `packages/ui-kit` and extracted truly shared UI primitives:
+  - `src/components/FormattedUtc.tsx`
+  - `src/hooks/use-client-ready.ts`
+  - `src/datetime/utc-display.ts`
+  - `src/__tests__/utc-display.test.ts`
+- Rewired renderer to consume `@agnostic/ui-kit`:
+  - `apps/renderer/app/page.tsx` uses shared `FormattedUtc`
+  - `apps/renderer/src/components/organisms/Table.tsx` uses shared `FormattedUtc` + UTC parser
+  - `apps/renderer/src/components/atoms/ThemeSwitcher.tsx` uses shared `useClientReady`
+- Rewired builder to consume shared `FormattedUtc` in `apps/builder/app/builder/page.tsx`.
+- Removed duplicated renderer-local files now owned by ui-kit:
+  - `apps/renderer/src/components/atoms/FormattedUtc.tsx`
+  - `apps/renderer/src/hooks/useClientReady.ts`
+  - `apps/renderer/src/lib/datetime/utc-display.ts`
+- Updated workspace aliases (`apps/renderer/tsconfig.json`, `apps/renderer/vitest.config.ts`, `apps/builder/tsconfig.json`) for `@agnostic/ui-kit`.
+- Added live phase tracker file: `docs/PHASE-M7-PROGRESS.md`.
+
+Validation run:
+
+- `npm run lint`
+- `npm run typecheck`
+- `npm test` (includes `packages/ui-kit/src/__tests__/*`)
+- `npm run build`
+- `npm run lint:builder`
+- `npm run typecheck:builder`
+- `npm run build:builder`
+
+Notes:
+
+- Extracted only cross-app primitives to avoid over-coupling app-specific UX.
+- Builder/renderer architectural split remains intact: builder writes, renderer reads.
 
 ---
 

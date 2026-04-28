@@ -15,6 +15,7 @@ agnostic-engine/
 ├── packages/
 │   ├── metadata-schema/   Shared schema/version contracts package (extracted in M2)
 │   ├── component-catalog/ Canonical component catalog package (extracted in M2.5)
+│   ├── ui-kit/            Shared cross-app UI primitives package (extracted in M7)
 │   ├── engine-core/       Shared engine safety and utility package (extracted in M3)
 │   └── data-access/       Published-content repository package (extracted in M4)
 ├── docs/                   This documentation (see `HARDENING-SESSION-REPORT.md` for phased hardening status)
@@ -92,6 +93,23 @@ packages/component-catalog/
 └── src/
     ├── index.ts                         Catalog definitions + helpers
     └── __tests__/catalog.test.ts        Catalog contract tests
+```
+
+---
+
+## `packages/ui-kit/` — Shared cross-app UI primitives package
+
+Owns lightweight presentational primitives and UI hooks used by both apps.
+
+```
+packages/ui-kit/
+├── package.json
+└── src/
+    ├── components/FormattedUtc.tsx      Shared UTC display component
+    ├── hooks/use-client-ready.ts        Hydration-safe client-ready hook
+    ├── datetime/utc-display.ts          UTC parse/format helpers
+    ├── __tests__/utc-display.test.ts    UTC helper tests
+    └── index.ts                         Public exports
 ```
 
 ---
@@ -253,7 +271,6 @@ components/
 │   ├── ThemeSwitcher.tsx   Theme picker group of toggle buttons
 │   ├── DegradedStateUI.tsx "Component unavailable" fallback for failures
 │   ├── Skeleton.tsx        Animated grey placeholder for loading states
-│   └── FormattedUtc.tsx    Formats a UTC ISO string for the user's local timezone
 ├── organisms/
 │   ├── Table.tsx           HTML table rendered from columns + rows metadata
 │   └── Sidebar.tsx         Nav sidebar — derives menu items from NavManifest (Law of Derivation)
@@ -289,8 +306,6 @@ lib/
 │   ├── themes.ts           THEMES array, THEME_IDS set, DEFAULT_THEME_ID
 │   ├── theme-context.tsx   ThemeProvider, useThemeContext, localStorage read/write
 │   └── theme-icons.tsx     SVG icon components (System, Light, Dark, Ocean, Forest)
-└── datetime/
-    └── utc-display.ts      parseUtcIso() and formatUtcLongLocal() using date-fns
 ```
 
 ---
@@ -302,7 +317,6 @@ Custom React hooks. One concern per hook. No JSX.
 | File | What it does |
 |------|-------------|
 | `useTheme.ts` | Re-exports `useThemeContext` as `useTheme` — the public API for theme state |
-| `useClientReady.ts` | Returns `false` on server / first hydration paint, `true` after. Prevents SSR mismatches for browser-only state (theme, locale). |
 
 ---
 

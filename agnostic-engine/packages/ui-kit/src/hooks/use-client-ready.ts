@@ -1,10 +1,12 @@
+'use client';
+
 import { useSyncExternalStore } from 'react';
 
 const noopSubscribe = () => () => {};
 
 /**
- * `false` during SSR and the hydration-matching paint; `true` once the client
- * may read browser-only state (localStorage theme, locale formatting, etc.).
+ * `false` during SSR and hydration-matching paint; `true` once browser-only
+ * state (localStorage, locale formatting) can be read safely.
  */
 export function useClientReady(): boolean {
   return useSyncExternalStore(noopSubscribe, () => true, () => false);

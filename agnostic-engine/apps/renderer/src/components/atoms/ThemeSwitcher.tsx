@@ -1,10 +1,10 @@
 'use client';
 
-import { useClientReady } from '@/src/hooks/useClientReady';
 import { useTheme } from '@/src/hooks/useTheme';
 import { parseThemeSwitcherMetadata } from '@/src/lib/metadata/parse-theme-switcher-metadata';
 import type { MetadataComponentProps } from '@/src/lib/metadata-types';
 import { THEMES } from '@/src/lib/theme/themes';
+import { useClientReady } from '@agnostic/ui-kit';
 
 // ── Styles ────────────────────────────────────────────────────────────────────
 

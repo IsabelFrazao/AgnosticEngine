@@ -148,7 +148,7 @@ You never use this directly in a schema.
 
 ### FormattedUtc
 
-**File:** `src/components/atoms/FormattedUtc.tsx`
+**File:** `packages/ui-kit/src/components/FormattedUtc.tsx`
 
 Takes an ISO 8601 UTC string and displays it formatted for the user's local timezone using `date-fns`. Shows the raw string on the server (to avoid hydration mismatch) and the formatted string after hydration.
 
@@ -157,7 +157,7 @@ Takes an ISO 8601 UTC string and displays it formatted for the user's local time
 // Renders: "April 1st, 2026 at 12:00 PM" (locale-dependent)
 ```
 
-This component is wired into `Table` for ISO UTC strings; non-date values remain plain text.
+This component is shared via `@agnostic/ui-kit` and is wired into `Table` for ISO UTC strings; non-date values remain plain text.
 
 ---
 
@@ -217,4 +217,4 @@ These exist in the codebase but are not registered in `COMPONENT_MAP`. They are 
 |-----------|---------|
 | `Skeleton` | `MetadataEngineItem` (Suspense fallback) |
 | `DegradedStateUI` | `MetadataEngineItem` (validation failure) |
-| `FormattedUtc` | `app/page.tsx` (demo date display), `src/components/organisms/Table.tsx` (table ISO date cells) |
+| `FormattedUtc` | `app/page.tsx` (demo date display), `src/components/organisms/Table.tsx` (table ISO date cells), `apps/builder/app/builder/page.tsx` (draft updated timestamp) |

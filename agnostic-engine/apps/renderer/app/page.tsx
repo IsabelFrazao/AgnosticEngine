@@ -1,8 +1,8 @@
 import { MetadataEngine } from '@/src/engines/MetadataEngine';
-import { FormattedUtc } from '@/src/components/atoms/FormattedUtc';
 import { getCurrentUserPermissions } from '@/src/lib/services/current-user';
 import { notFound } from 'next/navigation';
 import { canAccessPageEntry, getDemoUpdatedAt, getHomePageEntry } from '@/src/lib/services/pages';
+import { FormattedUtc } from '@agnostic/ui-kit';
 
 export default async function Home() {
   const homePage = getHomePageEntry();

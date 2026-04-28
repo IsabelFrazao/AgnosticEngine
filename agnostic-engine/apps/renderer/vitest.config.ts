@@ -21,6 +21,10 @@ export default defineConfig({
         __dirname,
         '../../packages/component-catalog/src/index.ts',
       ),
+      '@agnostic/ui-kit': path.resolve(
+        __dirname,
+        '../../packages/ui-kit/src/index.ts',
+      ),
     },
   },
   test: {
@@ -29,6 +33,7 @@ export default defineConfig({
       '**/*.{test,spec}.?(c|m)[jt]s?(x)',
       '../../packages/metadata-schema/src/__tests__/**/*.{test,spec}.?(c|m)[jt]s?(x)',
       '../../packages/component-catalog/src/__tests__/**/*.{test,spec}.?(c|m)[jt]s?(x)',
+      '../../packages/ui-kit/src/**/*.{test,spec}.?(c|m)[jt]s?(x)',
     ],
   },
 });

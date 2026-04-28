@@ -1,8 +1,7 @@
 import type { ReactNode } from 'react';
 import type { MetadataComponentProps } from '@/src/lib/metadata-types';
 import { parseTableMetadata } from '@/src/lib/metadata/parse-table-metadata';
-import { FormattedUtc } from '@/src/components/atoms/FormattedUtc';
-import { parseUtcIso } from '@/src/lib/datetime/utc-display';
+import { FormattedUtc, parseUtcIso } from '@agnostic/ui-kit';
 
 function renderTableCellValue(value: unknown): ReactNode {
   if (typeof value === 'string' && parseUtcIso(value)) {

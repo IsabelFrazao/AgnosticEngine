@@ -1,4 +1,5 @@
 import { InMemoryDraftContentRepository } from '@agnostic/data-access';
+import { FormattedUtc } from '@agnostic/ui-kit';
 import { BuilderStudio } from './BuilderStudio';
 
 const draftRepository = new InMemoryDraftContentRepository();
@@ -42,7 +43,9 @@ export default async function BuilderPage({ searchParams }: BuilderPageProps) {
             </select>
           </div>
           <button className="btn" type="submit">Load draft</button>
-          <span className="muted">Last updated: {new Date(draft.updatedAt).toLocaleString()}</span>
+          <span className="muted">
+            Last updated: <FormattedUtc iso={draft.updatedAt} />
+          </span>
         </form>
       </div>
 
