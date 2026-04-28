@@ -19,6 +19,8 @@ git clone <repository-url>
 cd agnostic-engine
 ```
 
+This repository now has an npm workspace scaffold (`apps/*`, `packages/*`) at the root for monorepo migration. In the current phase (M0), the active Next.js app still runs from the repository root.
+
 ---
 
 ## 2. Install dependencies
@@ -78,6 +80,8 @@ Open [http://localhost:3000](http://localhost:3000) in your browser. You should 
 | `npm run lint` | Run ESLint across all TypeScript/JavaScript files |
 | `npm test` | Run the full Vitest suite once |
 | `npm run test:watch` | Run Vitest in watch mode during development |
+
+All commands above are still run from the repository root during M0.
 
 ---
 

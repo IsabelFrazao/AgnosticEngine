@@ -9,6 +9,8 @@ Every folder and file explained.
 ```
 agnostic-engine/
 ├── .github/               CI workflows (lint, typecheck, test)
+├── apps/                  Workspace app directory scaffold (M0; renderer move happens in M1)
+├── packages/              Workspace shared-package scaffold (M0; package extraction starts in later phases)
 ├── app/                    Next.js App Router pages and layouts
 ├── src/                    All application source code
 ├── docs/                   This documentation (see `HARDENING-SESSION-REPORT.md` for phased hardening status)
@@ -26,6 +28,8 @@ agnostic-engine/
 ├── package.json            Dependencies and scripts
 └── CLAUDE.md               Instructions for Claude Code AI agent
 ```
+
+During monorepo Phase M0, `apps/` and `packages/` exist as workspace scaffolding only. The running renderer app remains at root (`app/`, `src/`, `public/`) until Phase M1.
 
 ---
 

@@ -338,4 +338,462 @@ Validation run:
 
 ---
 
+## Monorepo execution blueprint (for tomorrow)
+
+### Why this architecture
+
+You want two products with one shared domain:
+
+1. **Renderer app** (current app): reads published metadata from DB and renders websites.
+2. **Builder app** (new app): visual drag-and-drop editor (draw.io/Outsystems style UX) that writes drafts/published metadata to DB.
+
+The clean architecture is:
+
+- shared **domain contracts** (schemas, types, migration rules, permissions model)
+- shared **engine/runtime primitives** (registry, sanitization, guards, action contracts)
+- app-specific **composition/UI** and app-specific **delivery concerns** (RSC pages, editor canvas UX, auth UI, API endpoints)
+
+This minimizes duplication, keeps contracts strict, and allows independent deployment of builder and renderer.
+
+---
+
+### Target monorepo structure (final desired state)
+
+```text
+AgnosticEngine/
+├── apps/
+│   ├── renderer/                  # current Next.js app (public site renderer)
+│   └── builder/                   # new Next.js app (visual page builder)
+├── packages/
+│   ├── metadata-schema/           # Zod schemas + schemaVersion migrations + shared types
+│   ├── component-catalog/         # canonical component definitions (type IDs, inspector fields, defaults)
+│   ├── engine-core/               # validation/sanitize/permission/tree guards + shared engine helpers
+│   ├── ui-kit/                    # shared atoms/organisms usable by both apps
+│   ├── action-contracts/          # action IDs, payload contracts, registration helpers
+│   ├── data-access/               # DB read/write repositories + publish workflow services
+│   └── observability/             # logger transports and provider adapters
+├── tooling/
+│   ├── tsconfig/
+│   ├── eslint/
+│   └── vitest/
+├── package.json                   # workspaces + root scripts
+└── docs/
+```
+
+Notes:
+
+- Start with `metadata-schema`, `engine-core`, and `data-access` first. They unlock both apps quickly.
+- `ui-kit` should extract only truly shared components; do not over-extract builder-specific canvas UI.
+- `component-catalog` is mandatory to prevent builder/renderer drift on supported components.
+
+---
+
+### Domain model for DB (single source of truth)
+
+Use a **site + version + page** model with explicit publish boundaries.
+
+Core entities:
+
+- `sites`
+  - `id`, `slug`, `name`, `owner_org_id`, timestamps
+- `site_versions`
+  - `id`, `site_id`, `version_number`, `status` (`draft` | `published` | `archived`), `created_by`, timestamps
+  - immutable snapshot once published
+- `pages`
+  - `id`, `site_version_id`, `path`, `title`, `nav_json`, `permissions_json`, `header_json`, `components_json`, `schema_version`
+  - unique(`site_version_id`, `path`)
+- `layout_documents`
+  - `id`, `site_version_id`, `layout_json`, `schema_version`
+- `publish_events`
+  - audit table for release history + rollback traceability
+
+Rules:
+
+- Builder writes to `draft` version only.
+- Publish creates/promotes a version snapshot used by renderer.
+- Renderer reads only `published` (or a preview token for explicit preview mode).
+- No direct renderer writes to content tables.
+
+---
+
+### Builder app architecture (drag-and-drop)
+
+Builder should have clear internal layers:
+
+1. **Canvas state layer**
+   - normalized node graph (`id`, `type`, parent, order, props)
+   - undo/redo command stack
+   - selection/inspector state
+2. **Schema projection layer**
+   - converts canvas graph <-> metadata JSON (`MetadataSchemaItem[]`)
+   - validates using shared package schemas before save/publish
+3. **Persistence layer**
+   - save draft, load draft, publish, version history
+   - all via `packages/data-access`
+4. **Component palette + inspector**
+   - generated from `packages/component-catalog` metadata (no hand-maintained duplicate lists)
+   - no duplicated hand-coded field rules
+
+Key principle: builder edits a graph for UX ergonomics, but saves canonical metadata contracts.
+
+---
+
+### Renderer app architecture in monorepo
+
+Renderer remains thin:
+
+- Route handlers call `data-access` repositories
+- Repositories return validated contracts from `metadata-schema`
+- Engine rendering uses shared `engine-core` rules
+- App Router composition stays app-specific (`apps/renderer/app/*`)
+
+This preserves hardening guarantees while swapping mock data for DB reads.
+
+---
+
+### Shared package boundaries (strict ownership)
+
+`packages/metadata-schema`
+- Owns: Zod page/layout/node schemas, schema versions, migration functions
+- Must not import UI components
+
+`packages/component-catalog`
+- Owns: canonical component catalog (`type`, label, category, default metadata, inspector field config, capability flags)
+- Shared by: builder palette/inspector and renderer registry wiring
+- Must not import app routes, DB, or app-specific UI
+
+`packages/engine-core`
+- Owns: sanitize, permission evaluation, tree limits, registry contracts, parse helpers
+- Must not import app routes or DB code
+
+`packages/data-access`
+- Owns: repositories + transactions + publish workflows
+- Must not import React/UI
+
+`packages/ui-kit`
+- Owns: shared presentational components that are truly cross-app and must match visually between builder preview and renderer output
+- Must not import DB/repository code
+
+`packages/observability`
+- Owns: logger interfaces, transports, adapters
+- Must not import app UI
+
+---
+
+### Phased migration plan (separate PR-ready steps)
+
+#### Phase M0 — Workspace foundation
+
+Goal:
+- Introduce npm workspaces and root-level scripts without moving app code yet.
+
+Changes:
+- root `package.json` with workspaces (`apps/*`, `packages/*`)
+- keep current app runnable during transition
+- baseline CI updated to workspace commands
+
+Exit criteria:
+- `npm run lint`, `npm test`, `npm run build` still pass from root
+- no behavior change
+
+---
+
+#### Phase M1 — Move current app to `apps/renderer`
+
+Goal:
+- Relocate current Next app with zero behavior drift.
+
+Changes:
+- move app files into `apps/renderer`
+- update tsconfig aliases, vitest aliases, eslint paths, CI paths
+- keep docs and scripts accurate
+
+Exit criteria:
+- renderer app boots and tests pass in new location
+- all existing hardening behavior preserved
+
+---
+
+#### Phase M2 — Extract `metadata-schema` package
+
+Goal:
+- centralize all schema/version contracts.
+
+Changes:
+- move shared schemas/migrations/types to `packages/metadata-schema`
+- update renderer imports
+- add package-level tests
+
+Exit criteria:
+- contract tests unchanged
+- no duplicated schema code left in app
+
+---
+
+#### Phase M2.5 — Extract `component-catalog` package (component parity lock)
+
+Goal:
+- make component support and configuration a single source of truth for both apps.
+
+Changes:
+- add `packages/component-catalog` with entries per component type:
+  - `type`
+  - display label/category
+  - default metadata factory
+  - inspector field schema/config
+  - capability flags (`supportsChildren`, etc.)
+- renderer builds/derives its registry mapping from this catalog contract
+- builder palette + inspector are generated from this catalog
+- add parity test that fails when a component exists in renderer but is absent in catalog (or vice versa)
+
+Exit criteria:
+- no hand-maintained duplicate component lists in apps
+- adding a component updates one canonical catalog + required shared contracts
+- parity tests enforce builder/renderer sync
+
+---
+
+#### Phase M3 — Extract `engine-core` package
+
+Goal:
+- centralize engine safety rules and reusable metadata utilities.
+
+Changes:
+- move sanitization, permission evaluator, tree guards, metadata parsers, registry contracts
+- renderer consumes package APIs
+
+Exit criteria:
+- `MetadataEngineItem` behavior unchanged
+- security test coverage remains green
+
+---
+
+#### Phase M4 — Introduce `data-access` package + DB integration for renderer
+
+Goal:
+- replace mock-backed service layer with repository-backed reads.
+
+Changes:
+- define repository interfaces and SQL/ORM implementations
+- renderer route handlers read published versions from DB
+- keep API contracts stable
+
+Exit criteria:
+- renderer serves real DB content
+- mock data path removed or isolated to local demo profile
+
+---
+
+#### Phase M5 — Scaffold `apps/builder` (MVP shell)
+
+Goal:
+- stand up builder app with auth, site selector, canvas shell.
+
+Changes:
+- Next app with protected routes
+- basic canvas + palette + inspector shells
+- load/save draft metadata through `data-access`
+
+Exit criteria:
+- can create/update a draft site version from UI
+
+---
+
+#### Phase M6 — Builder drag/drop + publish workflow
+
+Goal:
+- complete builder MVP for real usage.
+
+Changes:
+- drag/drop interactions
+- undo/redo
+- validation errors surfaced in UI
+- publish flow creates published snapshot
+
+Exit criteria:
+- builder publish produces renderer-visible content without manual DB edits
+
+---
+
+#### Phase M7 — Shared `ui-kit` and clean dedup pass
+
+Goal:
+- extract only real cross-app UI primitives.
+
+Changes:
+- move reusable atoms/organisms/hooks
+- keep app-specific UX in owning app
+
+Exit criteria:
+- no duplicated shared UI logic
+- no over-coupling between builder and renderer
+
+---
+
+### Shared components strategy (non-negotiable)
+
+To guarantee that builder output always matches renderer output:
+
+1. **One canonical component catalog** (`packages/component-catalog`)
+   - both apps consume it
+   - no per-app component definition forks
+2. **One metadata schema contract** (`packages/metadata-schema`)
+   - parser/validation rules shared
+3. **One rendering primitive set** (`packages/ui-kit`)
+   - same visual components reused where applicable
+4. **Parity CI checks**
+   - fail build if catalog/renderer registry diverge
+   - fail build if inspector field contracts drift from metadata schema
+
+This allows rapid feature growth without “builder can create it but renderer cannot render it” regressions.
+
+---
+
+### PR slicing strategy (to stay reviewable)
+
+- 1 PR per migration phase above.
+- Keep each PR under ~500 effective changed lines when possible.
+- For risky phases, split into:
+  1) mechanical move PR
+  2) behavioral change PR
+
+Review checklist per PR:
+- architecture boundary respected
+- imports only from allowed package directions
+- no schema drift
+- component catalog parity preserved (builder/renderer)
+- docs updated in same PR
+- CI green
+
+---
+
+### Dependency direction rules (must not be broken)
+
+- `apps/*` can import from `packages/*`
+- `packages/ui-kit` can import from `packages/metadata-schema` only when needed for strict props contracts
+- `packages/data-access` cannot import from `apps/*` or UI packages
+- `packages/metadata-schema` cannot import from app/runtime code
+- cyclic dependencies between packages are forbidden
+
+Enforce with:
+- TS project references
+- ESLint import boundaries
+
+---
+
+### Auth and multi-tenant model (both apps)
+
+- Add real session identity provider for both apps.
+- Builder requires authenticated users with authoring roles.
+- Renderer public routes may be anonymous, but protected page metadata still enforces permissions.
+- Tenant scoping:
+  - every site belongs to org/tenant
+  - all reads/writes filtered by tenant at repository layer
+
+---
+
+### Publish model (critical consistency rules)
+
+- Builder edits only draft version rows.
+- Publish operation must be transactional:
+  1) validate draft contracts
+  2) create immutable published version snapshot
+  3) mark previous published as superseded (optional strategy)
+  4) record publish event
+- Renderer serves latest published by default.
+- Preview mode uses explicit draft/version token.
+
+---
+
+### Performance and scalability notes
+
+- Cache published page/layout payloads by `site_id + version_id + path`.
+- Invalidate cache on publish event only.
+- Keep schema payload normalized but avoid over-joining at render path.
+- Add pagination/search for builder asset/page lists early.
+
+---
+
+### Risks and mitigations
+
+- **Risk:** package extraction causes hidden import cycles  
+  **Mitigation:** enforce import boundary lint rules in M0/M1.
+
+- **Risk:** builder graph diverges from renderer contracts  
+  **Mitigation:** schema projection layer must validate with shared Zod before save.
+
+- **Risk:** concurrent edits overwrite drafts  
+  **Mitigation:** optimistic locking (`updated_at` or version counter) + conflict UX.
+
+- **Risk:** publish introduces partial writes  
+  **Mitigation:** single DB transaction with audit row.
+
+---
+
+### Tomorrow kickoff runbook (step-by-step)
+
+1. Pull latest main.
+2. Read this section fully (`Monorepo execution blueprint`).
+3. Confirm package manager/workspace tool choice (default: npm workspaces).
+4. Execute **Phase M0** only.
+5. Run full gates:
+   - `npm run lint`
+   - `npx tsc --noEmit`
+   - `npm test`
+   - `npm run build`
+6. Update docs (`02`, `08`, `TODOS`, this file).
+7. Commit Phase M0 as one isolated PR unit.
+8. Stop and review before Phase M1.
+
+---
+
+### Definition of done before starting monorepo Phase M0
+
+- Hardening phases up to 2.3 are complete and committed.
+- Working tree is clean.
+- This plan is accepted as baseline.
+- We agree to execute phases sequentially with one commit/PR per phase.
+
+---
+
+### Quick glossary (shared language for implementation)
+
+- **Renderer app:** public/consumer app that renders published metadata.
+- **Builder app:** internal authoring app with drag/drop canvas.
+- **Draft version:** editable site version not visible publicly.
+- **Published version:** immutable snapshot served by renderer.
+- **Schema contract:** Zod-validated shape shared by both apps.
+- **Engine core:** shared safety/rendering primitives independent of app framework.
+
+---
+
+## Continuation log — 2026-04-28
+
+### Phase M0 completion note
+
+Shipped in this continuation:
+
+- Added npm workspace foundation in root `package.json` with:
+  - `workspaces: ["apps/*", "packages/*"]`
+- Added minimal monorepo scaffolding directories:
+  - `apps/.gitkeep`
+  - `packages/.gitkeep`
+- Kept current renderer app location unchanged (`app/`, `src/`, `public/`) per M0 scope.
+- Kept CI quality checks unchanged (`lint`, `tsc --noEmit`, `npm test`) since root commands remain valid in this transitional state.
+- Updated docs for M0 transitional accuracy (`02-getting-started`, `08-project-structure`, `TODOS`, and this report).
+
+Validation run:
+
+- `npm run lint`
+- `npx tsc --noEmit`
+- `npm test`
+- `npm run build`
+
+Notes:
+
+- Build remains green, with existing non-blocking audit warning output (`postcss` via `next` transitive dependency) and the existing Next.js middleware deprecation notice.
+- Stop point honored: do not begin M1 app relocation until explicit review/approval.
+
+---
+
 *End of report — continue by appending dated log entries after each shipped hardening phase.*

@@ -2,7 +2,7 @@
 
 This file contains an honest assessment of everything that is missing, broken, risky, or incomplete in the current codebase. Items are grouped by severity.
 
-Last updated: 2026-04-23
+Last updated: 2026-04-28
 
 ---
 
@@ -170,6 +170,18 @@ Related to item 8. Observability plumbing now exists, but production deployments
 **Severity:** Low
 
 **Fix:** Install an icon library (e.g. `lucide-react`, which is zero-config with React 19). Update `NavItem` in `Sidebar.tsx` to render `icon` if present. Verify 2026 security standing before adding the dependency.
+
+---
+
+### 17. Monorepo migration is only at workspace foundation (M0)
+
+**Files:** `package.json`, `apps/.gitkeep`, `packages/.gitkeep`
+
+Workspace scaffolding is now in place (`workspaces: ["apps/*", "packages/*"]`) with placeholder directories, but the renderer app is still root-located (`app/`, `src/`, `public/`).
+
+**Severity:** Medium
+
+**Fix:** Execute Phase M1 next: relocate the current app into `apps/renderer` with zero behavior drift, then re-validate lint/typecheck/test/build.
 
 ---
 

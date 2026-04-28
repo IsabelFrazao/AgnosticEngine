@@ -2,6 +2,10 @@
   "name": "agnostic-engine",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "tsc --noEmit && eslint && npm audit --audit-level=high && next build",
