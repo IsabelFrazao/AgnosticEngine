@@ -13,6 +13,7 @@ agnostic-engine/
 │   ├── renderer/          Next.js renderer app workspace (moved in M1)
 │   └── builder/           Next.js builder app workspace (scaffolded in M5)
 ├── packages/
+│   ├── metadata-schema/   Shared schema/version contracts package (extracted in M2)
 │   ├── engine-core/       Shared engine safety and utility package (extracted in M3)
 │   └── data-access/       Published-content repository package (extracted in M4)
 ├── docs/                   This documentation (see `HARDENING-SESSION-REPORT.md` for phased hardening status)
@@ -40,6 +41,24 @@ packages/engine-core/
     ├── permissions.ts       Permission evaluator for node/page checks
     ├── sanitize.ts          Recursive metadata sanitizer
     └── index.ts             Public exports
+```
+
+---
+
+## `packages/metadata-schema/` — Shared schema/version contracts package
+
+Owns shared `schemaVersion` helpers, page/layout schema builders, and migration helpers used by renderer services.
+
+```
+packages/metadata-schema/
+├── package.json
+└── src/
+    ├── schema-version.ts             Supported schema versions + guards
+    ├── page-schemas.ts               Shared page/layout Zod schema factory
+    ├── migrations.ts                 Shared layout/page migration helpers
+    ├── __tests__/schema-version.test.ts
+    ├── __tests__/migrations.test.ts
+    └── index.ts                      Public exports
 ```
 
 ---
@@ -247,9 +266,6 @@ lib/
 │   ├── current-user.ts     Effective permission list (demo stub)
 │   └── __tests__/          Service contract tests
 ├── metadata/               Per-component metadata parsers
-│   ├── migrate-layout.ts   Normalizes and validates layout schemaVersion
-│   ├── migrate-page-manifest-entry.ts  Normalizes and validates page schemaVersion
-│   ├── schema-version.ts   Supported schema versions and validation helpers
 │   ├── parse-button-metadata.ts
 │   ├── parse-table-metadata.ts
 │   └── parse-theme-switcher-metadata.ts

@@ -20,6 +20,7 @@ cd agnostic-engine
 ```
 
 This repository uses npm workspaces (`apps/*`, `packages/*`). The active renderer Next.js app now lives in `apps/renderer`, while root scripts delegate to that workspace.
+Shared schema/version contracts are owned by `packages/metadata-schema`.
 
 ---
 

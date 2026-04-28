@@ -1,6 +1,6 @@
 import { InMemoryPublishedContentRepository } from '@agnostic/data-access';
 import { evaluatePermissionAccess } from '@agnostic/engine-core';
-import { migratePageManifestEntry } from '@/src/lib/metadata/migrate-page-manifest-entry';
+import { migratePageManifestEntry } from '@agnostic/metadata-schema';
 import {
   PagesManifestSchema,
   type NavManifest,

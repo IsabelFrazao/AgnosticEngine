@@ -132,7 +132,7 @@ Adding `nav` to a page entry makes it appear in the sidebar automatically (Law o
 
 ## Data loading (App Router + API)
 
-RSC pages and route handlers both consume **`apps/renderer/src/lib/services/*`** (`getPagesManifest`, `getPageEntry`, `getLayout`, `getAuthorizedNavManifest`, `getCurrentUserPermissions`). Those functions validate with Zod, normalize schema versions, and enforce page-level permission checks at route boundaries. They read through `@agnostic/data-access` (filesystem-backed transitional store in M6) so you can later swap repository implementations to DB reads without changing page components.
+RSC pages and route handlers both consume **`apps/renderer/src/lib/services/*`** (`getPagesManifest`, `getPageEntry`, `getLayout`, `getAuthorizedNavManifest`, `getCurrentUserPermissions`). Those functions validate with Zod, normalize schema versions via `@agnostic/metadata-schema`, and enforce page-level permission checks at route boundaries. They read through `@agnostic/data-access` (filesystem-backed transitional store in M6) so you can later swap repository implementations to DB reads without changing page components.
 
 HTTP contract smoke tests live in `apps/renderer/app/api/__tests__/routes.test.ts` (schema shape + 404 behavior).
 

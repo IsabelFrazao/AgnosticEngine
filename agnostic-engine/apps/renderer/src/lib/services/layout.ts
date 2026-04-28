@@ -1,5 +1,5 @@
 import { InMemoryPublishedContentRepository } from '@agnostic/data-access';
-import { migrateLayout } from '@/src/lib/metadata/migrate-layout';
+import { migrateLayout } from '@agnostic/metadata-schema';
 import { LayoutSchema, type Layout } from '@/src/schemas/page.schema';
 
 const publishedContentRepository = new InMemoryPublishedContentRepository();

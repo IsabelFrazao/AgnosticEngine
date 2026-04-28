@@ -23,7 +23,8 @@ export type SiteStore = {
   publishEvents: PublishEvent[];
 };
 
-const REPO_ROOT = path.resolve(fileURLToPath(new URL('../../../../', import.meta.url)));
+const MODULE_DIR = path.dirname(fileURLToPath(import.meta.url));
+const REPO_ROOT = path.resolve(MODULE_DIR, '../../../../');
 const DATA_ROOT = path.join(REPO_ROOT, '.data', 'sites');
 
 function cloneValue<T>(value: T): T {

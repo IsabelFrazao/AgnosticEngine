@@ -93,8 +93,8 @@ Order after validation:
 ### Schema version
 
 - `schemaVersion: "1.0"` on layout + page entries
-- Helpers: `src/lib/metadata/schema-version.ts`, `migrate-layout.ts`, `migrate-page-manifest-entry.ts`
-- Zod: `src/schemas/page.schema.ts` (`SchemaVersionSchema`, defaults)
+- Helpers: `packages/metadata-schema/src/schema-version.ts`, `packages/metadata-schema/src/migrations.ts`
+- Zod contract builder: `packages/metadata-schema/src/page-schemas.ts` (consumed by renderer `src/schemas/page.schema.ts`)
 
 ### Security transport
 
@@ -823,6 +823,41 @@ Notes:
 
 - Build remains green with the same existing advisory/deprecation output (`postcss` advisory via `next` transitive dependency; middleware-to-proxy notice).
 - Local environment file now needs to be in renderer workspace context (`apps/renderer/.env.local`) for Next build/runtime variable loading.
+
+---
+
+### Phase M2 completion note
+
+Shipped in this continuation:
+
+- Added `packages/metadata-schema` and extracted shared schema/version contracts:
+  - `src/schema-version.ts` (`CURRENT_SCHEMA_VERSION`, guards)
+  - `src/page-schemas.ts` (shared page/layout schema factory)
+  - `src/migrations.ts` (`migrateLayout`, `migratePageManifestEntry`)
+  - package tests under `src/__tests__`
+- Rewired renderer to consume `@agnostic/metadata-schema` in services and schema-version/migration tests.
+- Kept renderer behavior stable by preserving local `apps/renderer/src/schemas/page.schema.ts` as a thin adapter that composes `MetadataNodeSchema` with shared page/layout contracts.
+- Removed renderer-local duplicated schema-version/migration files:
+  - `apps/renderer/src/lib/metadata/schema-version.ts`
+  - `apps/renderer/src/lib/metadata/migrate-layout.ts`
+  - `apps/renderer/src/lib/metadata/migrate-page-manifest-entry.ts`
+- Updated workspace aliases (`apps/renderer/tsconfig.json`, `apps/renderer/vitest.config.ts`, `apps/builder/tsconfig.json`) for `@agnostic/metadata-schema`.
+- Added live phase tracker file: `docs/PHASE-M2-PROGRESS.md`.
+
+Validation run:
+
+- `npm run lint`
+- `npm run typecheck`
+- `npm test` (includes package-level `packages/metadata-schema/src/__tests__/*`)
+- `npm run build`
+- `npm run lint:builder`
+- `npm run typecheck:builder`
+- `npm run build:builder`
+
+Notes:
+
+- Shared schema/version contracts are now centralized in `packages/metadata-schema`.
+- Renderer-only atom/root schemas remain in `apps/renderer/src/schemas/*` and are planned for further cross-app parity work in Phase M2.5.
 
 ---
 

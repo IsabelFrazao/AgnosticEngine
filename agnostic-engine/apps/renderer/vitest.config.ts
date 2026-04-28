@@ -13,9 +13,17 @@ export default defineConfig({
         __dirname,
         '../../packages/data-access/src/index.ts',
       ),
+      '@agnostic/metadata-schema': path.resolve(
+        __dirname,
+        '../../packages/metadata-schema/src/index.ts',
+      ),
     },
   },
   test: {
     environment: 'node',
+    include: [
+      '**/*.{test,spec}.?(c|m)[jt]s?(x)',
+      '../../packages/metadata-schema/src/__tests__/**/*.{test,spec}.?(c|m)[jt]s?(x)',
+    ],
   },
 });
