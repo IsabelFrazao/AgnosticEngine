@@ -75,9 +75,13 @@ Remaining gap: there is only one supported version (`1.0`) and no real multi-ver
 
 ---
 
-### ~~7. All data is static — no real API integration~~ — **resolved**
+### ~~7. All data is static — no real API integration~~ — **partially resolved**
 
-API route handlers are now defined (`app/api/layout/route.ts`, `app/api/pages/route.ts`, `app/api/page/[...slug]/route.ts`). They serve `MOCK_LAYOUT` and `MOCK_PAGES` and establish the API contract. `QueryProvider` is wired. To connect a real backend: replace the data source in the route handlers — no consumer changes needed.
+API route handlers are now defined (`apps/renderer/app/api/layout/route.ts`, `apps/renderer/app/api/pages/route.ts`, `apps/renderer/app/api/page/[...slug]/route.ts`). Renderer services now read through `packages/data-access` instead of importing mock page/layout data directly. The current `InMemoryPublishedContentRepository` keeps contracts stable while awaiting a real DB adapter.
+
+Remaining gap: repository implementation is not yet database-backed (`sites/site_versions/pages/layout_documents` model is pending), so reads are not yet coming from persisted published snapshots.
+
+**Fix:** Replace in-memory repository with a DB-backed `PublishedContentRepository` implementation and keep builder writes isolated to draft/publish workflows.
 
 ---
 
@@ -173,11 +177,11 @@ Related to item 8. Observability plumbing now exists, but production deployments
 
 ---
 
-### 17. Monorepo migration is only partially complete (through M3)
+### 17. Monorepo migration is only partially complete (through M4)
 
-**Files:** `package.json`, `apps/renderer/*`, `packages/engine-core/*`
+**Files:** `package.json`, `apps/renderer/*`, `packages/engine-core/*`, `packages/data-access/*`
 
-Workspace scaffolding is in place, renderer is relocated to `apps/renderer`, and `packages/engine-core` is extracted. Remaining monorepo work still includes schema extraction (`M2`), component catalog parity (`M2.5`), and data-access/builder phases.
+Workspace scaffolding is in place, renderer is relocated to `apps/renderer`, and shared packages now include `engine-core` and `data-access`. Remaining monorepo work still includes schema extraction (`M2`), component catalog parity (`M2.5`), and builder-side write workflows on top of a real DB-backed repository layer.
 
 **Severity:** Medium
 
@@ -195,7 +199,7 @@ Workspace scaffolding is in place, renderer is relocated to `apps/renderer`, and
 | ~~4~~ | ~~High~~ | ~~Recursive children have no depth limit~~ — **resolved** |
 | 5 | High | Test coverage improved (sanitizer/parsers/ActionRegistry), but theme/hydration and deeper integration paths still need coverage |
 | 6 | High | Schema versioning is partial (single-version contract, no multi-version migration yet) |
-| ~~7~~ | ~~High~~ | ~~No real API integration~~ — **resolved**: API routes + QueryProvider wired |
+| ~~7~~ | ~~High~~ | ~~No real API integration~~ — **partially resolved**: data-access boundary extracted, DB-backed repository still pending |
 | 8 | Medium | Logger transport seam and generic remote forwarding exist; provider-native monitoring adapters are still pending |
 | ~~9~~ | ~~Medium~~ | ~~Table cells do not use `FormattedUtc` for date values~~ — **resolved** |
 | ~~10~~ | ~~Medium~~ | ~~No HTTP security headers in `next.config.ts`~~ — **partially resolved** (baseline CSP + headers; CSP tuning TBD) |

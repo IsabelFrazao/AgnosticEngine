@@ -20,7 +20,8 @@
     ],
     "paths": {
       "@/*": ["./*"],
-      "@agnostic/engine-core": ["../../packages/engine-core/src/index.ts"]
+      "@agnostic/engine-core": ["../../packages/engine-core/src/index.ts"],
+      "@agnostic/data-access": ["../../packages/data-access/src/index.ts"]
     }
   },
   "include": [

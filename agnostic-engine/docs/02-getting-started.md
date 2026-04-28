@@ -56,7 +56,7 @@ AE_LOG_INGEST_TOKEN=<secret-token>
 
 If `AE_LOG_INGEST_URL` is set, the logger will also POST structured server-side log events to that endpoint (optionally authenticated with `AE_LOG_INGEST_TOKEN`).
 
-> **Note:** There is no real API yet. The app currently uses static mock data. This variable is required by the schema validation even so. See [TODOS.md](./TODOS.md) for context.
+> **Note:** There is no real backend DB adapter wired yet. Renderer reads currently flow through `@agnostic/data-access` using its in-memory published-content adapter. This variable remains required by schema validation. See [TODOS.md](./TODOS.md) for context.
 
 ---
 

@@ -1,4 +1,4 @@
-import { DEMO_UPDATED_AT, MOCK_PAGES } from '@/src/data/mock-data';
+import { InMemoryPublishedContentRepository } from '@agnostic/data-access';
 import { evaluatePermissionAccess } from '@agnostic/engine-core';
 import { migratePageManifestEntry } from '@/src/lib/metadata/migrate-page-manifest-entry';
 import {
@@ -8,14 +8,18 @@ import {
   type PagesManifest,
 } from '@/src/schemas/page.schema';
 
+const publishedContentRepository = new InMemoryPublishedContentRepository();
+type LegacyPageManifestEntryInput = Parameters<typeof migratePageManifestEntry>[0];
 let pagesManifestCache: PagesManifest | undefined;
+let demoUpdatedAtCache: string | undefined;
 
 function loadPagesManifest(): PagesManifest {
   if (!pagesManifestCache) {
+    const rawPages = publishedContentRepository.getPublishedPagesManifest();
     const migrated = Object.fromEntries(
-      Object.entries(MOCK_PAGES).map(([slug, page]) => [
+      Object.entries(rawPages).map(([slug, page]) => [
         slug,
-        migratePageManifestEntry(page),
+        migratePageManifestEntry(page as LegacyPageManifestEntryInput),
       ]),
     );
     pagesManifestCache = PagesManifestSchema.parse(migrated);
@@ -23,9 +27,17 @@ function loadPagesManifest(): PagesManifest {
   return pagesManifestCache;
 }
 
+function loadDemoUpdatedAt(): string {
+  if (!demoUpdatedAtCache) {
+    demoUpdatedAtCache = publishedContentRepository.getPublishedUpdatedAt();
+  }
+  return demoUpdatedAtCache;
+}
+
 /**
  * Full pages manifest (Law of Derivation). Validated on read.
- * Today backed by mock data; swap the source when the API/DB is wired.
+ * Today backed by the data-access in-memory repository; swap that repository
+ * implementation for a real DB adapter when infrastructure is ready.
  */
 export function getPagesManifest(): PagesManifest {
   return loadPagesManifest();
@@ -94,4 +106,4 @@ export function getStaticPathParams(): { slug: string[] }[] {
     }));
 }
 
-export { DEMO_UPDATED_AT };
+export const DEMO_UPDATED_AT = loadDemoUpdatedAt();

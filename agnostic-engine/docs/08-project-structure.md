@@ -12,7 +12,8 @@ agnostic-engine/
 ├── apps/
 │   └── renderer/          Next.js renderer app workspace (moved in M1)
 ├── packages/
-│   └── engine-core/       Shared engine safety and utility package (extracted in M3)
+│   ├── engine-core/       Shared engine safety and utility package (extracted in M3)
+│   └── data-access/       Published-content repository package (extracted in M4)
 ├── docs/                   This documentation (see `HARDENING-SESSION-REPORT.md` for phased hardening status)
 ├── .cursor/                AI agent rules and prompts
 ├── .husky/                 Git hooks
@@ -38,6 +39,22 @@ packages/engine-core/
     ├── permissions.ts       Permission evaluator for node/page checks
     ├── sanitize.ts          Recursive metadata sanitizer
     └── index.ts             Public exports
+```
+
+---
+
+## `packages/data-access/` — Shared data access package
+
+Read-oriented repository boundary for renderer content loading. The current adapter is in-memory and transitional; production should wire a DB-backed implementation behind the same contracts.
+
+```
+packages/data-access/
+├── package.json
+└── src/
+    ├── contracts.ts                    Renderer read contracts and context
+    ├── mock-published-store.ts         Transitional published dataset
+    ├── repositories/published-content.ts InMemoryPublishedContentRepository
+    └── index.ts                        Public exports
 ```
 
 ---
@@ -108,8 +125,7 @@ apps/renderer/src/
 ├── components/       React UI components
 ├── lib/              Utilities, types, parsers, services
 ├── hooks/            Custom React hooks
-├── utils/            Security and sanitization
-├── data/             Mock and demo data
+├── data/             Demo-only auth fixtures
 └── env.ts            Environment variable validation
 ```
 
@@ -195,7 +211,7 @@ lib/
 ├── http-security-headers.ts  CSP and baseline response security headers for `next.config`
 ├── site-config.ts          SITE_CONFIG: site name and description (white-label entry point)
 ├── resolve-action.ts       Centralised ActionRegistry resolution — resolves actionId, handles missing handler (warn + forceDisabled). Use in every interactive component instead of inlining the logic.
-├── services/               Typed loaders for pages, layout, and session permissions (mock-backed; swap for API/DB)
+├── services/               Typed loaders for pages, layout, and session permissions (data-access-backed)
 │   ├── pages.ts            Validated pages manifest, nav slice, static params helpers
 │   ├── layout.ts           Validated shared layout document
 │   ├── current-user.ts     Effective permission list (demo stub)
@@ -231,11 +247,10 @@ Custom React hooks. One concern per hook. No JSX.
 
 ### `apps/renderer/src/data/`
 
-Static mock and demo data. Only used during development and demo scenarios.
+Demo-only auth data. Page/layout content loading now comes through `packages/data-access`.
 
 | File | What it does |
 |------|-------------|
-| `mock-data.ts` | Exports `MOCK_LAYOUT` and `MOCK_PAGES` — the full schema in the new two-level structure. Replaces the old `mock-schema.json` + `mock-schema.ts`. |
 | `mock-auth.ts` | Demo-only current user permissions used by the engine to enforce node-level access rules. |
 
 ---

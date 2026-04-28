@@ -79,16 +79,16 @@ Order after validation:
 ### Data & API
 
 - **Services (single validated path for RSC + route handlers):**
-  - `src/lib/services/pages.ts` — manifest, nav slice, `getPageEntry`, `getHomePageEntry`, `getStaticPathParams`, `DEMO_UPDATED_AT`
-  - `src/lib/services/layout.ts` — `getLayout()`
-  - `src/lib/services/current-user.ts` — `getCurrentUserPermissions()` (demo)
+  - `apps/renderer/src/lib/services/pages.ts` — manifest, nav slice, `getPageEntry`, `getHomePageEntry`, `getStaticPathParams`, `DEMO_UPDATED_AT`
+  - `apps/renderer/src/lib/services/layout.ts` — `getLayout()`
+  - `apps/renderer/src/lib/services/current-user.ts` — `getCurrentUserPermissions()` (demo)
 
 - **App Router** imports **services only** (not `mock-data`):
-  - `app/page.tsx`, `app/[...slug]/page.tsx`, `app/layout.tsx`
+  - `apps/renderer/app/page.tsx`, `apps/renderer/app/[...slug]/page.tsx`, `apps/renderer/app/layout.tsx`
 
-- **API:** `app/api/*/route.ts` delegates to the same services.
+- **API:** `apps/renderer/app/api/*/route.ts` delegates to the same services.
 
-- **Mock source of truth (until DB):** `src/data/mock-data.ts`, `src/data/mock-auth.ts`
+- **Data-access seam (until DB adapter):** `packages/data-access` (`InMemoryPublishedContentRepository`), plus demo auth source `apps/renderer/src/data/mock-auth.ts`
 
 ### Schema version
 
@@ -859,6 +859,35 @@ Validation run:
 Notes:
 
 - This M3 extraction keeps renderer read behavior unchanged and does not alter DB direction (builder writes, renderer reads).
+
+---
+
+### Phase M4 completion note
+
+Shipped in this continuation:
+
+- Added `packages/data-access` as the renderer read boundary:
+  - `contracts.ts` with `PublishedContentRepository` read contract
+  - `repositories/published-content.ts` with `InMemoryPublishedContentRepository`
+  - `mock-published-store.ts` transitional published dataset
+- Rewired renderer services to consume `@agnostic/data-access` instead of direct mock page/layout imports:
+  - `apps/renderer/src/lib/services/layout.ts`
+  - `apps/renderer/src/lib/services/pages.ts`
+- Removed direct renderer content mock file (`apps/renderer/src/data/mock-data.ts`) so page/layout reads go through data-access only.
+- Updated workspace aliases (`apps/renderer/tsconfig.json`, `apps/renderer/vitest.config.ts`) for `@agnostic/data-access`.
+- Updated docs (`02-getting-started`, `03-how-it-works`, `08-project-structure`, `TODOS`, and this report) for M4 architecture and status.
+
+Validation run:
+
+- `npm run lint`
+- `npm run typecheck`
+- `npm test`
+- `npm run build`
+
+Notes:
+
+- Renderer remains read-only against published content contracts.
+- Builder-write and publish workflows are intentionally not implemented in M4; they remain the next vertical while preserving the builder-writes / renderer-reads boundary.
 
 ---
 

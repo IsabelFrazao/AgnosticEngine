@@ -9,6 +9,10 @@ export default defineConfig({
         __dirname,
         '../../packages/engine-core/src/index.ts',
       ),
+      '@agnostic/data-access': path.resolve(
+        __dirname,
+        '../../packages/data-access/src/index.ts',
+      ),
     },
   },
   test: {
