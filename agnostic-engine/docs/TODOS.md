@@ -177,11 +177,11 @@ Related to item 8. Observability plumbing now exists, but production deployments
 
 ---
 
-### 17. Monorepo migration is only partially complete (through M5)
+### 17. Monorepo migration is only partially complete (through M6)
 
 **Files:** `package.json`, `apps/renderer/*`, `apps/builder/*`, `packages/engine-core/*`, `packages/data-access/*`
 
-Workspace scaffolding is in place, renderer and builder workspaces now exist, and shared packages include `engine-core` and `data-access`. Remaining monorepo work still includes schema extraction (`M2`), component catalog parity (`M2.5`), and replacing in-memory draft/published repositories with real DB-backed implementations.
+Workspace scaffolding is in place, renderer and builder workspaces now exist, and shared packages include `engine-core` and `data-access`. M6 also adds builder drag/drop-style interactions, undo/redo, validation feedback, and publish workflow against a shared local filesystem store. Remaining monorepo work still includes schema extraction (`M2`), component catalog parity (`M2.5`), and replacing filesystem transitional repositories with real DB-backed implementations.
 
 **Severity:** Medium
 

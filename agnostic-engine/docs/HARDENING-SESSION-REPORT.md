@@ -79,7 +79,7 @@ Order after validation:
 ### Data & API
 
 - **Services (single validated path for RSC + route handlers):**
-  - `apps/renderer/src/lib/services/pages.ts` — manifest, nav slice, `getPageEntry`, `getHomePageEntry`, `getStaticPathParams`, `DEMO_UPDATED_AT`
+- `apps/renderer/src/lib/services/pages.ts` — manifest, nav slice, `getPageEntry`, `getHomePageEntry`, `getStaticPathParams`, `getDemoUpdatedAt`
   - `apps/renderer/src/lib/services/layout.ts` — `getLayout()`
   - `apps/renderer/src/lib/services/current-user.ts` — `getCurrentUserPermissions()` (demo)
 
@@ -926,6 +926,42 @@ Notes:
 - Builder writes drafts through draft repository contracts.
 - Renderer remains read-only through published repository contracts.
 - Both repositories are currently in-memory and must be replaced with DB-backed implementations in later phases.
+
+---
+
+### Phase M6 completion note
+
+Shipped in this continuation:
+
+- Added builder interaction layer in `apps/builder/app/builder/BuilderStudio.tsx`:
+  - drag/drop page reordering
+  - undo/redo history
+  - in-UI validation feedback
+  - save draft + publish actions
+- Added builder APIs:
+  - `apps/builder/app/api/draft/route.ts` for loading/saving drafts
+  - `apps/builder/app/api/publish/route.ts` for publish operations
+- Extended `packages/data-access` with publish workflow and shared storage:
+  - `publishDraftSiteVersion(...)` on draft repository contract/implementation
+  - `src/storage/site-store.ts` shared filesystem-backed site store (`.data/sites/*.json`)
+  - published repository now reads published snapshots from shared site store per site context
+- Updated renderer read services to load the latest published snapshot on request (no in-process manifest cache).
+- Added live phase tracker file: `docs/PHASE-M6-PROGRESS.md`.
+
+Validation run:
+
+- `npm run lint`
+- `npm run typecheck`
+- `npm test`
+- `npm run build`
+- `npm run lint:builder`
+- `npm run typecheck:builder`
+- `npm run build:builder`
+
+Notes:
+
+- Builder remains the write path (draft + publish), renderer remains read-only from published snapshots.
+- Storage is transitional (filesystem) and is still planned to be replaced by a transactional DB-backed adapter in later phases.
 
 ---
 

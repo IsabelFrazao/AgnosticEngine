@@ -2,10 +2,11 @@ import { MetadataEngine } from '@/src/engines/MetadataEngine';
 import { FormattedUtc } from '@/src/components/atoms/FormattedUtc';
 import { getCurrentUserPermissions } from '@/src/lib/services/current-user';
 import { notFound } from 'next/navigation';
-import { DEMO_UPDATED_AT, canAccessPageEntry, getHomePageEntry } from '@/src/lib/services/pages';
+import { canAccessPageEntry, getDemoUpdatedAt, getHomePageEntry } from '@/src/lib/services/pages';
 
 export default async function Home() {
   const homePage = getHomePageEntry();
+  const demoUpdatedAt = getDemoUpdatedAt();
   const currentUserPermissions = await getCurrentUserPermissions();
 
   if (!canAccessPageEntry(homePage, [...currentUserPermissions])) {
@@ -23,9 +24,9 @@ export default async function Home() {
             <p className="text-sm text-(--color-muted-foreground)">
               {homePage.header.description} UTC demo:{' '}
               <code className="rounded bg-(--color-muted) px-1.5 py-0.5 text-xs">
-                {DEMO_UPDATED_AT}
+                {demoUpdatedAt}
               </code>{' '}
-              → <FormattedUtc iso={DEMO_UPDATED_AT} />
+              → <FormattedUtc iso={demoUpdatedAt} />
             </p>
           </header>
         )}

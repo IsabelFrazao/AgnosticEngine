@@ -11,6 +11,6 @@ type LegacyLayoutInput = Parameters<typeof migrateLayout>[0];
  * implementation for a real DB adapter when infrastructure is ready.
  */
 export function getLayout(): Layout {
-  const rawLayout = publishedContentRepository.getPublishedLayout() as LegacyLayoutInput;
+  const rawLayout = publishedContentRepository.getPublishedLayout({ siteSlug: 'demo-site' }) as LegacyLayoutInput;
   return LayoutSchema.parse(migrateLayout(rawLayout));
 }

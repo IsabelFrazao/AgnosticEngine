@@ -39,4 +39,5 @@ export type DraftContentRepository = {
     context: DraftWriteContext,
     input: Pick<DraftSiteVersion, 'layout' | 'pages' | 'schemaVersion'>,
   ): DraftSiteVersion;
+  publishDraftSiteVersion(context: DraftWriteContext): DraftSiteVersion;
 };

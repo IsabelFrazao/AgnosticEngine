@@ -1,8 +1,8 @@
 import type { PublishedContentRepository, PublishedReadContext } from '../contracts';
-import { MOCK_PUBLISHED_STORE } from '../mock-published-store';
+import { cloneSiteSnapshot, readSiteStore } from '../storage/site-store';
 
-function cloneValue<T>(value: T): T {
-  return JSON.parse(JSON.stringify(value)) as T;
+function resolveSiteSlug(context?: PublishedReadContext): string {
+  return context?.siteSlug?.trim() || 'demo-site';
 }
 
 /**
@@ -11,24 +11,28 @@ function cloneValue<T>(value: T): T {
  * for a data-access boundary that can be backed by a real DB adapter.
  */
 export class InMemoryPublishedContentRepository implements PublishedContentRepository {
-  getPublishedLayout(_context?: PublishedReadContext): unknown {
-    return cloneValue(MOCK_PUBLISHED_STORE.layout);
+  getPublishedLayout(context?: PublishedReadContext): unknown {
+    const store = readSiteStore(resolveSiteSlug(context));
+    return cloneSiteSnapshot(store.published).layout;
   }
 
-  getPublishedPagesManifest(_context?: PublishedReadContext): Record<string, unknown> {
-    return cloneValue(MOCK_PUBLISHED_STORE.pages);
+  getPublishedPagesManifest(context?: PublishedReadContext): Record<string, unknown> {
+    const store = readSiteStore(resolveSiteSlug(context));
+    return cloneSiteSnapshot(store.published).pages;
   }
 
-  getPublishedPageByPath(path: string, _context?: PublishedReadContext): unknown | undefined {
-    const pages = MOCK_PUBLISHED_STORE.pages as Record<string, unknown>;
+  getPublishedPageByPath(path: string, context?: PublishedReadContext): unknown | undefined {
+    const store = readSiteStore(resolveSiteSlug(context));
+    const pages = cloneSiteSnapshot(store.published).pages;
     const page = pages[path];
     if (!page) {
       return undefined;
     }
-    return cloneValue(page);
+    return page;
   }
 
-  getPublishedUpdatedAt(_context?: PublishedReadContext): string {
-    return MOCK_PUBLISHED_STORE.updatedAt;
+  getPublishedUpdatedAt(context?: PublishedReadContext): string {
+    const store = readSiteStore(resolveSiteSlug(context));
+    return store.published.updatedAt;
   }
 }

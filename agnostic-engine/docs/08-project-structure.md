@@ -46,15 +46,17 @@ packages/engine-core/
 
 ## `packages/data-access/` — Shared data access package
 
-Read-oriented repository boundary for renderer content loading. The current adapter is in-memory and transitional; production should wire a DB-backed implementation behind the same contracts.
+Repository boundary for renderer reads and builder draft/publish workflows. The current implementation uses a local filesystem site store (`.data/sites/*.json`) and remains transitional until DB-backed adapters are introduced.
 
 ```
 packages/data-access/
 ├── package.json
 └── src/
-    ├── contracts.ts                    Renderer read contracts and context
-    ├── mock-published-store.ts         Transitional published dataset
+    ├── contracts.ts                    Published + draft repository contracts
+    ├── mock-published-store.ts         Default seed data for new sites
     ├── repositories/published-content.ts InMemoryPublishedContentRepository
+    ├── repositories/draft-content.ts   InMemoryDraftContentRepository (+ publish operation)
+    ├── storage/site-store.ts           Shared filesystem site snapshots + publish events
     └── index.ts                        Public exports
 ```
 
@@ -83,17 +85,21 @@ apps/renderer/
 
 ## `apps/builder/` — Builder app workspace
 
-This workspace currently provides the M5 MVP shell:
+This workspace now provides M6 interactions and publish workflow:
 
 ```
 apps/builder/
 ├── app/
 │   ├── page.tsx                 Redirects to /builder
 │   ├── login/page.tsx           Simple login UI (cookie-based scaffold)
-│   ├── builder/page.tsx         Site selector + canvas/palette/inspector shell + draft save/load
+│   ├── builder/page.tsx         Loads draft for selected site
+│   ├── builder/BuilderStudio.tsx Client canvas with drag/drop, undo/redo, validation, save/publish
 │   └── api/auth/
 │       ├── login/route.ts       Sets builder auth cookie
 │       └── logout/route.ts      Clears builder auth cookie
+│   └── api/
+│       ├── draft/route.ts       Draft read/save API
+│       └── publish/route.ts     Publish draft snapshot API
 ├── middleware.ts                Protects builder routes (except login/auth endpoints)
 ├── .env.example
 ├── next.config.ts

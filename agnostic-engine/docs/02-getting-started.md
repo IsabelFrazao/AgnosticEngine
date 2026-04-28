@@ -56,7 +56,7 @@ AE_LOG_INGEST_TOKEN=<secret-token>
 
 If `AE_LOG_INGEST_URL` is set, the logger will also POST structured server-side log events to that endpoint (optionally authenticated with `AE_LOG_INGEST_TOKEN`).
 
-> **Note:** There is no real backend DB adapter wired yet. Renderer reads currently flow through `@agnostic/data-access` using its in-memory published-content adapter. This variable remains required by schema validation. See [TODOS.md](./TODOS.md) for context.
+> **Note:** There is no real backend DB adapter wired yet. Renderer reads and builder draft/publish flows currently use the transitional `@agnostic/data-access` filesystem site store. This variable remains required by schema validation. See [TODOS.md](./TODOS.md) for context.
 
 ---
 
@@ -75,6 +75,8 @@ npm run dev:builder
 ```
 
 Open [http://localhost:3001](http://localhost:3001) and sign in on `/login` (scaffold auth flow).
+
+In M6, publishing from builder updates the shared local site snapshot, so refreshing renderer (`http://localhost:3000`) reflects the new published content.
 
 ---
 

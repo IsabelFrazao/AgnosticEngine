@@ -10,28 +10,20 @@ import {
 
 const publishedContentRepository = new InMemoryPublishedContentRepository();
 type LegacyPageManifestEntryInput = Parameters<typeof migratePageManifestEntry>[0];
-let pagesManifestCache: PagesManifest | undefined;
-let demoUpdatedAtCache: string | undefined;
 
 function loadPagesManifest(): PagesManifest {
-  if (!pagesManifestCache) {
-    const rawPages = publishedContentRepository.getPublishedPagesManifest();
-    const migrated = Object.fromEntries(
-      Object.entries(rawPages).map(([slug, page]) => [
-        slug,
-        migratePageManifestEntry(page as LegacyPageManifestEntryInput),
-      ]),
-    );
-    pagesManifestCache = PagesManifestSchema.parse(migrated);
-  }
-  return pagesManifestCache;
+  const rawPages = publishedContentRepository.getPublishedPagesManifest({ siteSlug: 'demo-site' });
+  const migrated = Object.fromEntries(
+    Object.entries(rawPages).map(([slug, page]) => [
+      slug,
+      migratePageManifestEntry(page as LegacyPageManifestEntryInput),
+    ]),
+  );
+  return PagesManifestSchema.parse(migrated);
 }
 
 function loadDemoUpdatedAt(): string {
-  if (!demoUpdatedAtCache) {
-    demoUpdatedAtCache = publishedContentRepository.getPublishedUpdatedAt();
-  }
-  return demoUpdatedAtCache;
+  return publishedContentRepository.getPublishedUpdatedAt({ siteSlug: 'demo-site' });
 }
 
 /**
@@ -106,4 +98,6 @@ export function getStaticPathParams(): { slug: string[] }[] {
     }));
 }
 
-export const DEMO_UPDATED_AT = loadDemoUpdatedAt();
+export function getDemoUpdatedAt(): string {
+  return loadDemoUpdatedAt();
+}
