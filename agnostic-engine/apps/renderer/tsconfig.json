@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@agnostic/engine-core": ["../../packages/engine-core/src/index.ts"]
     }
   },
   "include": [

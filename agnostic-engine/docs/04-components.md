@@ -123,7 +123,7 @@ In **production**: shows only "Component unavailable".
 |----------|----------------|
 | `'invalid-schema'` | Node failed `MetadataNodeSchema.safeParse()` |
 | `'insufficient-permissions'` | Current user is missing one or more `permissions` required by the node |
-| `'max-depth-exceeded'` | Node is at or beyond `MAX_METADATA_TREE_DEPTH` (see `src/lib/metadata/engine-limits.ts`) |
+| `'max-depth-exceeded'` | Node is at or beyond `MAX_METADATA_TREE_DEPTH` (see `packages/engine-core/src/engine-limits.ts`) |
 | `'cycle-detected'` | Node `id` already appears on the path from the root |
 | `'unknown-type'` | `type` string has no entry in `COMPONENT_MAP` |
 | `'render-error'` | Component threw a runtime error during render (caught by `ErrorBoundary`) |

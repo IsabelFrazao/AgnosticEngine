@@ -1,5 +1,5 @@
 import { DEMO_UPDATED_AT, MOCK_PAGES } from '@/src/data/mock-data';
-import { evaluatePermissionAccess } from '@/src/lib/permissions';
+import { evaluatePermissionAccess } from '@agnostic/engine-core';
 import { migratePageManifestEntry } from '@/src/lib/metadata/migrate-page-manifest-entry';
 import {
   PagesManifestSchema,

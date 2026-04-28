@@ -1,8 +1,8 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
 
-vi.mock('@/src/lib/metadata/engine-limits', async (importOriginal) => {
-  const mod = await importOriginal<typeof import('@/src/lib/metadata/engine-limits')>();
+vi.mock('@agnostic/engine-core', async (importOriginal) => {
+  const mod = await importOriginal<typeof import('@agnostic/engine-core')>();
   return {
     ...mod,
     MAX_METADATA_TREE_DEPTH: 2,

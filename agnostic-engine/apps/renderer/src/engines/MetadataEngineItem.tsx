@@ -6,14 +6,14 @@ import { DegradedStateUI } from '@/src/components/atoms/DegradedStateUI';
 import { Skeleton } from '@/src/components/atoms/Skeleton';
 import { COMPONENT_MAP } from '@/src/registry/component-registry';
 import { MetadataNodeSchema } from '@/src/schemas/root.schema';
-import { sanitizeMetadata } from '@/src/utils/sanitize';
-import { logger } from '@/src/lib/logger';
 import {
+  evaluatePermissionAccess,
   extendMetadataAncestorIds,
   MAX_METADATA_TREE_DEPTH,
   resolveMetadataAncestorIds,
-} from '@/src/lib/metadata/engine-limits';
-import { evaluatePermissionAccess } from '@/src/lib/permissions';
+  sanitizeMetadata,
+} from '@agnostic/engine-core';
+import { logger } from '@/src/lib/logger';
 import type { MetadataComponentProps, MetadataSchemaItem } from '@/src/lib/metadata-types';
 
 /**

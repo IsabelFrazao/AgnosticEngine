@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { sanitizeMetadata } from '@/src/utils/sanitize';
+import { sanitizeMetadata } from '@agnostic/engine-core';
 
 describe('sanitizeMetadata', () => {
   it('removes disallowed tags and strips attributes from allowed tags', () => {

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   extendMetadataAncestorIds,
   resolveMetadataAncestorIds,
-} from '@/src/lib/metadata/engine-limits';
+} from '@agnostic/engine-core';
 
 describe('engine-limits', () => {
   it('resolveMetadataAncestorIds uses an empty set when omitted', () => {

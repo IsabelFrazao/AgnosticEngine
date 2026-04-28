@@ -11,7 +11,8 @@ agnostic-engine/
 ├── .github/               CI workflows (lint, typecheck, test)
 ├── apps/
 │   └── renderer/          Next.js renderer app workspace (moved in M1)
-├── packages/              Workspace shared-package scaffold (package extraction starts in later phases)
+├── packages/
+│   └── engine-core/       Shared engine safety and utility package (extracted in M3)
 ├── docs/                   This documentation (see `HARDENING-SESSION-REPORT.md` for phased hardening status)
 ├── .cursor/                AI agent rules and prompts
 ├── .husky/                 Git hooks
@@ -20,6 +21,24 @@ agnostic-engine/
 ```
 
 Renderer app code/config now lives under `apps/renderer`. Root scripts (`npm run lint`, `npm test`, etc.) call renderer workspace scripts.
+
+---
+
+## `packages/engine-core/` — Shared engine safety package
+
+Reusable framework-agnostic logic extracted from renderer in M3.
+
+```
+packages/engine-core/
+├── package.json
+└── src/
+    ├── contracts.ts         Shared metadata component props contract
+    ├── engine-limits.ts     Max metadata tree depth + ancestor helpers
+    ├── parse-with-schema.ts Generic schema parser helper
+    ├── permissions.ts       Permission evaluator for node/page checks
+    ├── sanitize.ts          Recursive metadata sanitizer
+    └── index.ts             Public exports
+```
 
 ---
 
@@ -173,7 +192,6 @@ lib/
 ├── metadata-types.ts       MetadataSchemaItem and MetadataComponentProps type aliases
 ├── api.ts                  Axios instance with base URL + 401 interceptor
 ├── logger.ts               Structured logger with pluggable transports (`setLoggerTransports`) and external reporter hook support
-├── permissions.ts          Pure permission evaluator for metadata node access checks
 ├── http-security-headers.ts  CSP and baseline response security headers for `next.config`
 ├── site-config.ts          SITE_CONFIG: site name and description (white-label entry point)
 ├── resolve-action.ts       Centralised ActionRegistry resolution — resolves actionId, handles missing handler (warn + forceDisabled). Use in every interactive component instead of inlining the logic.
@@ -186,7 +204,6 @@ lib/
 │   ├── migrate-layout.ts   Normalizes and validates layout schemaVersion
 │   ├── migrate-page-manifest-entry.ts  Normalizes and validates page schemaVersion
 │   ├── schema-version.ts   Supported schema versions and validation helpers
-│   ├── engine-limits.ts    Max metadata tree depth + ancestor path helpers for cycle checks
 │   ├── parse-button-metadata.ts
 │   ├── parse-table-metadata.ts
 │   └── parse-theme-switcher-metadata.ts
@@ -209,17 +226,6 @@ Custom React hooks. One concern per hook. No JSX.
 |------|-------------|
 | `useTheme.ts` | Re-exports `useThemeContext` as `useTheme` — the public API for theme state |
 | `useClientReady.ts` | Returns `false` on server / first hydration paint, `true` after. Prevents SSR mismatches for browser-only state (theme, locale). |
-
----
-
-### `apps/renderer/src/utils/`
-
-Security implementation.
-
-| File | What it does |
-|------|-------------|
-| `sanitize.ts` | Public entry point — re-exports `sanitizeMetadata` from `security.ts` |
-| `security.ts` | Implementation: recursively strips HTML from string values, allows only `<b>`, `<i>`, `<strong>` (no attributes) |
 
 ---
 

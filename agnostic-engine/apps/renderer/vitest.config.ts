@@ -5,6 +5,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname),
+      '@agnostic/engine-core': path.resolve(
+        __dirname,
+        '../../packages/engine-core/src/index.ts',
+      ),
     },
   },
   test: {

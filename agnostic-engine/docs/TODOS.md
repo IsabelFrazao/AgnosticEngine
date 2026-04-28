@@ -173,11 +173,11 @@ Related to item 8. Observability plumbing now exists, but production deployments
 
 ---
 
-### 17. Monorepo migration is only partially complete (through M1)
+### 17. Monorepo migration is only partially complete (through M3)
 
-**Files:** `package.json`, `apps/.gitkeep`, `packages/.gitkeep`
+**Files:** `package.json`, `apps/renderer/*`, `packages/engine-core/*`
 
-Workspace scaffolding is in place and the renderer app is now relocated to `apps/renderer`, but shared package extraction has not started yet.
+Workspace scaffolding is in place, renderer is relocated to `apps/renderer`, and `packages/engine-core` is extracted. Remaining monorepo work still includes schema extraction (`M2`), component catalog parity (`M2.5`), and data-access/builder phases.
 
 **Severity:** Medium
 

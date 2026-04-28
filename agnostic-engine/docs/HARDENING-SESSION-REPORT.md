@@ -73,7 +73,7 @@ Order after validation:
 
 - `src/engines/MetadataEngineItem.tsx`
 - `src/engines/MetadataEngine.tsx` (passes `depth={0}`)
-- `src/lib/metadata/engine-limits.ts` — `MAX_METADATA_TREE_DEPTH`, ancestor helpers
+- `packages/engine-core/src/engine-limits.ts` — `MAX_METADATA_TREE_DEPTH`, ancestor helpers
 - `src/components/atoms/DegradedStateUI.tsx` — reason union includes guard reasons
 
 ### Data & API
@@ -823,6 +823,42 @@ Notes:
 
 - Build remains green with the same existing advisory/deprecation output (`postcss` advisory via `next` transitive dependency; middleware-to-proxy notice).
 - Local environment file now needs to be in renderer workspace context (`apps/renderer/.env.local`) for Next build/runtime variable loading.
+
+---
+
+### Phase M3 completion note
+
+Shipped in this continuation:
+
+- Added `packages/engine-core` and extracted shared engine safety utilities:
+  - `permissions.ts` (`evaluatePermissionAccess`)
+  - `engine-limits.ts` (`MAX_METADATA_TREE_DEPTH`, ancestor helpers)
+  - `sanitize.ts` (`sanitizeMetadata`)
+  - `contracts.ts` (metadata component props contract)
+  - `parse-with-schema.ts` (generic metadata parsing helper)
+- Updated renderer to consume `@agnostic/engine-core` directly from:
+  - `apps/renderer/src/engines/MetadataEngineItem.tsx`
+  - `apps/renderer/src/lib/services/pages.ts`
+  - sanitizer/engine-limit test suites
+- Updated renderer parser wrappers to use shared `parseWithSchema(...)` helper.
+- Removed duplicated renderer-local implementations that are now owned by engine-core:
+  - `apps/renderer/src/lib/permissions.ts`
+  - `apps/renderer/src/lib/metadata/engine-limits.ts`
+  - `apps/renderer/src/utils/sanitize.ts`
+  - `apps/renderer/src/utils/security.ts`
+- Updated workspace path aliases (`apps/renderer/tsconfig.json`, `apps/renderer/vitest.config.ts`) for `@agnostic/engine-core`.
+- Updated docs to reflect package ownership and new paths.
+
+Validation run:
+
+- `npm run lint`
+- `npm run typecheck`
+- `npm test`
+- `npm run build`
+
+Notes:
+
+- This M3 extraction keeps renderer read behavior unchanged and does not alter DB direction (builder writes, renderer reads).
 
 ---
 

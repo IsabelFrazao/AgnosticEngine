@@ -8,7 +8,7 @@ AgnosticEngine treats all incoming metadata as untrusted input. Even metadata th
 
 ## Layer 1 — Schema validation (Zod)
 
-**Where:** `src/engines/MetadataEngineItem.tsx`, using `MetadataNodeSchema` from `src/schemas/root.schema.ts`
+**Where:** `apps/renderer/src/engines/MetadataEngineItem.tsx`, using `MetadataNodeSchema` from `apps/renderer/src/schemas/root.schema.ts`
 
 Every metadata node is validated against a strict Zod discriminated union before anything else happens. This means:
 
@@ -23,7 +23,7 @@ If validation fails, the engine logs the error and shows `DegradedStateUI`. The 
 
 ## Layer 2 — HTML sanitization
 
-**Where:** `src/utils/security.ts`, called via `src/utils/sanitize.ts`
+**Where:** `packages/engine-core/src/sanitize.ts`
 
 After schema validation, all string values in `props` are recursively sanitized. The sanitizer:
 
@@ -38,7 +38,7 @@ After schema validation, all string values in `props` are recursively sanitized.
 "<img src=x onerror=alert(1)>"  →  ""
 ```
 
-The sanitizer runs **after** Zod validation, so by the time it runs, it is working on a known, constrained shape — not arbitrary JSON.
+The sanitizer runs **after** Zod validation, so by the time it runs, it is working on a known, constrained shape - not arbitrary JSON.
 
 `dangerouslySetInnerHTML` is **never used** anywhere in the codebase. All text is rendered as React children (plain strings), so React's built-in escaping handles the rest.
 
@@ -46,7 +46,7 @@ The sanitizer runs **after** Zod validation, so by the time it runs, it is worki
 
 ## Layer 2.5 — Permission enforcement (component boundary)
 
-**Where:** `src/engines/MetadataEngineItem.tsx`, using `evaluatePermissionAccess` from `src/lib/permissions.ts`
+**Where:** `apps/renderer/src/engines/MetadataEngineItem.tsx`, using `evaluatePermissionAccess` from `packages/engine-core/src/permissions.ts`
 
 Before rendering a validated node, the engine checks `node.permissions` against the current user's permission set.
 
@@ -59,7 +59,7 @@ This keeps node-level access control centralized in the engine boundary rather t
 
 ## Layer 2.6 — Route and API authorization boundary
 
-**Where:** `src/lib/services/current-user.ts`, `src/lib/services/pages.ts`, `app/page.tsx`, `app/[...slug]/page.tsx`, `app/api/pages/route.ts`, `app/api/page/[...slug]/route.ts`
+**Where:** `apps/renderer/src/lib/services/current-user.ts`, `apps/renderer/src/lib/services/pages.ts`, `apps/renderer/app/page.tsx`, `apps/renderer/app/[...slug]/page.tsx`, `apps/renderer/app/api/pages/route.ts`, `apps/renderer/app/api/page/[...slug]/route.ts`
 
 The application now enforces page-level permissions at route boundaries in addition to node-level checks:
 
@@ -80,7 +80,7 @@ This keeps authorization logic inside service boundaries instead of scattering a
 
 ## Layer 3 — ActionRegistry whitelist
 
-**Where:** `src/registry/action-registry.ts`
+**Where:** `apps/renderer/src/registry/action-registry.ts`
 
 Buttons can specify an `actionId` in their metadata to trigger behavior when clicked. The `ActionRegistry` is a singleton Map of pre-registered handlers. Key rules:
 
@@ -107,7 +107,7 @@ ActionRegistry.register({
 
 ## Layer 4 — Error boundary
 
-**Where:** `src/engines/MetadataEngineItem.tsx`, using `react-error-boundary`
+**Where:** `apps/renderer/src/engines/MetadataEngineItem.tsx`, using `react-error-boundary`
 
 Every component render is wrapped in an `ErrorBoundary`. If a component throws for any reason (runtime error, bad data that slipped through), the error boundary catches it and renders `DegradedStateUI` for that component only. The rest of the page continues rendering normally.
 
@@ -117,7 +117,7 @@ This prevents a single broken component from crashing the entire application.
 
 ## Layer 5 — Logger
 
-**Where:** `src/lib/logger.ts`
+**Where:** `apps/renderer/src/lib/logger.ts`
 
 All security-relevant events (validation failures, unknown types, unregistered actions) are routed through the `logger` singleton. The logger now uses a **transport pipeline**:
 
@@ -141,7 +141,7 @@ Rules:
 
 ## Layer 6 — HTTP security headers
 
-**Where:** `next.config.ts` (uses `getSecurityHeaders` from `src/lib/http-security-headers.ts`)
+**Where:** `apps/renderer/next.config.ts` (uses `getSecurityHeaders` from `apps/renderer/src/lib/http-security-headers.ts`)
 
 Responses include a baseline policy suitable for this app:
 
@@ -152,7 +152,7 @@ Responses include a baseline policy suitable for this app:
 - **Permissions-Policy** — disables camera, microphone, and geolocation by default
 - **Strict-Transport-Security** — applied only when `NODE_ENV !== 'development'`
 
-**Where:** `middleware.ts` (root)
+**Where:** `apps/renderer/middleware.ts`
 
 Thin pass-through today — intended extension point for auth, tenancy, and rate limiting without scattering logic across routes.
 
@@ -160,13 +160,13 @@ Thin pass-through today — intended extension point for auth, tenancy, and rate
 
 ## Environment variables
 
-**Where:** `src/env.ts`
+**Where:** `apps/renderer/src/env.ts`
 
 All environment variables are validated at startup using Zod. If a required variable is missing or has the wrong format, the application throws immediately with a clear error message — it does not start in a broken state.
 
 New environment variables must be:
-1. Added to the Zod schema in `src/env.ts`
-2. Added to `.env.example` with a comment explaining the expected value
+1. Added to the Zod schema in `apps/renderer/src/env.ts`
+2. Added to `apps/renderer/.env.example` with a comment explaining the expected value
 3. Documented in [Getting Started](./02-getting-started.md)
 
 Access environment variables via `env.NEXT_PUBLIC_API_URL` (the validated object), never via `process.env.NEXT_PUBLIC_API_URL` directly.
@@ -179,7 +179,7 @@ Access environment variables via `env.NEXT_PUBLIC_API_URL` (the validated object
 |-----|------|---------|
 | Session-backed identity provider | Route and API permission checks are implemented with secure empty-default behavior, but real authenticated identity/session integration is still pending | [TODOS.md](./TODOS.md) |
 | Provider-native adapter wiring | Generic remote sink forwarding is available (`AE_LOG_INGEST_URL`), but provider-native Sentry/Datadog SDK adapters are not yet connected | [TODOS.md](./TODOS.md) |
-| CSP tuning for third parties | Baseline CSP is strict; any new external script or iframe host must be reflected in `src/lib/http-security-headers.ts` | [TODOS.md](./TODOS.md) |
+| CSP tuning for third parties | Baseline CSP is strict; any new external script or iframe host must be reflected in `apps/renderer/src/lib/http-security-headers.ts` | [TODOS.md](./TODOS.md) |
 | Rate limiting / auth | Middleware is a scaffold only — no enforcement on `/api` yet | [TODOS.md](./TODOS.md) |
 
 ---
@@ -192,6 +192,6 @@ Access environment variables via `env.NEXT_PUBLIC_API_URL` (the validated object
 | Arbitrary HTML/JS cannot be injected via metadata | Sanitizer strips everything except `<b>`, `<i>`, `<strong>` |
 | Arbitrary code cannot be triggered via button metadata | ActionRegistry whitelist |
 | A failing component cannot crash the whole page | ErrorBoundary per node |
-| Invalid environment config is caught at startup | Zod-validated `src/env.ts` |
-| Baseline transport security headers on responses | `next.config.ts` + `src/lib/http-security-headers.ts` |
+| Invalid environment config is caught at startup | Zod-validated `apps/renderer/src/env.ts` |
+| Baseline transport security headers on responses | `apps/renderer/next.config.ts` + `apps/renderer/src/lib/http-security-headers.ts` |
 | All failures are observable | Centralized `logger` |

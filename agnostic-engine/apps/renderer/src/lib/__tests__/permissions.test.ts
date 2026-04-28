@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { evaluatePermissionAccess } from '../permissions';
+import { evaluatePermissionAccess } from '@agnostic/engine-core';
 
 describe('evaluatePermissionAccess', () => {
   it('allows access when no permissions are required', () => {
