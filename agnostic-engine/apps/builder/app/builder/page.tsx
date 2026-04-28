@@ -22,9 +22,9 @@ export default async function BuilderPage({ searchParams }: BuilderPageProps) {
     <main>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <div>
-          <h1 style={{ margin: 0 }}>Builder MVP Shell</h1>
+          <h1 style={{ margin: 0 }}>Visual Builder Studio</h1>
           <p className="muted" style={{ marginTop: 6 }}>
-            M5 scaffold: protected builder routes, site selector, canvas shell, and draft save/load via data-access.
+            Build pages visually with tabbed pages, drag/drop placement, inspector editing, and publish workflow.
           </p>
         </div>
         <form method="post" action="/api/auth/logout">

@@ -147,7 +147,7 @@ apps/renderer/
 
 ## `apps/builder/` — Builder app workspace
 
-This workspace now provides M6 interactions and publish workflow:
+This workspace now provides visual authoring interactions and publish workflow:
 
 ```
 apps/builder/
@@ -155,13 +155,18 @@ apps/builder/
 │   ├── page.tsx                 Redirects to /builder
 │   ├── login/page.tsx           Simple login UI (cookie-based scaffold)
 │   ├── builder/page.tsx         Loads draft for selected site
-│   ├── builder/BuilderStudio.tsx Client canvas with drag/drop, undo/redo, validation, save/publish
+│   ├── builder/BuilderStudio.tsx Visual-first studio (tabs, drag canvas, inspector, simulator, save/publish)
 │   └── api/auth/
 │       ├── login/route.ts       Sets builder auth cookie
 │       └── logout/route.ts      Clears builder auth cookie
 │   └── api/
 │       ├── draft/route.ts       Draft read/save API
 │       └── publish/route.ts     Publish draft snapshot API
+├── src/
+│   └── lib/
+│       ├── builder-state.ts      Builder canvas/page/section/item state model + validation helpers
+│       ├── schema-projection.ts  Draft payload <-> builder state projection seam
+│       └── __tests__/builder-state.test.ts Projection and helper tests (run via root vitest command)
 ├── middleware.ts                Protects builder routes (except login/auth endpoints)
 ├── .env.example
 ├── next.config.ts

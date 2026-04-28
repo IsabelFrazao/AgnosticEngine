@@ -31,6 +31,7 @@ export default defineConfig({
     environment: 'node',
     include: [
       '**/*.{test,spec}.?(c|m)[jt]s?(x)',
+      '../../apps/builder/src/**/*.{test,spec}.?(c|m)[jt]s?(x)',
       '../../packages/metadata-schema/src/__tests__/**/*.{test,spec}.?(c|m)[jt]s?(x)',
       '../../packages/component-catalog/src/__tests__/**/*.{test,spec}.?(c|m)[jt]s?(x)',
       '../../packages/ui-kit/src/**/*.{test,spec}.?(c|m)[jt]s?(x)',

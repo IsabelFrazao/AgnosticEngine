@@ -137,8 +137,12 @@ RSC pages and route handlers both consume **`apps/renderer/src/lib/services/*`**
 HTTP contract smoke tests live in `apps/renderer/app/api/__tests__/routes.test.ts` (schema shape + 404 behavior).
 
 Builder writes and publishes through **`apps/builder/app/api/draft`** and **`apps/builder/app/api/publish`**, which call draft repository contracts in `@agnostic/data-access`.
-Builder palette/inspector defaults are now generated from `@agnostic/component-catalog`, and renderer registry parity is enforced with catalog contract tests.
-Shared UTC display/hydration-safe UI primitives now live in `@agnostic/ui-kit` and are consumed by both renderer and builder.
+Builder Studio (`apps/builder/app/builder/BuilderStudio.tsx`) is now visual-first: page tabs (sheet-like), section-based canvas, in-section drag positioning, metadata inspector editing, and a live simulator panel. Raw JSON remains available only behind an explicit toggle.
+The builder uses a dedicated projection seam:
+- `apps/builder/src/lib/schema-projection.ts` for `draft <-> builder state`
+- `apps/builder/src/lib/builder-state.ts` for canvas/page/section/item state transitions
+Builder palette/inspector defaults are generated from `@agnostic/component-catalog`, and renderer registry parity is enforced with catalog contract tests.
+Shared render primitives (`Button`, `Table`, `ThemeSwitcher`, theme provider) now come from `@agnostic/ui-kit` so simulator and renderer stay visually aligned.
 
 ---
 

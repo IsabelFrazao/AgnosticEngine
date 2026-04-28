@@ -1121,4 +1121,40 @@ Notes:
 
 ---
 
+### Builder visual UX completion note (post-M6 UX deepening)
+
+Shipped in this continuation:
+
+- Replaced JSON-first editing in `apps/builder/app/builder/BuilderStudio.tsx` with a visual-first workflow:
+  - sheet-like page tabs (create, rename, delete, reorder)
+  - section-based canvas with hybrid positioning (drop zones + free positioning inside section)
+  - component drag/drop from palette for current catalog types (`button`, `table`, `theme-switcher`)
+  - inspector-driven metadata editing for selected items/sections/pages
+  - live webpage simulator panel rendered from shared `@agnostic/ui-kit` components
+  - raw JSON moved behind an explicit show/hide toggle (debug-only)
+- Added builder projection/state seam:
+  - `apps/builder/src/lib/builder-state.ts` for normalized page/section/item state + validation helpers
+  - `apps/builder/src/lib/schema-projection.ts` for `draft <-> builder` conversion
+- Updated builder page shell text in `apps/builder/app/builder/page.tsx` to reflect Visual Builder Studio scope.
+- Added builder state/projection tests:
+  - `apps/builder/src/lib/__tests__/builder-state.test.ts`
+  - wired into root `npm test` by extending `apps/renderer/vitest.config.ts` includes.
+
+Validation run:
+
+- `npm run lint`
+- `npm run typecheck`
+- `npm test`
+- `npm run build`
+- `npm run lint:builder`
+- `npm run typecheck:builder`
+- `npm run build:builder`
+
+Notes:
+
+- API contracts stay stable (`/api/draft`, `/api/publish` unchanged); the new projection layer absorbs UX model changes.
+- Builder remains the write path and renderer remains the published read path.
+
+---
+
 *End of report — continue by appending dated log entries after each shipped hardening phase.*
