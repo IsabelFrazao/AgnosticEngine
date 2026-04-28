@@ -2,8 +2,7 @@
 
 import { Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { DegradedStateUI } from '@/src/components/atoms/DegradedStateUI';
-import { Skeleton } from '@/src/components/atoms/Skeleton';
+import { DegradedStateUI, Skeleton } from '@agnostic/ui-kit';
 import { COMPONENT_MAP } from '@/src/registry/component-registry';
 import { MetadataNodeSchema } from '@/src/schemas/root.schema';
 import {

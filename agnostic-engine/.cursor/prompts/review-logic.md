@@ -20,6 +20,8 @@ Undocumented Decisions: Does the code contain any of the following WITHOUT a com
 
 Cleanliness: Is the Code completely clean, optimized, parted in generic, reusable components/code and following the S.O.L.I.D. principles? Check for unused imports — specifically `import React from 'react'` used only for types (should be `import type { ... } from 'react'`).
 
+Atomic Design Placement: Are new components placed in atomic folders only (`components/atoms/*` or `components/organisms/*`)? Flag any flat `components/*.tsx` file addition as a violation unless it is an explicit provider entry under `components/providers/*`.
+
 Security: Is this code safe or will it let out confidential information?
 
 Output your review in this format:

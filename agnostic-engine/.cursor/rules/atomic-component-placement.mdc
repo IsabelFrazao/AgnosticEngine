@@ -1,0 +1,19 @@
+---
+description: Enforce atomic component placement for new UI components.
+globs: "**/*.{ts,tsx}"
+alwaysApply: true
+---
+
+# Atomic Component Placement
+
+Use atomic design folders whenever creating or moving UI components.
+
+- New presentational primitives go to `*/components/atoms/`.
+- New composed blocks that aggregate atoms go to `*/components/organisms/`.
+- Do not create flat `components/*.tsx` files for new UI components.
+- Keep app-specific providers separate from atomic layers (`*/components/providers/`).
+- In `packages/ui-kit`, preserve this structure:
+  - `src/components/atoms/*`
+  - `src/components/organisms/*`
+
+If a component is not clearly an atom or organism, decide explicitly in code review comments and place it in one of those folders anyway (no "misc" buckets).

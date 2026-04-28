@@ -99,14 +99,24 @@ packages/component-catalog/
 
 ## `packages/ui-kit/` — Shared cross-app UI primitives package
 
-Owns lightweight presentational primitives and UI hooks used by both apps.
+Owns shared presentational components, theme primitives, and UI hooks used by both apps.
 
 ```
 packages/ui-kit/
 ├── package.json
 └── src/
-    ├── components/FormattedUtc.tsx      Shared UTC display component
+    ├── components/atoms/Button.tsx      Shared presentational button primitive
+    ├── components/atoms/DegradedStateUI.tsx Shared degraded fallback UI
+    ├── components/atoms/FormattedUtc.tsx Shared UTC display component
+    ├── components/atoms/Skeleton.tsx    Shared loading skeleton primitive
+    ├── components/atoms/ThemeSwitcher.tsx Shared theme switcher presenter
+    ├── components/organisms/Sidebar.tsx Shared navigation sidebar shell
+    ├── components/organisms/Table.tsx   Shared table presenter (UTC-aware cells)
     ├── hooks/use-client-ready.ts        Hydration-safe client-ready hook
+    ├── theme/theme-context.tsx          Theme provider + storage integration
+    ├── theme/theme-icons.tsx            Shared theme icon set
+    ├── theme/theme-types.ts             Theme contracts
+    ├── theme/themes.ts                  Theme registry constants
     ├── datetime/utc-display.ts          UTC parse/format helpers
     ├── __tests__/utc-display.test.ts    UTC helper tests
     └── index.ts                         Public exports
@@ -204,9 +214,8 @@ apps/renderer/src/
 ├── engines/          The rendering engine
 ├── registry/         Component and action whitelists
 ├── schemas/          Zod validation schemas
-├── components/       React UI components
+├── components/       Renderer adapters, providers, and app-level UI composition
 ├── lib/              Utilities, types, parsers, services
-├── hooks/            Custom React hooks
 ├── data/             Demo-only auth fixtures
 └── env.ts            Environment variable validation
 ```
@@ -269,11 +278,8 @@ components/
 ├── atoms/
 │   ├── Button.tsx          Renders a <button>; resolves click from ActionRegistry
 │   ├── ThemeSwitcher.tsx   Theme picker group of toggle buttons
-│   ├── DegradedStateUI.tsx "Component unavailable" fallback for failures
-│   ├── Skeleton.tsx        Animated grey placeholder for loading states
 ├── organisms/
 │   ├── Table.tsx           HTML table rendered from columns + rows metadata
-│   └── Sidebar.tsx         Nav sidebar — derives menu items from NavManifest (Law of Derivation)
 └── providers/
     └── QueryProvider.tsx   TanStack Query QueryClientProvider wrapper ('use client')
 ```
@@ -301,22 +307,8 @@ lib/
 │   ├── parse-button-metadata.ts
 │   ├── parse-table-metadata.ts
 │   └── parse-theme-switcher-metadata.ts
-├── theme/                  Theme system
-│   ├── theme-types.ts      ThemeId type and Theme interface
-│   ├── themes.ts           THEMES array, THEME_IDS set, DEFAULT_THEME_ID
-│   ├── theme-context.tsx   ThemeProvider, useThemeContext, localStorage read/write
-│   └── theme-icons.tsx     SVG icon components (System, Light, Dark, Ocean, Forest)
+├── (theme moved to `packages/ui-kit/src/theme/*`)
 ```
-
----
-
-### `apps/renderer/src/hooks/`
-
-Custom React hooks. One concern per hook. No JSX.
-
-| File | What it does |
-|------|-------------|
-| `useTheme.ts` | Re-exports `useThemeContext` as `useTheme` — the public API for theme state |
 
 ---
 
@@ -345,6 +337,7 @@ Rules that Cursor AI and other agents always apply when working in this repo.
 | `rules/agnostic-laws.mdc` | The Three Laws: Discovery, Purity, Validation, and folder layout |
 | `rules/law-of-derivation.mdc` | Law of Derivation: pages map as single source of truth for content + nav; sub-menu derivation; extras escape hatch |
 | `rules/agnostic-standards.mdc` | Senior coding standards: TanStack Query, date-fns, ARIA, API client, i18n, Tailwind v4 CSS variable syntax (`(--xxx)`), React type-only imports |
+| `rules/atomic-component-placement.mdc` | Enforces atomic component placement (`atoms/` and `organisms/`) and forbids flat component additions |
 | `rules/security.mdc` | Zero-trust rendering, schema-first, action decoupling, error observability |
 | `rules/solid-atomic-reuse.mdc` | SOLID principles, atomic layout, no duplication, generic components |
 | `rules/metadata-tree.mdc` | The recursive engine pipeline in concise form |

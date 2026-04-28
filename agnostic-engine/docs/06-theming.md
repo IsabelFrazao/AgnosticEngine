@@ -56,7 +56,7 @@ The selected theme is saved to `localStorage` under the key `agnostic-theme`. On
 
 ### 4. React state
 
-`ThemeProvider` (`src/lib/theme/theme-context.tsx`) wraps the entire app and exposes `theme` and `setTheme` via context. Components access it via `useTheme` (`src/hooks/useTheme.ts`).
+`ThemeProvider` (`packages/ui-kit/src/theme/theme-context.tsx`) wraps the app shell and exposes `theme` and `setTheme` via context. Both renderer and builder consume the same shared theme contract through `@agnostic/ui-kit`.
 
 ---
 
@@ -66,7 +66,7 @@ Always use CSS variables — never hardcode hex values:
 
 ```tsx
 // Correct
-className="bg-[var(--color-primary)] text-[var(--color-primary-foreground)]"
+className="bg-(--color-primary) text-(--color-primary-foreground)"
 
 // Wrong
 className="bg-[#1d4ed8] text-white"
@@ -99,13 +99,13 @@ Available tokens:
 
 ## Adding a new theme
 
-1. **Add the ID** to `src/lib/theme/theme-types.ts`:
+1. **Add the ID** to `packages/ui-kit/src/theme/theme-types.ts`:
 
 ```ts
 export type ThemeId = 'system' | 'light' | 'dark' | 'ocean' | 'forest' | 'sunset';
 ```
 
-2. **Register the theme** in `src/lib/theme/themes.ts`:
+2. **Register the theme** in `packages/ui-kit/src/theme/themes.ts`:
 
 ```ts
 import { SunsetIcon } from './theme-icons';
@@ -116,7 +116,7 @@ export const THEMES: readonly Theme[] = [
 ];
 ```
 
-3. **Add an icon** in `src/lib/theme/theme-icons.tsx` following the same SVG pattern.
+3. **Add an icon** in `packages/ui-kit/src/theme/theme-icons.tsx` following the same SVG pattern.
 
 4. **Add the CSS block** in `app/globals.css`:
 

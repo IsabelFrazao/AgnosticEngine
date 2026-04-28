@@ -167,13 +167,13 @@ Related to item 8. Observability plumbing now exists, but production deployments
 
 ### 16. Sidebar nav icons not rendered
 
-**Files:** `src/schemas/page.schema.ts`, `src/components/organisms/Sidebar.tsx`
+**Files:** `src/schemas/page.schema.ts`, `packages/ui-kit/src/components/organisms/Sidebar.tsx`
 
 `PageNavItem.icon` is defined in the schema and parsed by Zod, but the Sidebar does not render it — no icon library is installed. The field is reserved for future use.
 
 **Severity:** Low
 
-**Fix:** Install an icon library (e.g. `lucide-react`, which is zero-config with React 19). Update `NavItem` in `Sidebar.tsx` to render `icon` if present. Verify 2026 security standing before adding the dependency.
+**Fix:** Install an icon library (e.g. `lucide-react`, which is zero-config with React 19). Update `NavItem` in `packages/ui-kit/src/components/organisms/Sidebar.tsx` to render `icon` if present. Verify 2026 security standing before adding the dependency.
 
 ---
 

@@ -14,6 +14,8 @@ Treat the following project rules as **non-optional** for any code or config you
 
 @.cursor/rules/solid-atomic-reuse.mdc
 
+@.cursor/rules/atomic-component-placement.mdc
+
 @.cursor/rules/security.mdc
 
 @.cursor/rules/law-of-derivation.mdc
@@ -76,6 +78,7 @@ Schema (JSON)
 - **Dates**: API always returns UTC ISO strings; format for display using `FormattedUtc` or `date-fns`
 - **Environment**: New env vars must be added to `src/env.ts` Zod schema and `.env.example`
 - **Lazy loading**: Organisms use `dynamic()` in `component-registry.ts`; atoms are static imports
+- **Atomic placement**: New UI components must live in `components/atoms/` or `components/organisms/` (no flat `components/*.tsx` additions)
 - **Path alias**: `@/` resolves to the repo root (e.g., `@/src/components/...`)
 
 ### Stack

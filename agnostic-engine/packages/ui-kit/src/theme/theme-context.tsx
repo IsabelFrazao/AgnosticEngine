@@ -4,16 +4,12 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { DEFAULT_THEME_ID, THEME_IDS } from './themes';
 import type { ThemeId } from './theme-types';
 
-// ── Context ───────────────────────────────────────────────────────────────────
-
 interface ThemeContextValue {
   theme: ThemeId;
   setTheme: (id: ThemeId) => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
-
-// ── Storage ───────────────────────────────────────────────────────────────────
 
 export const STORAGE_KEY = 'agnostic-theme';
 
@@ -36,8 +32,6 @@ function writeStoredTheme(id: ThemeId): void {
   }
 }
 
-// ── DOM ───────────────────────────────────────────────────────────────────────
-
 function applyTheme(id: ThemeId): void {
   const root = document.documentElement;
   if (id === 'system') {
@@ -47,10 +41,7 @@ function applyTheme(id: ThemeId): void {
   }
 }
 
-// ── Provider ──────────────────────────────────────────────────────────────────
-
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  // Lazy initializer: runs once, SSR-safe (returns default on server)
   const [theme, setThemeState] = useState<ThemeId>(readStoredTheme);
 
   useEffect(() => {
@@ -63,17 +54,11 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     setThemeState(id);
   }
 
-  return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
+  return <ThemeContext.Provider value={{ theme, setTheme }}>{children}</ThemeContext.Provider>;
 }
 
-// ── Internal hook (consumed via src/hooks/useTheme.ts) ────────────────────────
-
-export function useThemeContext(): ThemeContextValue {
+export function useTheme(): ThemeContextValue {
   const ctx = useContext(ThemeContext);
-  if (!ctx) throw new Error('useThemeContext must be used inside <ThemeProvider>');
+  if (!ctx) throw new Error('useTheme must be used inside <ThemeProvider>');
   return ctx;
 }

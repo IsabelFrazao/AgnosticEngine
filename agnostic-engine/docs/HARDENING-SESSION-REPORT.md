@@ -74,7 +74,7 @@ Order after validation:
 - `src/engines/MetadataEngineItem.tsx`
 - `src/engines/MetadataEngine.tsx` (passes `depth={0}`)
 - `packages/engine-core/src/engine-limits.ts` — `MAX_METADATA_TREE_DEPTH`, ancestor helpers
-- `src/components/atoms/DegradedStateUI.tsx` — reason union includes guard reasons
+- `packages/ui-kit/src/components/atoms/DegradedStateUI.tsx` — reason union includes guard reasons
 
 ### Data & API
 
@@ -106,7 +106,7 @@ Order after validation:
 
 - Cross-app presentational primitives now live in `packages/ui-kit`.
 - Renderer and builder both consume `FormattedUtc` from `@agnostic/ui-kit`.
-- Hydration-safe `useClientReady` and UTC parse/format helpers moved behind the same package boundary.
+- Hydration-safe `useClientReady`, theme primitives (`ThemeProvider`, `THEMES`, `ThemeSwitcher`) and shared fallback/navigation UI now live behind the same package boundary.
 
 ### Security transport
 
@@ -1081,6 +1081,43 @@ Notes:
 
 - Extracted only cross-app primitives to avoid over-coupling app-specific UX.
 - Builder/renderer architectural split remains intact: builder writes, renderer reads.
+
+---
+
+### UI kit expansion completion note (post-M7 parity pass)
+
+Shipped in this continuation:
+
+- Expanded `packages/ui-kit` from minimal primitives to shared cross-app UI surface:
+  - theme primitives in `src/theme/*` (`ThemeProvider`, `THEMES`, `THEME_IDS`, `DEFAULT_THEME_ID`)
+  - shared components in `src/components/*` (`Button`, `Table`, `ThemeSwitcher`, `Sidebar`, `Skeleton`, `DegradedStateUI`)
+- Kept `QueryProvider` app-local in renderer (`apps/renderer/src/components/providers/QueryProvider.tsx`) by design to avoid sharing data-access behavior in ui-kit.
+- Rewired renderer shell and engine internals to consume shared ui-kit exports:
+  - `apps/renderer/app/layout.tsx` now imports `ThemeProvider`, theme constants, and `Sidebar` from `@agnostic/ui-kit`
+  - `apps/renderer/src/engines/MetadataEngineItem.tsx` now imports `Skeleton` + `DegradedStateUI` from `@agnostic/ui-kit`
+  - renderer metadata adapters for schema components (`Button`, `ThemeSwitcher`, `Table`) now delegate rendering to ui-kit components
+- Removed duplicated renderer-local files now owned by ui-kit:
+  - `apps/renderer/src/lib/theme/*`
+  - `apps/renderer/src/components/atoms/DegradedStateUI.tsx`
+  - `apps/renderer/src/components/atoms/Skeleton.tsx`
+  - `apps/renderer/src/components/organisms/Sidebar.tsx`
+  - `apps/renderer/src/hooks/useTheme.ts`
+- Added live progress tracker: `docs/PHASE-UI-KIT-EXPANSION-PROGRESS.md`.
+
+Validation run:
+
+- `npm run lint`
+- `npm run typecheck`
+- `npm test`
+- `npm run build`
+- `npm run lint:builder`
+- `npm run typecheck:builder`
+- `npm run build:builder`
+
+Notes:
+
+- This pass targets WYSIWYG parity through shared rendering primitives while preserving the builder-write / renderer-read architecture.
+- Query/data providers remain app-owned; ui-kit remains presentational/theme infrastructure.
 
 ---
 

@@ -1,3 +1,12 @@
-export { FormattedUtc } from './components/FormattedUtc';
+export { FormattedUtc } from './components/atoms/FormattedUtc';
+export { Button } from './components/atoms/Button';
+export { DegradedStateUI } from './components/atoms/DegradedStateUI';
+export { Skeleton } from './components/atoms/Skeleton';
+export { ThemeSwitcher } from './components/atoms/ThemeSwitcher';
+export { Sidebar } from './components/organisms/Sidebar';
+export { Table } from './components/organisms/Table';
 export { useClientReady } from './hooks/use-client-ready';
 export { formatUtcLongLocal, parseUtcIso } from './datetime/utc-display';
+export { ThemeProvider, STORAGE_KEY, useTheme } from './theme/theme-context';
+export { DEFAULT_THEME_ID, THEME_IDS, THEMES } from './theme/themes';
+export type { Theme, ThemeId } from './theme/theme-types';

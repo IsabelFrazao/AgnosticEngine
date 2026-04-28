@@ -1,13 +1,15 @@
+type DegradedReason =
+  | 'invalid-schema'
+  | 'unknown-type'
+  | 'render-error'
+  | 'insufficient-permissions'
+  | 'max-depth-exceeded'
+  | 'cycle-detected';
+
 type Props = {
-  itemId:   string;
+  itemId: string;
   itemType: string;
-  reason:
-    | 'invalid-schema'
-    | 'unknown-type'
-    | 'render-error'
-    | 'insufficient-permissions'
-    | 'max-depth-exceeded'
-    | 'cycle-detected';
+  reason: DegradedReason;
 };
 
 export function DegradedStateUI({ itemId, itemType, reason }: Props) {
@@ -20,7 +22,7 @@ export function DegradedStateUI({ itemId, itemType, reason }: Props) {
       <span className="font-medium">Component unavailable</span>
       {process.env.NODE_ENV !== 'production' && (
         <span className="ml-2 font-mono text-xs">
-          [{itemType} / {itemId} — {reason}]
+          [{itemType} / {itemId} - {reason}]
         </span>
       )}
     </div>

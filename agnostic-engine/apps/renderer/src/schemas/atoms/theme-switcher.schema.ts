@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { THEME_IDS } from '@/src/lib/theme/themes';
-import type { ThemeId } from '@/src/lib/theme/theme-types';
+import { THEME_IDS } from '@agnostic/ui-kit';
+import type { ThemeId } from '@agnostic/ui-kit';
 
 const themeIdSchema = z.string().refine(
   (val): val is ThemeId => THEME_IDS.has(val as ThemeId),

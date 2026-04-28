@@ -110,7 +110,7 @@ Defers rendering until after browser hydration to prevent a server/client mismat
 
 ### DegradedStateUI
 
-**File:** `src/components/atoms/DegradedStateUI.tsx`
+**File:** `packages/ui-kit/src/components/atoms/DegradedStateUI.tsx`
 
 Not a schema component. Rendered automatically by the engine when a component fails to validate, has an unknown type, or throws during render.
 
@@ -134,7 +134,7 @@ You never use this directly in a schema.
 
 ### Skeleton
 
-**File:** `src/components/atoms/Skeleton.tsx`
+**File:** `packages/ui-kit/src/components/atoms/Skeleton.tsx`
 
 A pulsing grey placeholder shown while lazy-loaded organisms are downloading. Accepts an optional `className` for sizing.
 
@@ -148,7 +148,7 @@ You never use this directly in a schema.
 
 ### FormattedUtc
 
-**File:** `packages/ui-kit/src/components/FormattedUtc.tsx`
+**File:** `packages/ui-kit/src/components/atoms/FormattedUtc.tsx`
 
 Takes an ISO 8601 UTC string and displays it formatted for the user's local timezone using `date-fns`. Shows the raw string on the server (to avoid hydration mismatch) and the formatted string after hydration.
 
@@ -215,6 +215,6 @@ These exist in the codebase but are not registered in `COMPONENT_MAP`. They are 
 
 | Component | Used by |
 |-----------|---------|
-| `Skeleton` | `MetadataEngineItem` (Suspense fallback) |
-| `DegradedStateUI` | `MetadataEngineItem` (validation failure) |
+| `Skeleton` | `MetadataEngineItem` (Suspense fallback) via `@agnostic/ui-kit` |
+| `DegradedStateUI` | `MetadataEngineItem` (validation failure) via `@agnostic/ui-kit` |
 | `FormattedUtc` | `app/page.tsx` (demo date display), `src/components/organisms/Table.tsx` (table ISO date cells), `apps/builder/app/builder/page.tsx` (draft updated timestamp) |

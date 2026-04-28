@@ -1,7 +1,7 @@
 'use client';
 
-import { useClientReady } from '../hooks/use-client-ready';
-import { formatUtcLongLocal, parseUtcIso } from '../datetime/utc-display';
+import { useClientReady } from '../../hooks/use-client-ready';
+import { formatUtcLongLocal, parseUtcIso } from '../../datetime/utc-display';
 
 type FormattedUtcProps = {
   iso: string;
