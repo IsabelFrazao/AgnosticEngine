@@ -173,15 +173,15 @@ Related to item 8. Observability plumbing now exists, but production deployments
 
 ---
 
-### 17. Monorepo migration is only at workspace foundation (M0)
+### 17. Monorepo migration is only partially complete (through M1)
 
 **Files:** `package.json`, `apps/.gitkeep`, `packages/.gitkeep`
 
-Workspace scaffolding is now in place (`workspaces: ["apps/*", "packages/*"]`) with placeholder directories, but the renderer app is still root-located (`app/`, `src/`, `public/`).
+Workspace scaffolding is in place and the renderer app is now relocated to `apps/renderer`, but shared package extraction has not started yet.
 
 **Severity:** Medium
 
-**Fix:** Execute Phase M1 next: relocate the current app into `apps/renderer` with zero behavior drift, then re-validate lint/typecheck/test/build.
+**Fix:** Execute Phase M2 next: extract `packages/metadata-schema` and update renderer imports without changing runtime behavior.
 
 ---
 

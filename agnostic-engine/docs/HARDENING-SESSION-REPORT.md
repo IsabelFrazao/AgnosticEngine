@@ -796,4 +796,34 @@ Notes:
 
 ---
 
+### Phase M1 completion note
+
+Shipped in this continuation:
+
+- Moved the current Next.js renderer app from repo root into `apps/renderer` with no intended behavior drift.
+- Relocated app/runtime/config files:
+  - `app/`, `src/`, `public/`
+  - `middleware.ts`, `next.config.ts`, `next-env.d.ts`
+  - `tsconfig.json`, `eslint.config.mjs`, `postcss.config.mjs`, `vitest.config.ts`
+  - `.env.example` (to `apps/renderer/.env.example`)
+- Added `apps/renderer/package.json` with renderer scripts and dependencies.
+- Updated root `package.json` scripts to delegate to the renderer workspace (`npm run <script> -w agnostic-engine-renderer`).
+- Updated root `lint-staged` to execute ESLint/Vitest via renderer workspace context.
+- Updated CI typecheck command to use root workspace script (`npm run typecheck`).
+- Updated docs (`02-getting-started`, `08-project-structure`, `TODOS`, and this report) for M1 paths and workflow.
+
+Validation run:
+
+- `npm run lint`
+- `npm run typecheck`
+- `npm test`
+- `npm run build`
+
+Notes:
+
+- Build remains green with the same existing advisory/deprecation output (`postcss` advisory via `next` transitive dependency; middleware-to-proxy notice).
+- Local environment file now needs to be in renderer workspace context (`apps/renderer/.env.local`) for Next build/runtime variable loading.
+
+---
+
 *End of report — continue by appending dated log entries after each shipped hardening phase.*

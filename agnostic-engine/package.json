@@ -7,44 +7,24 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "next dev",
-    "build": "tsc --noEmit && eslint && npm audit --audit-level=high && next build",
-    "start": "next start",
-    "lint": "eslint",
-    "test": "vitest run",
-    "test:watch": "vitest",
+    "dev": "npm run dev -w agnostic-engine-renderer",
+    "build": "npm run build -w agnostic-engine-renderer",
+    "start": "npm run start -w agnostic-engine-renderer",
+    "lint": "npm run lint -w agnostic-engine-renderer",
+    "typecheck": "npm run typecheck -w agnostic-engine-renderer",
+    "test": "npm run test -w agnostic-engine-renderer",
+    "test:watch": "npm run test:watch -w agnostic-engine-renderer",
     "prepare": "husky",
     "lint:staged": "lint-staged"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
-      "eslint --fix",
-      "vitest run --related --passWithNoTests"
+      "npm exec -w agnostic-engine-renderer eslint --fix",
+      "npm exec -w agnostic-engine-renderer vitest run --related --passWithNoTests"
     ]
   },
-  "dependencies": {
-    "@tanstack/react-query": "^5.96.1",
-    "axios": "^1.14.0",
-    "date-fns": "^4.1.0",
-    "next": "^16.2.4",
-    "react": "19.2.4",
-    "react-dom": "19.2.4",
-    "react-error-boundary": "^6.1.1",
-    "zod": "^4.3.6"
-  },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "@vitest/ui": "^4.1.5",
-    "eslint": "^9",
-    "eslint-config-next": "^16.2.4",
     "husky": "^9.1.7",
-    "jsdom": "^29.0.2",
-    "lint-staged": "^16.4.0",
-    "tailwindcss": "^4",
-    "typescript": "^5",
-    "vitest": "^4.1.5"
+    "lint-staged": "^16.4.0"
   }
 }

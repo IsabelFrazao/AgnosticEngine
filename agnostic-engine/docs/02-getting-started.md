@@ -19,7 +19,7 @@ git clone <repository-url>
 cd agnostic-engine
 ```
 
-This repository now has an npm workspace scaffold (`apps/*`, `packages/*`) at the root for monorepo migration. In the current phase (M0), the active Next.js app still runs from the repository root.
+This repository uses npm workspaces (`apps/*`, `packages/*`). The active renderer Next.js app now lives in `apps/renderer`, while root scripts delegate to that workspace.
 
 ---
 
@@ -33,13 +33,13 @@ npm install
 
 ## 3. Set up environment variables
 
-The project requires one environment variable and supports optional observability variables. Copy the example file and fill it in:
+The project requires one environment variable and supports optional observability variables. Copy the renderer example file and fill it in:
 
 ```bash
-cp .env.example .env.local
+cp apps/renderer/.env.example apps/renderer/.env.local
 ```
 
-Open `.env.local` and set:
+Open `apps/renderer/.env.local` and set:
 
 ```
 NEXT_PUBLIC_API_URL=http://localhost:3000/api
@@ -81,7 +81,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser. You should 
 | `npm test` | Run the full Vitest suite once |
 | `npm run test:watch` | Run Vitest in watch mode during development |
 
-All commands above are still run from the repository root during M0.
+All commands above are run from the repository root and delegated to `apps/renderer`.
 
 ---
 
@@ -105,7 +105,7 @@ import { MetadataEngine } from '@/src/engines/MetadataEngine';
 // same as: import { MetadataEngine } from '../../engines/MetadataEngine';
 ```
 
-This is configured in `tsconfig.json` under `paths`.
+This is configured in `apps/renderer/tsconfig.json` under `paths`.
 
 ---
 
@@ -113,7 +113,7 @@ This is configured in `tsconfig.json` under `paths`.
 
 | Problem | Fix |
 |---------|-----|
-| App crashes on startup with "Invalid environment variables" | Create `.env.local` with a valid `NEXT_PUBLIC_API_URL` and valid URL format for `AE_LOG_INGEST_URL` if set |
+| App crashes on startup with "Invalid environment variables" | Create `apps/renderer/.env.local` with a valid `NEXT_PUBLIC_API_URL` and valid URL format for `AE_LOG_INGEST_URL` if set |
 | `npm test` fails with "No test files found" | Add at least one `*.test.ts`/`*.test.tsx` file under `src/` |
 | Pre-commit hook fails | Run `npm run lint` manually, fix the errors, re-stage |
 | Port 3000 already in use | Next.js will try 3001, 3002, etc. automatically |

@@ -9,36 +9,47 @@ Every folder and file explained.
 ```
 agnostic-engine/
 ├── .github/               CI workflows (lint, typecheck, test)
-├── apps/                  Workspace app directory scaffold (M0; renderer move happens in M1)
-├── packages/              Workspace shared-package scaffold (M0; package extraction starts in later phases)
-├── app/                    Next.js App Router pages and layouts
-├── src/                    All application source code
+├── apps/
+│   └── renderer/          Next.js renderer app workspace (moved in M1)
+├── packages/              Workspace shared-package scaffold (package extraction starts in later phases)
 ├── docs/                   This documentation (see `HARDENING-SESSION-REPORT.md` for phased hardening status)
-├── public/                 Static assets (SVGs, favicon)
 ├── .cursor/                AI agent rules and prompts
 ├── .husky/                 Git hooks
-├── .env.example            Environment variable template
-├── .env.local              Your local config (not committed)
-├── middleware.ts           Next.js middleware (scaffold for auth / rate limits)
-├── next.config.ts          Next.js configuration + security headers
-├── tsconfig.json           TypeScript configuration
-├── eslint.config.mjs       ESLint rules
-├── postcss.config.mjs      PostCSS (for Tailwind v4)
-├── vitest.config.ts        Vitest config (path aliases + test runtime)
-├── package.json            Dependencies and scripts
+├── package.json            Workspace root scripts + tooling orchestration
 └── CLAUDE.md               Instructions for Claude Code AI agent
 ```
 
-During monorepo Phase M0, `apps/` and `packages/` exist as workspace scaffolding only. The running renderer app remains at root (`app/`, `src/`, `public/`) until Phase M1.
+Renderer app code/config now lives under `apps/renderer`. Root scripts (`npm run lint`, `npm test`, etc.) call renderer workspace scripts.
 
 ---
 
-## `app/` — Pages and layout
+## `apps/renderer/` — Renderer app workspace
+
+This workspace contains the full Next.js application and all app-level config files:
+
+```
+apps/renderer/
+├── app/                  Next.js App Router pages and route handlers
+├── src/                  Application source (engine, schemas, components, services)
+├── public/               Static assets (SVGs, favicon)
+├── .env.example          Renderer environment template
+├── middleware.ts         Next.js middleware/proxy scaffold
+├── next.config.ts        Next.js configuration + security headers
+├── tsconfig.json         TypeScript configuration
+├── eslint.config.mjs     ESLint rules
+├── postcss.config.mjs    PostCSS (Tailwind v4)
+├── vitest.config.ts      Vitest config (alias + runtime)
+└── package.json          Renderer dependencies and scripts
+```
+
+---
+
+## `apps/renderer/app/` — Pages and layout
 
 This is the Next.js App Router entry point. Minimal by design — pages are thin schema consumers.
 
 ```
-app/
+apps/renderer/app/
 ├── layout.tsx          Root HTML shell: fonts, QueryProvider, ThemeProvider, Sidebar, anti-flash script
 ├── page.tsx            Home page — loads "/" via `getHomePageEntry()` and passes components to MetadataEngine
 ├── [...slug]/
@@ -56,22 +67,22 @@ app/
             └── route.ts  GET /api/page/:slug — returns full page entry; 404 if missing
 ```
 
-**`app/layout.tsx`** — Sets up the full app shell. Wraps children in `QueryProvider` (TanStack Query infrastructure) and `ThemeProvider`. Loads layout shell and permission-filtered `NavManifest` via `src/lib/services`, registers app actions once via `src/registry/registered-actions.ts`, and passes nav/extras to `Sidebar`. Anti-flash theme script runs before React hydrates.
+**`apps/renderer/app/layout.tsx`** — Sets up the full app shell. Wraps children in `QueryProvider` (TanStack Query infrastructure) and `ThemeProvider`. Loads layout shell and permission-filtered `NavManifest` via `apps/renderer/src/lib/services`, registers app actions once via `apps/renderer/src/registry/registered-actions.ts`, and passes nav/extras to `Sidebar`. Anti-flash theme script runs before React hydrates.
 
-**`app/page.tsx`** — Home page (`/`). Loads the root page entry through the pages service. Intentionally thin — no business logic.
+**`apps/renderer/app/page.tsx`** — Home page (`/`). Loads the root page entry through the pages service. Intentionally thin — no business logic.
 
-**`app/[...slug]/page.tsx`** — Dynamic renderer for all non-root pages. Joins slug segments into a path (`["courses","modules"]` → `"/courses/modules"`), resolves the page via the pages service, renders via `MetadataEngine`. Returns 404 if not found.
+**`apps/renderer/app/[...slug]/page.tsx`** — Dynamic renderer for all non-root pages. Joins slug segments into a path (`["courses","modules"]` → `"/courses/modules"`), resolves the page via the pages service, renders via `MetadataEngine`. Returns 404 if not found.
 
-**`app/api/`** — Next.js Route Handlers that define the HTTP contract. Handlers delegate to the same `src/lib/services` loaders as the App Router (mock-backed today). Point those services at a real backend when ready.
+**`apps/renderer/app/api/`** — Next.js Route Handlers that define the HTTP contract. Handlers delegate to the same `apps/renderer/src/lib/services` loaders as the App Router (mock-backed today). Point those services at a real backend when ready.
 
-**`app/globals.css`** — Contains the entire token system: 5 complete theme blocks (`:root`, `[data-theme="dark"]`, etc.), plus the Tailwind v4 `@theme` mapping that connects CSS vars to utility classes.
+**`apps/renderer/app/globals.css`** — Contains the entire token system: 5 complete theme blocks (`:root`, `[data-theme="dark"]`, etc.), plus the Tailwind v4 `@theme` mapping that connects CSS vars to utility classes.
 
 ---
 
-## `src/` — Application source
+## `apps/renderer/src/` — Application source
 
 ```
-src/
+apps/renderer/src/
 ├── engines/          The rendering engine
 ├── registry/         Component and action whitelists
 ├── schemas/          Zod validation schemas
@@ -85,7 +96,7 @@ src/
 
 ---
 
-### `src/engines/`
+### `apps/renderer/src/engines/`
 
 The two files that make the engine work. Do not add business logic here.
 
@@ -98,7 +109,7 @@ The two files that make the engine work. Do not add business logic here.
 
 ---
 
-### `src/registry/`
+### `apps/renderer/src/registry/`
 
 The two whitelists that control what can and cannot happen.
 
@@ -106,12 +117,12 @@ The two whitelists that control what can and cannot happen.
 |------|---------|
 | `component-registry.ts` | Maps `type` strings → React components (`COMPONENT_MAP`). TypeScript ensures completeness. |
 | `action-registry.ts` | Maps `actionId` strings → event handlers (`ActionRegistry`). A singleton class. |
-| `registered-actions.ts` | Single bootstrap point for action handler registration (imported once in `app/layout.tsx`). |
+| `registered-actions.ts` | Single bootstrap point for action handler registration (imported once in `apps/renderer/app/layout.tsx`). |
 | `__tests__/` | Registry contract tests (`action-registry` behavior + bootstrap idempotence). |
 
 ---
 
-### `src/schemas/`
+### `apps/renderer/src/schemas/`
 
 All Zod validation schemas. The discriminated union is built automatically — you never edit `root.schema.ts` directly.
 
@@ -132,7 +143,7 @@ schemas/
 
 ---
 
-### `src/components/`
+### `apps/renderer/src/components/`
 
 All React components. Three sub-levels: atoms, organisms, and providers.
 
@@ -153,7 +164,7 @@ components/
 
 ---
 
-### `src/lib/`
+### `apps/renderer/src/lib/`
 
 Pure logic, types, and services. No JSX. Grouped by concern.
 
@@ -190,7 +201,7 @@ lib/
 
 ---
 
-### `src/hooks/`
+### `apps/renderer/src/hooks/`
 
 Custom React hooks. One concern per hook. No JSX.
 
@@ -201,7 +212,7 @@ Custom React hooks. One concern per hook. No JSX.
 
 ---
 
-### `src/utils/`
+### `apps/renderer/src/utils/`
 
 Security implementation.
 
@@ -212,7 +223,7 @@ Security implementation.
 
 ---
 
-### `src/data/`
+### `apps/renderer/src/data/`
 
 Static mock and demo data. Only used during development and demo scenarios.
 
@@ -223,7 +234,7 @@ Static mock and demo data. Only used during development and demo scenarios.
 
 ---
 
-### `src/env.ts`
+### `apps/renderer/src/env.ts`
 
 Validates environment variables at startup using Zod. Exports the `env` object — always import from here, never from `process.env` directly.
 
