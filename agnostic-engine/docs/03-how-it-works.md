@@ -137,6 +137,7 @@ RSC pages and route handlers both consume **`apps/renderer/src/lib/services/*`**
 HTTP contract smoke tests live in `apps/renderer/app/api/__tests__/routes.test.ts` (schema shape + 404 behavior).
 
 Builder writes and publishes through **`apps/builder/app/api/draft`** and **`apps/builder/app/api/publish`**, which call draft repository contracts in `@agnostic/data-access`.
+Builder palette/inspector defaults are now generated from `@agnostic/component-catalog`, and renderer registry parity is enforced with catalog contract tests.
 
 ---
 

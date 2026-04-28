@@ -14,6 +14,7 @@ agnostic-engine/
 │   └── builder/           Next.js builder app workspace (scaffolded in M5)
 ├── packages/
 │   ├── metadata-schema/   Shared schema/version contracts package (extracted in M2)
+│   ├── component-catalog/ Canonical component catalog package (extracted in M2.5)
 │   ├── engine-core/       Shared engine safety and utility package (extracted in M3)
 │   └── data-access/       Published-content repository package (extracted in M4)
 ├── docs/                   This documentation (see `HARDENING-SESSION-REPORT.md` for phased hardening status)
@@ -77,6 +78,20 @@ packages/data-access/
     ├── repositories/draft-content.ts   InMemoryDraftContentRepository (+ publish operation)
     ├── storage/site-store.ts           Shared filesystem site snapshots + publish events
     └── index.ts                        Public exports
+```
+
+---
+
+## `packages/component-catalog/` — Canonical component catalog package
+
+Owns component definitions shared by builder and renderer (type IDs, display metadata, defaults, and inspector field contracts).
+
+```
+packages/component-catalog/
+├── package.json
+└── src/
+    ├── index.ts                         Catalog definitions + helpers
+    └── __tests__/catalog.test.ts        Catalog contract tests
 ```
 
 ---
@@ -199,10 +214,10 @@ The two whitelists that control what can and cannot happen.
 
 | File | Purpose |
 |------|---------|
-| `component-registry.ts` | Maps `type` strings → React components (`COMPONENT_MAP`). TypeScript ensures completeness. |
+| `component-registry.ts` | Builds `COMPONENT_MAP` from `@agnostic/component-catalog` type keys and maps each type to a renderer component. |
 | `action-registry.ts` | Maps `actionId` strings → event handlers (`ActionRegistry`). A singleton class. |
 | `registered-actions.ts` | Single bootstrap point for action handler registration (imported once in `apps/renderer/app/layout.tsx`). |
-| `__tests__/` | Registry contract tests (`action-registry` behavior + bootstrap idempotence). |
+| `__tests__/` | Registry contract tests (`action-registry`, bootstrap idempotence, and component-catalog parity). |
 
 ---
 

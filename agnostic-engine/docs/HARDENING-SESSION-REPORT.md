@@ -96,6 +96,12 @@ Order after validation:
 - Helpers: `packages/metadata-schema/src/schema-version.ts`, `packages/metadata-schema/src/migrations.ts`
 - Zod contract builder: `packages/metadata-schema/src/page-schemas.ts` (consumed by renderer `src/schemas/page.schema.ts`)
 
+### Component catalog parity
+
+- Canonical component support and builder defaults are now defined in `packages/component-catalog/src/index.ts`.
+- Renderer registry consumes catalog type keys.
+- Builder palette/inspector surfaces are generated from the same catalog contract.
+
 ### Security transport
 
 - `src/lib/http-security-headers.ts` — CSP + headers (dev allows `'unsafe-eval'` for Next)
@@ -894,6 +900,40 @@ Validation run:
 Notes:
 
 - This M3 extraction keeps renderer read behavior unchanged and does not alter DB direction (builder writes, renderer reads).
+
+---
+
+### Phase M2.5 completion note
+
+Shipped in this continuation:
+
+- Added `packages/component-catalog` with canonical component entries:
+  - component type IDs
+  - display labels/categories
+  - default metadata factories
+  - inspector field contracts
+- Rewired renderer registry to derive `COMPONENT_MAP` from catalog type keys.
+- Rewired builder palette/inspector to generate from `@agnostic/component-catalog` instead of hardcoded component lists/defaults.
+- Added parity enforcement tests:
+  - `apps/renderer/src/registry/__tests__/component-catalog-parity.test.ts`
+  - `packages/component-catalog/src/__tests__/catalog.test.ts`
+- Updated workspace aliases (`apps/renderer/tsconfig.json`, `apps/renderer/vitest.config.ts`, `apps/builder/tsconfig.json`) for `@agnostic/component-catalog`.
+- Added live phase tracker file: `docs/PHASE-M2.5-PROGRESS.md`.
+
+Validation run:
+
+- `npm run lint`
+- `npm run typecheck`
+- `npm test` (includes `packages/component-catalog/src/__tests__/*`)
+- `npm run build`
+- `npm run lint:builder`
+- `npm run typecheck:builder`
+- `npm run build:builder`
+
+Notes:
+
+- Renderer atom schemas remain local to renderer for now; parity tests guard drift between schema/registry and the shared catalog.
+- Next planned monorepo phase is M7 (`ui-kit` extraction).
 
 ---
 

@@ -17,6 +17,10 @@ export default defineConfig({
         __dirname,
         '../../packages/metadata-schema/src/index.ts',
       ),
+      '@agnostic/component-catalog': path.resolve(
+        __dirname,
+        '../../packages/component-catalog/src/index.ts',
+      ),
     },
   },
   test: {
@@ -24,6 +28,7 @@ export default defineConfig({
     include: [
       '**/*.{test,spec}.?(c|m)[jt]s?(x)',
       '../../packages/metadata-schema/src/__tests__/**/*.{test,spec}.?(c|m)[jt]s?(x)',
+      '../../packages/component-catalog/src/__tests__/**/*.{test,spec}.?(c|m)[jt]s?(x)',
     ],
   },
 });

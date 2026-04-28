@@ -21,7 +21,8 @@
     "paths": {
       "@/*": ["./*"],
       "@agnostic/data-access": ["../../packages/data-access/src/index.ts"],
-      "@agnostic/metadata-schema": ["../../packages/metadata-schema/src/index.ts"]
+      "@agnostic/metadata-schema": ["../../packages/metadata-schema/src/index.ts"],
+      "@agnostic/component-catalog": ["../../packages/component-catalog/src/index.ts"]
     }
   },
   "include": [

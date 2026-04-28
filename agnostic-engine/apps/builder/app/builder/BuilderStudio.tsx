@@ -1,6 +1,12 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import {
+  COMPONENT_CATALOG,
+  COMPONENT_CATALOG_BY_TYPE,
+  createDefaultComponentMetadata,
+  type ComponentType,
+} from '@agnostic/component-catalog';
 
 type DraftSiteVersion = {
   siteSlug: string;
@@ -127,7 +133,7 @@ export function BuilderStudio({ initialDraft }: BuilderStudioProps) {
     setPointer(pointer + 1);
   }
 
-  function addPaletteItem(type: 'button' | 'table' | 'theme-switcher') {
+  function addPaletteItem(type: ComponentType) {
     try {
       const pages = parseJsonObject(current.pagesText);
       const home = pages['/'] as Record<string, unknown> | undefined;
@@ -140,12 +146,7 @@ export function BuilderStudio({ initialDraft }: BuilderStudioProps) {
         id: `builder-${type}-${Date.now()}`,
         type,
         props: {
-          metadata:
-            type === 'button'
-              ? { labelKey: 'Builder Added Button', variant: 'secondary', actionId: 'demo:log' }
-              : type === 'table'
-                ? { columns: ['Col'], rows: [{ Col: 'New row' }] }
-                : { groupLabel: 'Builder Added Theme Switcher' },
+          metadata: createDefaultComponentMetadata(type),
         },
       });
       const nextPages = {
@@ -275,9 +276,16 @@ export function BuilderStudio({ initialDraft }: BuilderStudioProps) {
         <aside className="card">
           <h3 style={{ marginTop: 0 }}>Component Palette</h3>
           <div style={{ display: 'grid', gap: 8 }}>
-            <button className="btn" type="button" onClick={() => addPaletteItem('button')}>Add Button</button>
-            <button className="btn" type="button" onClick={() => addPaletteItem('table')}>Add Table</button>
-            <button className="btn" type="button" onClick={() => addPaletteItem('theme-switcher')}>Add Theme Switcher</button>
+            {COMPONENT_CATALOG.map((entry) => (
+              <button
+                key={entry.type}
+                className="btn"
+                type="button"
+                onClick={() => addPaletteItem(entry.type)}
+              >
+                Add {entry.label}
+              </button>
+            ))}
           </div>
         </aside>
 
@@ -304,6 +312,16 @@ export function BuilderStudio({ initialDraft }: BuilderStudioProps) {
         <aside className="card">
           <h3 style={{ marginTop: 0 }}>Inspector</h3>
           <p className="muted">Drag pages to reorder manifest order:</p>
+          <div style={{ marginBottom: 10 }}>
+            <p className="muted" style={{ margin: 0 }}>Catalog fields:</p>
+            <ul className="muted" style={{ marginTop: 4 }}>
+              {COMPONENT_CATALOG.map((entry) => (
+                <li key={entry.type}>
+                  {entry.label}: {entry.inspectorFields.map((field) => field.key).join(', ')}
+                </li>
+              ))}
+            </ul>
+          </div>
           <ul style={{ display: 'grid', gap: 8, listStyle: 'none', padding: 0, margin: 0 }}>
             {pageKeys.map((key) => (
               <li
@@ -316,6 +334,9 @@ export function BuilderStudio({ initialDraft }: BuilderStudioProps) {
                 style={{ padding: 8, cursor: 'move' }}
               >
                 <code>{key}</code>
+                <div className="muted" style={{ marginTop: 4 }}>
+                  Supported components: {Object.keys(COMPONENT_CATALOG_BY_TYPE).join(', ')}
+                </div>
               </li>
             ))}
           </ul>

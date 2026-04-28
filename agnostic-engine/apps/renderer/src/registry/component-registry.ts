@@ -1,7 +1,7 @@
 import type { ComponentType as ReactComponentType } from 'react';
 import dynamic from 'next/dynamic';
 import type { MetadataComponentProps } from '@/src/lib/metadata-types';
-import type { ComponentType } from '@/src/schemas/atoms';
+import { COMPONENT_TYPES, type ComponentType } from '@agnostic/component-catalog';
 import { Button } from '@/src/components/atoms/Button';
 import { ThemeSwitcher } from '@/src/components/atoms/ThemeSwitcher';
 
@@ -18,8 +18,12 @@ type EngineComponent = ReactComponentType<MetadataComponentProps>;
  * TypeScript enforces completeness: if a type exists in ATOM_SCHEMAS
  * but is missing here, you get a compile error on the Record type.
  */
-export const COMPONENT_MAP: Record<ComponentType, EngineComponent> = {
+const RAW_COMPONENT_MAP = {
   button:           Button,
   table:            Table,
   'theme-switcher': ThemeSwitcher,
-};
+} satisfies Record<ComponentType, EngineComponent>;
+
+export const COMPONENT_MAP = Object.fromEntries(
+  COMPONENT_TYPES.map((type) => [type, RAW_COMPONENT_MAP[type]]),
+) as Record<ComponentType, EngineComponent>;

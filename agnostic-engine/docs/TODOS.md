@@ -177,15 +177,15 @@ Related to item 8. Observability plumbing now exists, but production deployments
 
 ---
 
-### 17. Monorepo migration is only partially complete (through M2 + M6 milestones)
+### 17. Monorepo migration is only partially complete (through M2.5 + M6 milestones)
 
-**Files:** `package.json`, `apps/renderer/*`, `apps/builder/*`, `packages/metadata-schema/*`, `packages/engine-core/*`, `packages/data-access/*`
+**Files:** `package.json`, `apps/renderer/*`, `apps/builder/*`, `packages/metadata-schema/*`, `packages/component-catalog/*`, `packages/engine-core/*`, `packages/data-access/*`
 
-Workspace scaffolding is in place, renderer and builder workspaces now exist, and shared packages now include `metadata-schema`, `engine-core`, and `data-access`. M6 also adds builder drag/drop-style interactions, undo/redo, validation feedback, and publish workflow against a shared local filesystem store. Remaining monorepo work still includes component catalog parity (`M2.5`) and replacing filesystem transitional repositories with real DB-backed implementations.
+Workspace scaffolding is in place, renderer and builder workspaces now exist, and shared packages now include `metadata-schema`, `component-catalog`, `engine-core`, and `data-access`. M6 also adds builder drag/drop-style interactions, undo/redo, validation feedback, and publish workflow against a shared local filesystem store. Remaining monorepo work still includes shared UI extraction (`M7`) and replacing filesystem transitional repositories with real DB-backed implementations.
 
 **Severity:** Medium
 
-**Fix:** Execute Phase M2.5 next: extract `packages/component-catalog` and add parity checks between builder and renderer component support.
+**Fix:** Execute Phase M7 next: extract `packages/ui-kit` for true cross-app primitives while keeping app-specific UX isolated.
 
 ---
 
