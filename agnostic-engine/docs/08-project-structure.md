@@ -10,7 +10,8 @@ Every folder and file explained.
 agnostic-engine/
 ├── .github/               CI workflows (lint, typecheck, test)
 ├── apps/
-│   └── renderer/          Next.js renderer app workspace (moved in M1)
+│   ├── renderer/          Next.js renderer app workspace (moved in M1)
+│   └── builder/           Next.js builder app workspace (scaffolded in M5)
 ├── packages/
 │   ├── engine-core/       Shared engine safety and utility package (extracted in M3)
 │   └── data-access/       Published-content repository package (extracted in M4)
@@ -21,7 +22,7 @@ agnostic-engine/
 └── CLAUDE.md               Instructions for Claude Code AI agent
 ```
 
-Renderer app code/config now lives under `apps/renderer`. Root scripts (`npm run lint`, `npm test`, etc.) call renderer workspace scripts.
+Renderer app code/config now lives under `apps/renderer`, and builder app code/config lives under `apps/builder`. Root default scripts continue to target renderer; builder has explicit `*:builder` scripts.
 
 ---
 
@@ -76,6 +77,29 @@ apps/renderer/
 ├── postcss.config.mjs    PostCSS (Tailwind v4)
 ├── vitest.config.ts      Vitest config (alias + runtime)
 └── package.json          Renderer dependencies and scripts
+```
+
+---
+
+## `apps/builder/` — Builder app workspace
+
+This workspace currently provides the M5 MVP shell:
+
+```
+apps/builder/
+├── app/
+│   ├── page.tsx                 Redirects to /builder
+│   ├── login/page.tsx           Simple login UI (cookie-based scaffold)
+│   ├── builder/page.tsx         Site selector + canvas/palette/inspector shell + draft save/load
+│   └── api/auth/
+│       ├── login/route.ts       Sets builder auth cookie
+│       └── logout/route.ts      Clears builder auth cookie
+├── middleware.ts                Protects builder routes (except login/auth endpoints)
+├── .env.example
+├── next.config.ts
+├── tsconfig.json
+├── eslint.config.mjs
+└── package.json
 ```
 
 ---

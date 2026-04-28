@@ -891,4 +891,42 @@ Notes:
 
 ---
 
+### Phase M5 completion note
+
+Shipped in this continuation:
+
+- Added `apps/builder` workspace scaffold with:
+  - protected-route middleware (`apps/builder/middleware.ts`)
+  - login/logout route handlers (`apps/builder/app/api/auth/*`)
+  - builder MVP shell page (`apps/builder/app/builder/page.tsx`)
+- Implemented M5 shell sections in builder UI:
+  - site selector
+  - component palette shell
+  - canvas shell (JSON editor)
+  - inspector shell
+- Extended `packages/data-access` with draft repository contracts and in-memory implementation:
+  - `DraftContentRepository` contract
+  - `InMemoryDraftContentRepository` implementation
+- Wired builder draft load/save to `@agnostic/data-access` from server actions in `apps/builder/app/builder/page.tsx`.
+- Added root convenience scripts for builder workspace (`dev:builder`, `build:builder`, `lint:builder`, `typecheck:builder`, `start:builder`).
+- Added live phase tracker file: `docs/PHASE-M5-PROGRESS.md`.
+
+Validation run:
+
+- `npm run lint`
+- `npm run typecheck`
+- `npm test`
+- `npm run build`
+- `npm run lint:builder`
+- `npm run typecheck:builder`
+- `npm run build:builder`
+
+Notes:
+
+- Builder writes drafts through draft repository contracts.
+- Renderer remains read-only through published repository contracts.
+- Both repositories are currently in-memory and must be replaced with DB-backed implementations in later phases.
+
+---
+
 *End of report — continue by appending dated log entries after each shipped hardening phase.*

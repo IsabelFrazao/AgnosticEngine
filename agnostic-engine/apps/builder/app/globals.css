@@ -1,0 +1,62 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background: #0b1020;
+  color: #e5e7eb;
+}
+
+a {
+  color: inherit;
+}
+
+main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.card {
+  border: 1px solid #243049;
+  background: #111a2f;
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.muted {
+  color: #94a3b8;
+}
+
+.btn {
+  border: 1px solid #334155;
+  background: #1e293b;
+  color: #e5e7eb;
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.btn:hover {
+  background: #273449;
+}
+
+.input,
+.textarea,
+.select {
+  width: 100%;
+  border: 1px solid #334155;
+  background: #0f172a;
+  color: #e5e7eb;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.textarea {
+  min-height: 160px;
+  font-family: Consolas, monospace;
+}

@@ -68,6 +68,14 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser. You should see the demo page rendering buttons, a table, and a theme switcher.
 
+To run the builder shell during M5:
+
+```bash
+npm run dev:builder
+```
+
+Open [http://localhost:3001](http://localhost:3001) and sign in on `/login` (scaffold auth flow).
+
 ---
 
 ## Available commands
@@ -75,9 +83,14 @@ Open [http://localhost:3000](http://localhost:3000) in your browser. You should 
 | Command | What it does |
 |---------|--------------|
 | `npm run dev` | Start the local development server with hot reload |
+| `npm run dev:builder` | Start the builder workspace dev server on port 3001 |
 | `npm run build` | Create a production-optimised build |
+| `npm run build:builder` | Build the builder workspace |
 | `npm run start` | Serve the production build (run `build` first) |
+| `npm run start:builder` | Serve the builder production build on port 3001 |
 | `npm run lint` | Run ESLint across all TypeScript/JavaScript files |
+| `npm run lint:builder` | Run ESLint for the builder workspace |
+| `npm run typecheck:builder` | Run TypeScript checks for the builder workspace |
 | `npm test` | Run the full Vitest suite once |
 | `npm run test:watch` | Run Vitest in watch mode during development |
 
@@ -117,3 +130,4 @@ This is configured in `apps/renderer/tsconfig.json` under `paths`.
 | `npm test` fails with "No test files found" | Add at least one `*.test.ts`/`*.test.tsx` file under `src/` |
 | Pre-commit hook fails | Run `npm run lint` manually, fix the errors, re-stage |
 | Port 3000 already in use | Next.js will try 3001, 3002, etc. automatically |
+| Builder app redirects to `/login` unexpectedly | Ensure the builder auth cookie is set by signing in at `/login` in the builder app |
